@@ -14,7 +14,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Пароль</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Игровой пароль" required>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Игровой пароль" minlength="6" required>
                     </div>
                     <div>
                         <button type="submit" class="btn btn-primary">Войти</button>
