@@ -20,15 +20,16 @@ class ForgotPasswordController extends Controller
     public function __invoke(Request $request): Response|RedirectResponse
     {
         try {
-            $request->validate(['email' => 'required|email|exists:users']);
+            $request->validate(
+                ['email' => 'required|email|exists:users'],
+                ['email.exists' => 'Пользователь с таким email не зарегистрирован.']
+            );
 
             $status = Password::sendResetLink(
                 $request->only('email')
             );
 
-            return $status === Password::RESET_LINK_SENT
-                ? back()->with(['status' => __($status)])
-                : back()->withErrors(['email' => __($status)]);
+            return response(['status' => $status, 'response' => $status === Password::RESET_LINK_SENT ? 'Письмо отправлено на вашу почту' : 'Ошибка']);
 
         } catch (Exception $e) {
             return response(['status' => 'error', 'response' => [$e->getMessage()]], HttpResponse::HTTP_BAD_REQUEST);
