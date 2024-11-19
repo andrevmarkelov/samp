@@ -6,3 +6,5 @@
 
 /* Стили страниц */
 @import './pages/home.css';
+@import './pages/profile.css';
+

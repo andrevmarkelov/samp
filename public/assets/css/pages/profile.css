@@ -1,0 +1,33 @@
+.profile-page {
+    background-color: #edf2fc;
+}
+
+.profile-card {
+    background: var(--white);
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: rgba(149, 157, 165, 0.2) 0 8px 24px;
+}
+
+.profile-menu {
+    list-style: none;
+}
+
+.profile-menu a,
+.profile-menu button {
+    color: var(--grey);
+    font-size: 17px;
+    font-weight: 500;
+    transition: 0.3s all;
+}
+
+.profile-menu a:hover,
+.profile-menu button:hover {
+    color: var(--light-blue);
+}
+
+.profile-menu button {
+    background: none;
+    border: none;
+    padding: 0;
+}
