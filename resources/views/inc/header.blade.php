@@ -31,7 +31,7 @@
                     </ul>
                 </div>
             @else
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loginModal">Войти</button>
+                <button class="btn-default" data-bs-toggle="modal" data-bs-target="#loginModal">Войти</button>
             @endif
         </div>
     </div>
