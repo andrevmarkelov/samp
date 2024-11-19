@@ -2,7 +2,7 @@
 
 @section('profile-content')
     <div>
-        <h1>Смена пароля</h1>
+        <h1 class="h3 text-center mb-3">Смена пароля</h1>
         <form id="changePasswordForm" action="{{ route('profile.settings.password') }}" method="POST">
             @csrf
             <div class="mb-3">
@@ -17,7 +17,7 @@
                 <label for="new_password_confirmation " class="form-label">Подтвердите новый пароль</label>
                 <input type="password" class="form-control" id="new_password_confirmation " name="new_password_confirmation " placeholder="Повторите новый пароль" minlength="6" required>
             </div>
-            <button type="submit" class="btn btn-primary">Сменить пароль</button>
+            <button type="submit" class="btn-default">Сменить пароль</button>
         </form>
 
     </div>
