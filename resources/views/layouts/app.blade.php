@@ -8,6 +8,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>SAMP Role Play</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="{{ asset('assets/css/main.css') }}">
+    <script src="{{ asset('assets/libs/particles/js/particles.min.js')}}"></script>
 </head>
 <body>
 
@@ -24,6 +26,9 @@
     @include('modals.login')
     @include('modals.forgot-password')
 
+    {{-- Scripts --}}
     @vite(['resources/js/requests.js'])
+    @stack('scripts')
+
 </body>
 </html>

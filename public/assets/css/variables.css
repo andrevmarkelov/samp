@@ -1,0 +1,15 @@
+@font-face {
+    font-family: 'OpenSans';
+    src: url('../fonts/OpenSans.ttf') format('truetype');
+    font-display: swap;
+}
+
+:root {
+    --white: #ffffff;
+    --light-blue: #54a8c7;
+    --dark-blue: #343f52;
+    --grey: #60697B;
+    --light-blue-2: #54A8C7;
+
+    --font-family: 'OpenSans', Arial;
+}

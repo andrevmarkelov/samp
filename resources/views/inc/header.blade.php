@@ -1,4 +1,4 @@
-<header class="p-3 mb-3 border-bottom">
+<header class="p-3 border-bottom">
     <div class="container">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
             <a href="{{ route('home') }}" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
@@ -15,11 +15,12 @@
             @if(session()->has('user'))
                 <div class="dropdown text-end">
                     <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="https://github.com/mdo.png" alt="1" width="32" height="32" class="rounded-circle">
+                        <img src="{{ asset('assets/images/skins/' . $user->p_skin . '.png') }}" alt="1" width="40" height="40" class="rounded-circle">
+                        {{ $user->username }}
                     </a>
                     <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1" style="">
                         <li><a class="dropdown-item" href="{{ route('profile.index') }}">Профиль</a></li>
-                        <li><a class="dropdown-item" href="#">Настройки</a></li>
+                        <li><a class="dropdown-item" href="{{ route('profile.settings') }}">Настройки</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <form action="{{ route('profile.logout') }}" method="POST">
