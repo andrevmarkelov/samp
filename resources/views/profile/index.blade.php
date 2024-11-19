@@ -1,8 +1,7 @@
-@extends('layouts.app')
+@extends('layouts.profile')
 
-@section('content')
-    <div class="container">
-        <h1>Личный кабинет, {{ $user->username }}!</h1>
+@section('profile-content')
+    <div class="profile-content">
         <p>Уровень: {{ $user->p_level  }}</p>
         <p>Деньги: {{ $user->p_money  }}</p>
         <p>Донат счет: {{ $user->p_donate  }}</p>

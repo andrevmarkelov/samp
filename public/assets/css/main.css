@@ -1,0 +1,8 @@
+/* Переменные */
+@import './variables.css';
+
+/* Базовые стили */
+@import './default.css';
+
+/* Стили страниц */
+@import './pages/home.css';

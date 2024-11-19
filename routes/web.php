@@ -18,5 +18,7 @@ Route::group(['prefix' => 'auth'], function () {
 
 Route::group(['prefix' => 'profile', 'middleware' => ['auth.user']], function () {
     Route::get('/', [ProfileController::class, 'index'])->name('profile.index');
+    Route::get('settings', [ProfileController::class, 'settings'])->name('profile.settings');
+    Route::post('settings', [ProfileController::class, 'changePassword'])->name('profile.settings.password');
     Route::post('logout', [AuthController::class, 'logout'])->name('profile.logout');
 });
