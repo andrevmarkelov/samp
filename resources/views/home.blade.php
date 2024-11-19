@@ -9,7 +9,7 @@
                     <div class="d-flex flex-column justify-content-center align-items-start col-md-6 intro-text mb-3">
                         <h1 class="mb-3">Samp Role Play</h1>
                         <p class="mb-5">Многопользовательская онлайн игра с огромным открытым миром, в котором ты можешь стать кем захочешь!</p>
-                        <a href="#howToPlay" class="p-2">Начать игру</a>
+                        <a href="#howToPlay" class="btn-default">Начать игру</a>
                     </div>
 
                     <div class="d-flex justify-content-center align-items-center col-md-6">
@@ -86,19 +86,191 @@
                         <span class="section-subtitle mb-2">Что такое Role Play?</span>
                         <h2>Погружение в мир SAMP: выбери свою роль и стань частью истории</h2>
                     </div>
-
                     <p>
                         <strong>Ролевая игра (role-play)</strong> - Это режим игры, в котором игроки отыгрывают роли определённых персонажей. Ролей гораздо больше,
                         чем вы можете себе представить, вас ограничивает только ваше воображение! Начав играть в Samp Role Play,
                         вам предстоит придерживаться игровой концепции: вести себя в соответствии с характером и историей своего персонажа.
                     </p>
-
                     <p>
                         После регистрации и первого входа в игру, вы становитесь законопослушным гражданином штата San Andreas.
                         Отсюда начинается ваш увлекательный путь, и дальнейшая судьба персонажа зависит только от ваших решений.
                         Остаться законопослушным гражданином, вступив в государственную организацию, или стать частью криминального мира,
                         постепенно завоевывая авторитет? Выбор зависит только от вас!
                     </p>
+                </div>
+            </div>
+        </div>
+
+        {{-- Почему именно мы --}}
+        <div class="container py-5">
+            <div class="row">
+                <div class="d-flex flex-column justify-content-center col-md-6">
+                    <div class="section-header mb-4">
+                        <span class="section-subtitle mb-2">Почему именно мы?</span>
+                        <h2>Узнайте, что выделяет наш сервер среди других и делает игру незабываемой</h2>
+                    </div>
+
+                    <div class="why-we__accordion">
+                        <div class="accordion-item mb-3">
+                            <div class="accordion-header active"><i class="bi bi-arrow-down-short"></i> Уникальный игровой мод</div>
+                            <div class="accordion-content ms-4 active">
+                                Наш сервер предлагает эксклюзивные игровые возможности, тщательно продуманные механики и
+                                уникальные системы, которые делают каждую сессию незабываемой. Здесь вы найдете то, чего нет на других серверах!
+                            </div>
+                        </div>
+
+                        <div class="accordion-item mb-3">
+                            <div class="accordion-header"><i class="bi bi-arrow-down-short"></i> Стабильный и активный онлайн</div>
+                            <div class="accordion-content ms-4">
+                                У нас всегда есть с кем играть! Постоянно высокий онлайн и дружное комьюнити создают атмосферу,
+                                в которой легко найти новых друзей или союзников для захватывающих приключений.
+                            </div>
+                        </div>
+
+                        <div class="accordion-item mb-3">
+                            <div class="accordion-header"><i class="bi bi-arrow-down-short"></i> Активная администрация и справедливость</div>
+                            <div class="accordion-content ms-4">
+                                Наша команда администраторов всегда на связи, чтобы поддерживать порядок и обеспечивать комфорт
+                                для каждого игрока. Справедливое решение любых споров — наша главная задача.
+                            </div>
+                        </div>
+
+                        <div class="accordion-item mb-3">
+                            <div class="accordion-header"><i class="bi bi-arrow-down-short"></i> Интересные мероприятия и захватывающий РП-сценарий</div>
+                            <div class="accordion-content ms-4">
+                                Регулярные ивенты, конкурсы, а также яркие ролевые ситуации добавляют динамики и погружают
+                                в уникальный мир игры, где каждый может проявить свои таланты.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-md-6">
+                    <img src="{{ asset('assets/images/home-page/why-we.png') }}" alt="Почему именно мы" class="w-100">
+                </div>
+            </div>
+        </div>
+
+        {{-- Присоединяйтесь к нам --}}
+        <div class="join-us mb-5">
+            <div class="container">
+                <div class="section-header mb-4">
+                    <span class="section-subtitle mb-2 text-white">Присоединяйтесь к нам</span>
+                    <h2 class="text-white mb-5">Тысячи игроков уже выбрали нас! Откройте для себя мир новых возможностей и захватывающих приключений</h2>
+                    <a href="samp://127.0.0.1:7777">Присоединиться</a>
+                </div>
+            </div>
+        </div>
+
+        {{-- Новости --}}
+        <div class="container py-5">
+            <div class="section-header mb-4">
+                <span class="section-subtitle mb-2">Все важные обновления и события</span>
+                <h2>Будьте в курсе всех новостей, обновлений и предстоящих мероприятий на сервере!</h2>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="news-item mb-3">
+                        <a href="{{ route('home') }}" class="d-block news-item__image mb-3">
+                            <img src="{{ asset('/assets/images/home-page/join-us.webp') }}" alt="News Title">
+                        </a>
+                        <a href="{{ route('home') }}" class="news-item__title mb-2">Ligula tristique quis risus risus</a>
+                        <p class="news-item__description">
+                            Mauris convallis non ligula non interdum. Gravida vulputate convallis tempus vestibulum cras
+                            imperdiet nun eu dolor. Aenean lacinia bibendum nulla sed.
+                        </p>
+                        <div class="d-flex justify-content-end align-items-center gap-2 news-item__date">
+                            <i class="bi bi-calendar3"></i>
+                            <span>19.11.2024</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="news-item mb-3">
+                        <a href="{{ route('home') }}" class="d-block news-item__image mb-3">
+                            <img src="{{ asset('/assets/images/home-page/join-us.webp') }}" alt="News Title">
+                        </a>
+                        <a href="{{ route('home') }}" class="news-item__title mb-2">Ligula tristique quis risus Ligula tristique quis risus</a>
+                        <p class="news-item__description">
+                            Mauris convallis non ligula non interdum. Gravida vulputate convallis tempus vestibulum cras
+                            imperdiet nun eu dolor. Aenean lacinia bibendum nulla sed. Mauris convallis non ligula non
+                            interdum. Gravida vulputate convallis tempus vestibulum cras imperdiet nun eu dolor.
+                            Aenean lacinia bibendum nulla sed.
+                        </p>
+                        <div class="d-flex justify-content-end align-items-center gap-2 news-item__date">
+                            <i class="bi bi-calendar3"></i>
+                            <span>19.11.2024</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="news-item mb-3">
+                        <a href="{{ route('home') }}" class="d-block news-item__image mb-3">
+                            <img src="{{ asset('/assets/images/home-page/join-us.webp') }}" alt="News Title">
+                        </a>
+                        <a href="{{ route('home') }}" class="news-item__title mb-2">Ligula tristique quis risus</a>
+                        <p class="news-item__description">
+                            Mauris convallis non ligula non interdum. Gravida vulputate convallis tempus vestibulum cras
+                            imperdiet nun eu dolor. Aenean lacinia bibendum nulla sed. imperdiet nun eu dolor. Aenean lacinia bibendum nulla sed.
+                            imperdiet nun eu dolor. Aenean lacinia bibendum nulla sed.
+                        </p>
+                        <div class="d-flex justify-content-end align-items-center gap-2 news-item__date">
+                            <i class="bi bi-calendar3"></i>
+                            <span>19.11.2024</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center align-items-center mt-5">
+                <a href="{{ route('home') }}" class="btn-default">Все новости</a>
+            </div>
+        </div>
+
+        {{-- Будем на связи --}}
+        <div class="container py-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <img src="{{ asset('assets/images/home-page/contacts.png') }}" alt="Будем на связи" class="w-100">
+                </div>
+                <div class="col-md-6 d-flex flex-column justify-content-center">
+                    <div class="section-header mb-4">
+                        <span class="section-subtitle mb-2">Будем на связи</span>
+                        <h2>Заводи знакомства в соцсетях и стань частью нашего комьюнити</h2>
+                    </div>
+
+                    <div class="d-flex align-items-start contact-item gap-3 mb-2">
+                        <i class="bi bi-discord"></i>
+                        <div class="d-flex flex-column gap-1">
+                            <a href="https://discord.com/" target="_blank">Discord</a>
+                            <p class="contact-description">Присоединяйся к нашему серверу в Discord для общения, совместных игр и участия в мероприятиях</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-start contact-item gap-3 mb-2">
+                        <i class="bi bi-chat-heart-fill"></i>
+                        <div class="d-flex flex-column gap-1">
+                            <a href="https://vk.com/" target="_blank">ВКонтакте</a>
+                            <p class="contact-description">Следи за новостями, обсуждениями и обновлениями на нашей странице ВКонтакте</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-start contact-item gap-3 mb-2">
+                        <i class="bi bi-youtube"></i>
+                        <div class="d-flex flex-column gap-1">
+                            <a href="https://www.youtube.com/" target="_blank">YouTube</a>
+                            <p class="contact-description">Смотри наши видео, стримы и гайды на официальном канале YouTube.</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-start contact-item gap-3 mb-2">
+                        <i class="bi bi-telegram"></i>
+                        <div class="d-flex flex-column gap-1">
+                            <a href="https://telegram.org/" target="_blank">Telegram</a>
+                            <p class="contact-description">Будь в курсе всех новостей и важной информации через наш канал в Telegram.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -183,6 +355,26 @@
 
             container.addEventListener('mouseleave', () => {
                 image.style.transform = "rotateX(0deg) rotateY(0deg)";
+            });
+
+            // Аккордеон
+            const headers = document.querySelectorAll('.why-we__accordion .accordion-header');
+
+            headers.forEach(header => {
+                header.addEventListener('click', () => {
+                    const allContents = document.querySelectorAll('.why-we__accordion .accordion-content');
+                    const allHeaders = document.querySelectorAll('.why-we__accordion .accordion-header');
+
+                    allContents.forEach(content => content.classList.remove('active'));
+                    allHeaders.forEach(h => h.classList.remove('active'));
+
+                    const content = header.nextElementSibling;
+
+                    if (content) {
+                        content.classList.add('active');
+                        header.classList.add('active');
+                    }
+                });
             });
         });
     </script>

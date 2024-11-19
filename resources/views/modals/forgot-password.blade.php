@@ -12,7 +12,7 @@
                         <label for="email" class="form-label">Email</label>
                         <input type="email" class="form-control" id="email" name="email" placeholder="Игровая почта" required>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Восстановить</button>
+                    <button type="submit" class="btn-default w-100">Восстановить</button>
                 </form>
             </div>
         </div>

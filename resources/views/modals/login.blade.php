@@ -17,7 +17,7 @@
                         <input type="password" class="form-control" id="password" name="password" placeholder="Игровой пароль" minlength="6" required>
                     </div>
                     <div>
-                        <button type="submit" class="btn btn-primary">Войти</button>
+                        <button type="submit" class="btn-default">Войти</button>
                         <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Забыли пароль?</button>
                     </div>
                 </form>
