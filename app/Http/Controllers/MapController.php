@@ -16,11 +16,11 @@ class MapController extends Controller
     public function index(): View
     {
         $houses = House::with('user:id,username')
-            ->select('name', 'description', 'price', 'entrance_x', 'entrance_y')
+            ->select('id', 'name', 'description', 'price', 'entrance_x', 'entrance_y', 'user_id')
             ->get();
 
         $business = Business::with('user:id,username')
-            ->select('name', 'description', 'price', 'entrance_x', 'entrance_y')
+            ->select('id', 'name', 'description', 'price', 'entrance_x', 'entrance_y', 'user_id')
             ->get();
 
         return view('profile.map', [
