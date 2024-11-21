@@ -5,6 +5,7 @@
 
 <ul class="profile-menu">
     <li class="mb-2"><a href="{{ route('profile.index') }}">Личный кабинет</a></li>
+    <li class="mb-2"><a href="{{ route('profile.map') }}">Карта</a></li>
     <li class="mb-2"><a href="{{ route('profile.settings') }}">Магазин</a></li>
     <li class="mb-2"><a href="{{ route('profile.settings') }}">Настройки</a></li>
     <li>

@@ -16,7 +16,6 @@
 .profile-menu a,
 .profile-menu button {
     color: var(--grey);
-    font-size: 17px;
     font-weight: 500;
     transition: 0.3s all;
 }
@@ -30,4 +29,17 @@
     background: none;
     border: none;
     padding: 0;
+}
+
+.canvas-map {
+    border-radius: 8px;
+    background-color: #edf2fc;
+    cursor: grab;
+}
+
+@media screen and (max-width: 1200px) {
+    .canvas-map {
+        width: 100%;
+        height: auto;
+    }
 }

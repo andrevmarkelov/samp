@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -47,5 +48,26 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Связь "один ко многим" с моделью House
+     * У одного пользователя может быть несколько домов
+     *
+     * @return HasMany
+     */
+    public function houses(): HasMany
+    {
+        return $this->hasMany(House::class);
+    }
+
+    /**
+     * Связь "один ко многим" с моделью Business
+     *
+     * @return HasMany
+     */
+    public function businesses(): HasMany
+    {
+        return $this->hasMany(Business::class);
     }
 }
