@@ -5,7 +5,7 @@
         <div class="container py-5">
             <div class="row">
                 <div class="col-md-3">
-                    <div class="profile-card">
+                    <div class="profile-card mb-5">
                         @include('inc.profile-menu')
                     </div>
                 </div>
