@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ChangePasswordRequest;
+use App\Models\Payment;
 use App\Models\User;
 use App\Notifications\PasswordChangedNotification;
 use Exception;
@@ -73,8 +74,14 @@ class ProfileController extends Controller
     public function paymentHistory(): View|Response
     {
         try {
+            $userId = session('user');
+
+            $payments = Payment::where('user_id', $userId)
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+
             return view('profile.payment-history', [
-                'payments' => $payments ?? []
+                'payments' => $payments ?? [],
             ]);
         } catch (Exception $e) {
             return response(['status' => 'error', 'response' => [$e->getMessage()]], HttpResponse::HTTP_BAD_REQUEST);
