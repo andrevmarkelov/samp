@@ -70,4 +70,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Business::class);
     }
+
+    /**
+     * Связь "один ко многим" с моделью Payment
+     *
+     * @return HasMany
+     */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
 }

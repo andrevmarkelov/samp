@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Notifications\PasswordChangedNotification;
 use Exception;
 use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
@@ -59,6 +60,22 @@ class ProfileController extends Controller
             $user->notify(new PasswordChangedNotification());
 
             return response(['status' => 'success', 'response' => 'Пароль успешно изменён.']);
+        } catch (Exception $e) {
+            return response(['status' => 'error', 'response' => [$e->getMessage()]], HttpResponse::HTTP_BAD_REQUEST);
+        }
+    }
+
+    /**
+     * История платежей
+     *
+     * @return View|Response
+     */
+    public function paymentHistory(): View|Response
+    {
+        try {
+            return view('profile.payment-history', [
+                'payments' => $payments ?? []
+            ]);
         } catch (Exception $e) {
             return response(['status' => 'error', 'response' => [$e->getMessage()]], HttpResponse::HTTP_BAD_REQUEST);
         }

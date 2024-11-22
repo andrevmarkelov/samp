@@ -6,9 +6,12 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ResetPasswordController;
+use App\Http\Controllers\ShopController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('shop', [ShopController::class, 'index'])->name('shop');
+Route::post('shop', [ShopController::class, 'processPayment'])->name('payment');
 
 Route::group(['prefix' => 'auth'], function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');
@@ -24,6 +27,8 @@ Route::group(['prefix' => 'profile', 'middleware' => ['auth.user']], function ()
 
     Route::get('settings', [ProfileController::class, 'settings'])->name('profile.settings');
     Route::post('settings', [ProfileController::class, 'changePassword'])->name('profile.settings.password');
+
+    Route::get('payment-history', [ProfileController::class, 'paymentHistory'])->name('profile.payment.history');
 
     Route::post('logout', [AuthController::class, 'logout'])->name('profile.logout');
 });
