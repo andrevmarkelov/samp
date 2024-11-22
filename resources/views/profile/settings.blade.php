@@ -14,8 +14,8 @@
                 <input type="password" class="form-control" id="new_password" name="new_password" placeholder="Введите новый пароль" minlength="6" required>
             </div>
             <div class="mb-3">
-                <label for="new_password_confirmation " class="form-label">Подтвердите новый пароль</label>
-                <input type="password" class="form-control" id="new_password_confirmation " name="new_password_confirmation " placeholder="Повторите новый пароль" minlength="6" required>
+                <label for="new_password_confirmation" class="form-label">Подтвердите новый пароль</label>
+                <input type="password" class="form-control" id="new_password_confirmation" name="new_password_confirmation" placeholder="Повторите новый пароль" minlength="6" required>
             </div>
             <button type="submit" class="btn-default">Сменить пароль</button>
         </form>
@@ -31,10 +31,10 @@
             const form = new FormData(event.target);
             const current_password = form.get('current_password');
             const new_password = form.get('new_password');
-            const new_password_confirmation  = form.get('new_password_confirmation ');
+            const new_password_confirmation  = form.get('new_password_confirmation');
 
             try {
-                const response = await axios.post('/profile/settings', {current_password, new_password, new_password_confirmation }, {
+                const response = await axios.post('/profile/settings', { current_password, new_password, new_password_confirmation }, {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
                         'Content-Type': 'application/json',
@@ -43,10 +43,10 @@
                 });
 
                 if (response.status === 200) {
-                    const errorText = document.createElement('div');
-                    errorText.className = 'alert alert-success';
-                    errorText.textContent = response.data.response;
-                    event.target.parentNode.prepend(errorText);
+                    const successText = document.createElement('div');
+                    successText.className = 'alert alert-success';
+                    successText.textContent = response.data.response;
+                    event.target.parentNode.prepend(successText);
                 }
 
             } catch (error) {
