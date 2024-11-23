@@ -26,6 +26,32 @@ a {
     background-color: var(--light-blue-2);
 }
 
+.color-grey {
+    color: var(--grey);
+}
+
+.footer {
+    box-shadow: 0 25px 30px 0 rgba(0, 0, 0, .5);
+}
+
+.footer-bottom {
+    font-size: 14px;
+}
+
+.footer-bottom a,
+.footer-contacts a {
+    transition: 0.3s all;
+}
+
+.footer-bottom a:hover,
+.footer-contacts a:hover {
+    color: var(--light-blue);
+}
+
+.footer-contacts i {
+    font-size: 25px;
+}
+
 .btn-default {
     padding: 10px 24px;
     background-color: var(--light-blue);

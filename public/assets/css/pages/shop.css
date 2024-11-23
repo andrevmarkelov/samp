@@ -4,10 +4,6 @@
     font-size: 48px;
 }
 
-.info-shop__text {
-    color: var(--grey);
-}
-
 .shop-img__container {
     perspective: 1000px;
 }

@@ -6,7 +6,7 @@
             <div class="container py-5">
                 <div class="row">
 
-                    <div class="d-flex flex-column justify-content-center align-items-start col-md-6 intro-text mb-3">
+                    <div class="d-flex flex-column justify-content-center align-items-start col-md-6 intro-text mb-4">
                         <h1 class="mb-3">Samp Role Play</h1>
                         <p class="mb-5">Многопользовательская онлайн игра с огромным открытым миром, в котором ты можешь стать кем захочешь!</p>
                         <a href="#howToPlay" class="btn-default">Начать игру</a>
@@ -14,7 +14,7 @@
 
                     <div class="d-flex justify-content-center align-items-center col-md-6">
                         <div class="intro-img__container">
-                            <img src="{{ asset('assets/images/home-page/intro.png') }}" alt="1" class="intro-img">
+                            <img src="{{ asset('assets/images/home-page/intro.png') }}" alt="Samp Role Play" class="intro-img">
                         </div>
                     </div>
 
@@ -33,7 +33,7 @@
 
             <div id="howToPlay" class="row">
                 <div class="col-md-4 col-lg-3">
-                    <div class="how-to-play__item mb-3">
+                    <div class="how-to-play__item mb-4">
                         <div class="mb-4 how-to-play__icon">
                             <i class="bi bi-controller"></i>
                         </div>
@@ -43,7 +43,7 @@
                     </div>
                 </div>
                 <div class="col-md-4 col-lg-3">
-                    <div class="how-to-play__item mb-3">
+                    <div class="how-to-play__item mb-4">
                         <div class="mb-4 how-to-play__icon">
                             <i class="bi bi-aspect-ratio"></i>
                         </div>
@@ -53,7 +53,7 @@
                     </div>
                 </div>
                 <div class="col-md-4 col-lg-3">
-                    <div class="how-to-play__item mb-3">
+                    <div class="how-to-play__item mb-4">
                         <div class="mb-4 how-to-play__icon">
                             <i class="bi bi-cloud-download"></i>
                         </div>
@@ -63,7 +63,7 @@
                     </div>
                 </div>
                 <div class="col-md-4 col-lg-3">
-                    <div class="how-to-play__item mb-3">
+                    <div class="how-to-play__item mb-4">
                         <div class="mb-4 how-to-play__icon">
                             <i class="bi bi-check2-square"></i>
                         </div>
@@ -154,24 +154,32 @@
         {{-- Присоединяйтесь к нам --}}
         <div class="join-us mb-5">
             <div class="container">
-                <div class="section-header mb-4">
-                    <span class="section-subtitle mb-2 text-white">Присоединяйтесь к нам</span>
-                    <h2 class="text-white mb-5">Тысячи игроков уже выбрали нас! Откройте для себя мир новых возможностей и захватывающих приключений</h2>
-                    <a href="samp://127.0.0.1:7777">Присоединиться</a>
+                <div class="row">
+                    <div class="col-md-9">
+                        <div class="section-header mb-4">
+                            <span class="section-subtitle mb-2 text-white">Присоединяйтесь к нам</span>
+                            <h2 class="text-white mb-5">Тысячи игроков уже выбрали нас! Откройте для себя мир новых возможностей и захватывающих приключений</h2>
+                            <a href="samp://127.0.0.1:7777">Присоединиться</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
         {{-- Новости --}}
         <div class="container py-5">
-            <div class="section-header mb-4">
-                <span class="section-subtitle mb-2">Все важные обновления и события</span>
-                <h2>Будьте в курсе всех новостей, обновлений и предстоящих мероприятий на сервере!</h2>
+            <div class="row mb-5">
+                <div class="col-md-8">
+                    <div class="section-header">
+                        <span class="section-subtitle mb-2">Все важные обновления и события</span>
+                        <h2>Будьте в курсе всех новостей, обновлений и предстоящих мероприятий на сервере!</h2>
+                    </div>
+                </div>
             </div>
 
             <div class="row">
                 <div class="col-md-4">
-                    <div class="news-item mb-3">
+                    <div class="news-item mb-4">
                         <a href="{{ route('home') }}" class="d-block news-item__image mb-3">
                             <img src="{{ asset('/assets/images/home-page/join-us.webp') }}" alt="News Title">
                         </a>
@@ -187,7 +195,7 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="news-item mb-3">
+                    <div class="news-item mb-4">
                         <a href="{{ route('home') }}" class="d-block news-item__image mb-3">
                             <img src="{{ asset('/assets/images/home-page/join-us.webp') }}" alt="News Title">
                         </a>
@@ -205,7 +213,7 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="news-item mb-3">
+                    <div class="news-item mb-4">
                         <a href="{{ route('home') }}" class="d-block news-item__image mb-3">
                             <img src="{{ asset('/assets/images/home-page/join-us.webp') }}" alt="News Title">
                         </a>
