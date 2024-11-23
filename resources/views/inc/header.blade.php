@@ -2,14 +2,14 @@
     <div class="container">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
             <a href="{{ route('home') }}" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none me-4">
-                <img src="{{ asset('assets/images/logo.png') }}" width="100" alt="Samp Role Play">
+                <img src="{{ asset('assets/images/logo.png') }}" width="100" alt="{{ $serverName }}">
             </a>
 
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                 <li><a href="{{ route('home') }}" class="nav-link px-2 link-dark">Главная</a></li>
                 <li><a href="#" class="nav-link px-2 link-dark">Новости</a></li>
                 <li><a href="{{ route('shop') }}" class="nav-link px-2 link-dark">Магазин</a></li>
-                <li><a href="{{ route('about')  }}" class="nav-link px-2 link-dark">О нас</a></li>
+                <li><a href="{{ route('company.about')  }}" class="nav-link px-2 link-dark">О нас</a></li>
             </ul>
 
             @if(session()->has('user'))
