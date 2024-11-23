@@ -2,7 +2,7 @@
 <div class="container py-4">
     <div class="row">
         <div class="col-md-6">
-            <img src="{{ asset('assets/images/home-page/contacts.png') }}" alt="Будем на связи" class="w-100">
+            <img src="{{ asset('assets/images/home-page/contacts.png') }}" alt="Будем на связи" class="w-100 mb-4">
         </div>
         <div class="col-md-6 d-flex flex-column justify-content-center">
             <div class="section-header mb-4">

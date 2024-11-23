@@ -1,16 +1,8 @@
-.about-description {
-    color: var(--grey);
-}
-
 .about-intro__text h1 {
     text-transform: uppercase;
     font-weight: bold;
     color: var(--dark-blue);
     font-size: 26px;
-}
-
-.about-intro__text p {
-    color: var(--grey);
 }
 
 .about-img__container {

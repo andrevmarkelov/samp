@@ -18,7 +18,7 @@
                     </div>
                     <div>
                         <button type="submit" class="btn-default">Войти</button>
-                        <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Забыли пароль?</button>
+                        <button type="button" class="btn btn-link color-grey text-decoration-none" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Забыли пароль?</button>
                     </div>
                 </form>
             </div>

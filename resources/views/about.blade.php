@@ -7,7 +7,7 @@
                 <div class="col-md-6 d-flex flex-column justify-content-center">
                     <div class="about-intro__text">
                         <h1 class="mb-3">О проекте Samp Role Play</h1>
-                        <p>
+                        <p class="color-grey">
                             Один из самых интересных проектов многопользовательской игры GTA San Andreas Multiplayer.
                             Увлекательные особенности игрового процесса привлекают всё больше новых игроков.
                         </p>
@@ -28,7 +28,7 @@
     <div class="container py-5">
         <div class="row">
             <div class="col-md-6">
-                <img src="{{ asset('assets/images/about/about.png') }}" alt="" class="w-100">
+                <img src="{{ asset('assets/images/about/about.png') }}" alt="Стань частью нашей игры" class="w-100 mb-3">
             </div>
 
             <div class="col-md-6 d-flex flex-column justify-content-center">
@@ -37,7 +37,7 @@
                     <h2>Выбирай свою роль, строй карьеру и управляй страной</h2>
                 </div>
 
-                <p class="about-description">
+                <p class="color-grey">
                     Мы постарались объединить лучшие элементы ролевой игры SA-MP с новыми идеями и широкими возможностями для всех игроков.
                     Поселившись в одном из городов и став полноценным гражданином, вы сможете выбрать любимую работу, а возможно, открыть свое небольшое дело и получать постоянный доход.
                     А может быть, вам захочется вступить в одну из организаций и начать карьерный рост, пока не достигнете желаемой высоты.
