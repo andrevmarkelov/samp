@@ -7,14 +7,14 @@
                 <div class="row">
 
                     <div class="d-flex flex-column justify-content-center align-items-start col-md-6 intro-text mb-4">
-                        <h1 class="mb-3">Samp Role Play</h1>
+                        <h1 class="mb-3">{{ $serverName }}</h1>
                         <p class="mb-5">Многопользовательская онлайн игра с огромным открытым миром, в котором ты можешь стать кем захочешь!</p>
                         <a href="#howToPlay" class="btn-default">Начать игру</a>
                     </div>
 
                     <div class="d-flex justify-content-center align-items-center col-md-6">
                         <div class="intro-img__container">
-                            <img src="{{ asset('assets/images/home-page/intro.png') }}" alt="Samp Role Play" class="intro-img">
+                            <img src="{{ asset('assets/images/home-page/intro.png') }}" alt="{{ $serverName }}" class="intro-img">
                         </div>
                     </div>
 
@@ -68,8 +68,8 @@
                             <i class="bi bi-check2-square"></i>
                         </div>
                         <h3>Укажи IP-адрес</h3>
-                        <p>Введи IP-адрес 127.0.0.1:7777 в настройках клиента SAMP</p>
-                        <a href="samp://127.0.0.1:7777" class="d-flex align-items-center gap-2" target="_blank">Открыть <i class="bi bi-arrow-right"></i></a>
+                        <p>Введи IP-адрес {{ $serverIP }} в настройках клиента SAMP</p>
+                        <a href="samp://{{ $serverIP }}" class="d-flex align-items-center gap-2" target="_blank">Открыть <i class="bi bi-arrow-right"></i></a>
                     </div>
                 </div>
             </div>
@@ -88,7 +88,7 @@
                     </div>
                     <p>
                         <strong>Ролевая игра (role-play)</strong> - Это режим игры, в котором игроки отыгрывают роли определённых персонажей. Ролей гораздо больше,
-                        чем вы можете себе представить, вас ограничивает только ваше воображение! Начав играть в Samp Role Play,
+                        чем вы можете себе представить, вас ограничивает только ваше воображение! Начав играть на {{ $serverName }},
                         вам предстоит придерживаться игровой концепции: вести себя в соответствии с характером и историей своего персонажа.
                     </p>
                     <p>
@@ -159,7 +159,7 @@
                         <div class="section-header mb-4">
                             <span class="section-subtitle mb-2 text-white">Присоединяйтесь к нам</span>
                             <h2 class="text-white mb-5">Тысячи игроков уже выбрали нас! Откройте для себя мир новых возможностей и захватывающих приключений</h2>
-                            <a href="samp://127.0.0.1:7777">Присоединиться</a>
+                            <a href="samp://{{ $serverIP }}">Присоединиться</a>
                         </div>
                     </div>
                 </div>

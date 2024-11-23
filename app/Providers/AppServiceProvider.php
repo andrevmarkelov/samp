@@ -30,5 +30,8 @@ class AppServiceProvider extends ServiceProvider
 
         View::composer('inc.header', HeaderComposer::class);
         View::composer('inc.profile-menu', ProfileMenuComposer::class);
+
+        View::share('serverName', config('app.samp_server_name'));
+        View::share('serverIP', config('app.samp_server_ip'));
     }
 }

@@ -6,7 +6,7 @@
             <div class="row">
                 <div class="col-md-6 d-flex flex-column justify-content-center">
                     <div class="about-intro__text">
-                        <h1 class="mb-3">О проекте Samp Role Play</h1>
+                        <h1 class="mb-3">О проекте {{ $serverName }}</h1>
                         <p class="color-grey">
                             Один из самых интересных проектов многопользовательской игры GTA San Andreas Multiplayer.
                             Увлекательные особенности игрового процесса привлекают всё больше новых игроков.
@@ -15,7 +15,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="about-img__container">
-                        <img src="{{ asset('assets/images/about/about-intro.png') }}" alt="О проекте Samp Role Play" class="about-img">
+                        <img src="{{ asset('assets/images/about/about-intro.png') }}" alt="О проекте {{ $serverName }}" class="about-img">
                     </div>
                 </div>
             </div>
@@ -55,7 +55,7 @@
             <div class="section-header mb-4">
                 <span class="section-subtitle mb-2 text-white">Присоединяйтесь к нам</span>
                 <h2 class="text-white mb-5">Тысячи игроков уже выбрали нас! Откройте для себя мир новых возможностей и захватывающих приключений</h2>
-                <a href="samp://127.0.0.1:7777">Присоединиться</a>
+                <a href="samp://{{ $serverIP }}">Присоединиться</a>
             </div>
         </div>
     </div>

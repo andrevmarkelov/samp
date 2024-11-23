@@ -26,6 +26,10 @@ a {
     background-color: var(--light-blue-2);
 }
 
+.color-dark-blue {
+    color: var(--dark-blue);
+}
+
 .color-grey {
     color: var(--grey);
 }
@@ -50,6 +54,7 @@ a {
 
 .footer-contacts i {
     font-size: 25px;
+    color: var(--light-blue);
 }
 
 .btn-default {
