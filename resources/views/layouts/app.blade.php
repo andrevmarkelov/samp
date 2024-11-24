@@ -6,7 +6,7 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>SAMP Role Play</title>
+    <title>SAMP: Играй в GTA San Andreas Multiplayer на {{ $serverName }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="{{ asset('assets/css/main.css') }}">
     <script src="{{ asset('assets/libs/particles/js/particles.min.js')}}"></script>
@@ -28,7 +28,16 @@
 
     {{-- Scripts --}}
     @vite(['resources/js/requests.js'])
+    <script src="{{ asset('assets/js/main.js') }}"></script>
     @stack('scripts')
+
+    {{-- Кнопка наверх --}}
+    <button id="toTopBtn">
+        <i class="bi bi-arrow-up-short"></i>
+        <svg class="progress-ring" width="60" height="60">
+            <circle class="progress-ring__circle" cx="30" cy="30" r="28" />
+        </svg>
+    </button>
 
 </body>
 </html>

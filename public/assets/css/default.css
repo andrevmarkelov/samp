@@ -67,3 +67,46 @@ a {
     cursor: pointer;
     border: none;
 }
+
+#toTopBtn {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    width: 60px;
+    height: 60px;
+    background-color: transparent;
+    color: var(--light-blue);
+    font-size: 32px;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s, visibility 0.3s;
+    z-index: 1000;
+}
+
+#toTopBtn.visible {
+    visibility: visible;
+    opacity: 1;
+}
+
+.progress-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: rotate(-90deg);
+    z-index: -1;
+}
+
+.progress-ring__circle {
+    fill: none;
+    stroke: var(--light-blue);
+    stroke-width: 2;
+    stroke-dasharray: 175;
+    stroke-dashoffset: 175;
+    transition: stroke-dashoffset 0.2s linear;
+}
