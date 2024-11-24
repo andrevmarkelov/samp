@@ -39,3 +39,5 @@ Route::group(['prefix' => 'company'], function () {
     Route::get('user-agreement', [PageController::class, 'userAgreement'])->name('user.agreement');
     Route::get('privacy-policy', [PageController::class, 'privacyPolicy'])->name('privacy.policy');
 });
+
+require_once __DIR__ . '/admin.php';

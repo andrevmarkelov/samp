@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AuthenticateAdmin;
 use App\Http\Middleware\AuthenticateUser;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -14,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'auth.user' => AuthenticateUser::class,
+            'auth.admin' => AuthenticateAdmin::class,
         ]);
 
         $middleware->trustProxies(at: '*');
