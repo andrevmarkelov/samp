@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Business;
+use App\Models\House;
+use App\Models\User;
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -16,6 +18,14 @@ class HomeController extends Controller
      */
     public function index(): View
     {
-        return view('admin.home');
+        $users = User::count();
+        $houses = House::count();
+        $businesses = Business::count();
+
+        return view('admin.home', [
+            'users' => $users,
+            'houses' => $houses,
+            'businesses' => $businesses,
+        ]);
     }
 }

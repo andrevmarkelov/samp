@@ -8,6 +8,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Администрирование - {{ $serverName }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="{{ asset('assets/libs/quill/css/quill.css') }}">
 </head>
 <body class="bg-body-secondary">
 
@@ -21,5 +22,8 @@
         </div>
     </div>
 
+    {{-- Scripts --}}
+    <script src="{{ asset('assets/libs/quill/js/quill.js')}}"></script>
+    @stack('scripts')
 </body>
 </html>

@@ -11,7 +11,7 @@
             </a>
         </li>
         <li>
-            <a href="#" class="nav-link link-body-emphasis">
+            <a href="{{ route('admin.news') }}" class="nav-link link-body-emphasis">
                 <i class="bi bi-newspaper"></i>
                 Новости
             </a>
