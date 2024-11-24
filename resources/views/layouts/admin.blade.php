@@ -9,9 +9,17 @@
     <title>Администрирование - {{ $serverName }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body>
+<body class="bg-body-secondary">
 
-    <div id="content">@yield('content')</div>
+    <div class="d-flex">
+        {{-- Меню --}}
+        @include('admin.inc.menu')
+
+        {{-- Контент --}}
+        <div id="content" class="bg-body-tertiary m-5 p-5 w-100 shadow-sm rounded">
+            @yield('content')
+        </div>
+    </div>
 
 </body>
 </html>
