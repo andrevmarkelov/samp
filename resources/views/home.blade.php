@@ -166,75 +166,29 @@
             </div>
         </div>
 
-        {{-- Новости --}}
-        <div class="container py-5">
-            <div class="row mb-5">
-                <div class="col-md-8">
-                    <div class="section-header">
-                        <span class="section-subtitle mb-2">Все важные обновления и события</span>
-                        <h2>Будьте в курсе всех новостей, обновлений и предстоящих мероприятий на сервере!</h2>
+        @if ($news->isNotEmpty())
+            {{-- Новости --}}
+            <div class="container py-5">
+                <div class="row mb-5">
+                    <div class="col-md-8">
+                        <div class="section-header">
+                            <span class="section-subtitle mb-2">Все важные обновления и события</span>
+                            <h2>Будьте в курсе всех новостей, обновлений и предстоящих мероприятий на сервере!</h2>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="news-item mb-4">
-                        <a href="{{ route('home') }}" class="d-block news-item__image mb-3">
-                            <img src="{{ asset('/assets/images/home-page/join-us.webp') }}" alt="News Title">
-                        </a>
-                        <a href="{{ route('home') }}" class="news-item__title mb-2">Ligula tristique quis risus risus</a>
-                        <p class="news-item__description">
-                            Mauris convallis non ligula non interdum. Gravida vulputate convallis tempus vestibulum cras
-                            imperdiet nun eu dolor. Aenean lacinia bibendum nulla sed.
-                        </p>
-                        <div class="d-flex justify-content-end align-items-center gap-2 news-item__date">
-                            <i class="bi bi-calendar3"></i>
-                            <span>19.11.2024</span>
-                        </div>
-                    </div>
+                <div class="row">
+                    @foreach ($news as $item)
+                        <x-news-card :news="$item" />
+                    @endforeach
                 </div>
-                <div class="col-md-4">
-                    <div class="news-item mb-4">
-                        <a href="{{ route('home') }}" class="d-block news-item__image mb-3">
-                            <img src="{{ asset('/assets/images/home-page/join-us.webp') }}" alt="News Title">
-                        </a>
-                        <a href="{{ route('home') }}" class="news-item__title mb-2">Ligula tristique quis risus Ligula tristique quis risus</a>
-                        <p class="news-item__description">
-                            Mauris convallis non ligula non interdum. Gravida vulputate convallis tempus vestibulum cras
-                            imperdiet nun eu dolor. Aenean lacinia bibendum nulla sed. Mauris convallis non ligula non
-                            interdum. Gravida vulputate convallis tempus vestibulum cras imperdiet nun eu dolor.
-                            Aenean lacinia bibendum nulla sed.
-                        </p>
-                        <div class="d-flex justify-content-end align-items-center gap-2 news-item__date">
-                            <i class="bi bi-calendar3"></i>
-                            <span>19.11.2024</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="news-item mb-4">
-                        <a href="{{ route('home') }}" class="d-block news-item__image mb-3">
-                            <img src="{{ asset('/assets/images/home-page/join-us.webp') }}" alt="News Title">
-                        </a>
-                        <a href="{{ route('home') }}" class="news-item__title mb-2">Ligula tristique quis risus</a>
-                        <p class="news-item__description">
-                            Mauris convallis non ligula non interdum. Gravida vulputate convallis tempus vestibulum cras
-                            imperdiet nun eu dolor. Aenean lacinia bibendum nulla sed. imperdiet nun eu dolor. Aenean lacinia bibendum nulla sed.
-                            imperdiet nun eu dolor. Aenean lacinia bibendum nulla sed.
-                        </p>
-                        <div class="d-flex justify-content-end align-items-center gap-2 news-item__date">
-                            <i class="bi bi-calendar3"></i>
-                            <span>19.11.2024</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <div class="d-flex justify-content-center align-items-center mt-5">
-                <a href="{{ route('home') }}" class="btn-default">Все новости</a>
+                <div class="d-flex justify-content-center align-items-center mt-5">
+                    <a href="{{ route('news') }}" class="btn-default">Все новости</a>
+                </div>
             </div>
-        </div>
+        @endif
 
         <x-contact />
     </div>

@@ -7,7 +7,7 @@
 
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                 <li><a href="{{ route('home') }}" class="nav-link px-2 link-dark">Главная</a></li>
-                <li><a href="#" class="nav-link px-2 link-dark">Новости</a></li>
+                <li><a href="{{ route('news') }}" class="nav-link px-2 link-dark">Новости</a></li>
                 <li><a href="{{ route('shop') }}" class="nav-link px-2 link-dark">Магазин</a></li>
                 <li><a href="{{ route('company.about')  }}" class="nav-link px-2 link-dark">О нас</a></li>
             </ul>
