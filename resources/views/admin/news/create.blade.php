@@ -6,7 +6,17 @@
             <h1 class="h3">Создание новости</h1>
         </div>
 
-        <form method="POST" enctype="multipart/form-data">
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="nav mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form id="createNewsForm" action="{{ route('admin.news.create') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="mb-3">
                 <label for="title" class="form-label">Заголовок</label>
@@ -15,7 +25,7 @@
 
             <div class="mb-3">
                 <label for="slug" class="form-label">Slug</label>
-                <input type="text" class="form-control" id="slug" name="slug" required readonly>
+                <input type="text" class="form-control" id="slug" name="slug" required>
             </div>
 
             <div class="mb-3">
@@ -30,21 +40,21 @@
 
             <div class="mb-3">
                 <label for="description" class="form-label">Описание</label>
-                <div class="bg-white"><div id="description"></div></div>
-                <input type="hidden" name="description" id="description-input">
+                <div class="bg-white"><div id="descriptionInput"></div></div>
+                <input type="hidden" id="description" name="description">
             </div>
 
             <div class="mb-3">
                 <label for="status" class="form-label">Статус</label>
                 <select class="form-select" id="status" name="status" required>
-                    <option value="1">Опубликовано</option>
-                    <option value="0">Черновик</option>
+                    <option value="published">Опубликовано</option>
+                    <option value="draft">Черновик</option>
                 </select>
             </div>
 
             <div class="d-flex justify-content-between align-items-center">
                 <a href="{{ route('admin.news') }}" class="btn btn-secondary">Назад</a>
-                <button type="submit" class="btn btn-primary">Создать новость</button>
+                <button type="submit" class="btn btn-primary">Создать</button>
             </div>
         </form>
     </div>
@@ -53,7 +63,7 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const quill = new Quill('#description', {
+            const quill = new Quill('#descriptionInput', {
                 theme: 'snow',
                 modules: {
                     toolbar: [
@@ -90,11 +100,18 @@
                     .replace(/-+$/, '');
             }
 
-            const form = document.querySelector('form');
-            form.onsubmit = function() {
-                const description = document.querySelector('#description-input');
-                description.value = quill.root.innerHTML;
-            };
+            document.getElementById('createNewsForm').addEventListener('submit', function (event) {
+                const description = quill.root.innerHTML.trim();
+                const descriptionInput = document.getElementById('description');
+
+                if (!description || description === '<p><br></p>') {
+                    alert('Описание не может быть пустым.');
+                    event.preventDefault();
+                    return;
+                }
+
+                descriptionInput.value = description;
+            });
 
             document.getElementById('title').addEventListener('input', function() {
                 const title = this.value;
