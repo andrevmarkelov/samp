@@ -11,5 +11,5 @@ Route::group(['prefix' => 'admin'], function () {
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth.admin']], function () {
     Route::get('/', [HomeController::class, 'index'])->name('admin.index');
-    Route::get('logout', [AdminController::class, 'logout'])->name('admin.logout');
+    Route::post('logout', [AdminController::class, 'logout'])->name('admin.logout');
 });
