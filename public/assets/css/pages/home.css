@@ -181,7 +181,7 @@
     color: var(--grey);
 }
 
-.news-item__date {
+.news-item__footer {
     font-size: 14px;
     color: var(--light-grey-blue);
 }

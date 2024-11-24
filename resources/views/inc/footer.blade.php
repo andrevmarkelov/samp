@@ -9,7 +9,7 @@
             <div class="col-md-6 d-flex align-items-center justify-content-center">
                 <ul class="nav gap-3">
                     <li class="nav-item"><a href="{{ route('home') }}" class="nav-link p-0 text-body-secondary">Главная</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link p-0 text-body-secondary">Новости</a></li>
+                    <li class="nav-item"><a href="{{ route('news') }}" class="nav-link p-0 text-body-secondary">Новости</a></li>
                     <li class="nav-item"><a href="{{ route('shop') }}" class="nav-link p-0 text-body-secondary">Магазин</a></li>
                     <li class="nav-item"><a href="{{ route('company.about')  }}" class="nav-link p-0 text-body-secondary">О нас</a></li>
                 </ul>

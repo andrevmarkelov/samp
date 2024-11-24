@@ -48,6 +48,9 @@
                                     <i class="bi bi-trash3"></i>
                                 </button>
                             </form>
+                            <a href="{{ route('news.show', $item->slug) }}" target="_blank" title="Перейти">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                            </a>
                         </td>
                     </tr>
                 @endforeach

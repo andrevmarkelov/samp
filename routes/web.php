@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MapController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ResetPasswordController;
@@ -11,8 +12,12 @@ use App\Http\Controllers\ShopController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
 Route::get('shop', [ShopController::class, 'index'])->name('shop');
 Route::post('shop', [ShopController::class, 'processPayment'])->name('payment');
+
+Route::get('news', [NewsController::class, 'index'])->name('news');
+Route::get('news/{slug}', [NewsController::class, 'show'])->name('news.show');
 
 Route::group(['prefix' => 'auth'], function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');

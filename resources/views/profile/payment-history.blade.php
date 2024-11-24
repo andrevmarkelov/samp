@@ -31,27 +31,29 @@
             </table>
         </div>
 
-        <!-- Пагинация -->
-        <nav class="d-flex justify-content-center mt-4">
-            <ul class="pagination">
-                <li class="page-item {{ $payments->onFirstPage() ? 'disabled' : '' }}">
-                    <a class="page-link" href="{{ $payments->previousPageUrl() }}" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-
-                @foreach ($payments->getUrlRange(1, $payments->lastPage()) as $page => $url)
-                    <li class="page-item {{ $page == $payments->currentPage() ? 'active' : '' }}">
-                        <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+        @if ($payments->hasPages())
+            <!-- Пагинация -->
+            <nav class="d-flex justify-content-center mt-4">
+                <ul class="pagination">
+                    <li class="page-item {{ $payments->onFirstPage() ? 'disabled' : '' }}">
+                        <a class="page-link" href="{{ $payments->previousPageUrl() }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
                     </li>
-                @endforeach
 
-                <li class="page-item {{ $payments->hasMorePages() ? '' : 'disabled' }}">
-                    <a class="page-link" href="{{ $payments->nextPageUrl() }}" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+                    @foreach ($payments->getUrlRange(1, $payments->lastPage()) as $page => $url)
+                        <li class="page-item {{ $page == $payments->currentPage() ? 'active' : '' }}">
+                            <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                        </li>
+                    @endforeach
+
+                    <li class="page-item {{ $payments->hasMorePages() ? '' : 'disabled' }}">
+                        <a class="page-link" href="{{ $payments->nextPageUrl() }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        @endif
     </div>
 @endsection
