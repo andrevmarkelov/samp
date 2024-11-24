@@ -15,6 +15,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth.admin']], function () 
 
     Route::get('news', [NewsController::class, 'index'])->name('admin.news');
     Route::get('news/create', [NewsController::class, 'createForm'])->name('admin.news.create.form');
+    Route::post('news/create', [NewsController::class, 'store'])->name('admin.news.create');
+    Route::get('news/edit/{news}', [NewsController::class, 'editForm'])->name('admin.news.edit.form');
+    Route::put('news/edit/{news}', [NewsController::class, 'update'])->name('admin.news.edit');
+    Route::delete('news/edit/{news}', [NewsController::class, 'destroy'])->name('admin.news.destroy');
 
     Route::post('logout', [AdminController::class, 'logout'])->name('admin.logout');
 });
