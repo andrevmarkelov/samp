@@ -25,30 +25,7 @@
                     @endforeach
                 </div>
 
-                @if ($news->hasPages())
-                    <!-- Пагинация -->
-                    <nav class="d-flex justify-content-center mt-4">
-                        <ul class="pagination">
-                            <li class="page-item {{ $news->onFirstPage() ? 'disabled' : '' }}">
-                                <a class="page-link" href="{{ $news->previousPageUrl() }}" aria-label="Previous">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-
-                            @foreach ($news->getUrlRange(1, $news->lastPage()) as $page => $url)
-                                <li class="page-item {{ $page == $news->currentPage() ? 'active' : '' }}">
-                                    <a class="page-link" href="{{ $url }}">{{ $page }}</a>
-                                </li>
-                            @endforeach
-
-                            <li class="page-item {{ $news->hasMorePages() ? '' : 'disabled' }}">
-                                <a class="page-link" href="{{ $news->nextPageUrl() }}" aria-label="Next">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
-                @endif
+                {{ $news->links('inc.pagination') }}
 
             @else
                 <p class="text-center mt-5">Пока нет новых новостей. Заглядывайте сюда позже, чтобы быть в курсе всех событий!</p>
