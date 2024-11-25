@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\NewsController;
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'admin'], function () {
@@ -19,6 +20,13 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth.admin']], function () 
     Route::get('news/edit/{news}', [NewsController::class, 'editForm'])->name('admin.news.edit.form');
     Route::put('news/edit/{news}', [NewsController::class, 'update'])->name('admin.news.edit');
     Route::delete('news/edit/{news}', [NewsController::class, 'destroy'])->name('admin.news.destroy');
+
+    Route::get('users', [UserController::class, 'index'])->name('admin.users');
+    Route::get('users/edit/{user}', [UserController::class, 'editForm'])->name('admin.users.edit.form');
+    Route::put('users/edit/{user}', [UserController::class, 'update'])->name('admin.users.edit');
+    Route::delete('users/edit/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
+    Route::get('users/{user}/payments', [UserController::class, 'payments'])->name('admin.users.payments');
+
 
     Route::post('logout', [AdminController::class, 'logout'])->name('admin.logout');
 });

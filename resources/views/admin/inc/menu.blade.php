@@ -16,6 +16,12 @@
                 Новости
             </a>
         </li>
+        <li>
+            <a href="{{ route('admin.users') }}" class="nav-link link-body-emphasis">
+                <i class="bi bi-people"></i>
+                Пользователи
+            </a>
+        </li>
     </ul>
     <hr>
     <div class="dropdown">
