@@ -27,6 +27,13 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth.admin']], function () 
     Route::delete('users/edit/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
     Route::get('users/{user}/payments', [UserController::class, 'payments'])->name('admin.users.payments');
 
+    Route::get('admins', [AdminController::class, 'adminList'])->name('admin.admins.index');
+    Route::get('admins/edit/{admin}', [AdminController::class, 'editForm'])->name('admin.admins.edit.form');
+    Route::put('admins/edit/{admin}', [AdminController::class, 'update'])->name('admin.admins.edit');
+    Route::get('admins/create', [AdminController::class, 'createForm'])->name('admin.admins.create.form');
+    Route::post('admins/create', [AdminController::class, 'store'])->name('admin.admins.create');
+    Route::delete('admins/{admin}', [AdminController::class, 'destroy'])->name('admin.admins.destroy');
+    Route::get('profile', [AdminController::class, 'profile'])->name('admin.profile');
 
     Route::post('logout', [AdminController::class, 'logout'])->name('admin.logout');
 });

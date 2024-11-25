@@ -21,7 +21,7 @@ class HomeController extends Controller
             ->get();
 
         return view('home', [
-           'news' => $news
+            'news' => $news
         ]);
     }
 }
