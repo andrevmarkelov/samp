@@ -5,8 +5,14 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>SAMP: Играй в GTA San Andreas Multiplayer на {{ $serverName }}</title>
+    <meta name="description" content="Играй в GTA SAMP с самым большим русскоязычным комьюнити в GTA Online. Начни играть в GTA San Andreas по сети на {{ $serverName }} всего в пару кликов прямо сейчас!">
+
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="{{ asset('assets/css/main.css') }}">
     <script src="{{ asset('assets/libs/particles/js/particles.min.js')}}"></script>

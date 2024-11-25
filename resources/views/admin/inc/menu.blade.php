@@ -22,6 +22,12 @@
                 Пользователи
             </a>
         </li>
+        <li>
+            <a href="{{ route('admin.admins.index') }}" class="nav-link link-body-emphasis">
+                <i class="bi bi-person-video2"></i>
+                Администраторы
+            </a>
+        </li>
     </ul>
     <hr>
     <div class="dropdown">
@@ -30,8 +36,7 @@
             <strong>{{ $admin->name }}</strong>
         </button>
         <ul class="dropdown-menu text-small shadow" style="">
-            <li><a class="dropdown-item" href="#">Профиль</a></li>
-            <li><a class="dropdown-item" href="#">Настройки</a></li>
+            <li><a class="dropdown-item" href="{{ route('admin.profile') }}">Профиль</a></li>
             <li><hr class="dropdown-divider"></li>
             <li>
                 <form action="{{ route('admin.logout') }}" method="POST">

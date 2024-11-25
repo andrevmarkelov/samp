@@ -18,13 +18,13 @@
                 <div class="d-flex flex-column align-items-center align-items-md-end footer-contacts">
                     <h5 class="color-dark-blue text-end">Контакты</h5>
 
-                    <a href="mailto:{{ env('CONTACT_EMAIL') }}" class="color-grey">{{ env('CONTACT_EMAIL') }}</a>
+                    <a href="mailto:{{ env('CONTACT_EMAIL') }}" rel="nofollow" class="color-grey">{{ env('CONTACT_EMAIL') }}</a>
 
                     <div class="d-flex align-items-center justify-content-between gap-3">
-                        <a href="https://discord.com/" title="Discord" class="color-grey" target="_blank"><i class="bi bi-discord"></i></a>
-                        <a href="https://vk.com/" title="ВКонтакте" class="color-grey" target="_blank"><i class="bi bi-chat-heart-fill"></i></a>
-                        <a href="https://www.youtube.com/" title="YouTube" class="color-grey" target="_blank"><i class="bi bi-youtube"></i></a>
-                        <a href="https://telegram.org/" title="Telegram" class="color-grey" target="_blank"><i class="bi bi-telegram"></i></a>
+                        <a href="https://discord.com/" title="Discord" rel="nofollow" class="color-grey" target="_blank"><i class="bi bi-discord"></i></a>
+                        <a href="https://vk.com/" title="ВКонтакте" rel="nofollow" class="color-grey" target="_blank"><i class="bi bi-chat-heart-fill"></i></a>
+                        <a href="https://www.youtube.com/" title="YouTube" rel="nofollow" class="color-grey" target="_blank"><i class="bi bi-youtube"></i></a>
+                        <a href="https://telegram.org/" title="Telegram" rel="nofollow" class="color-grey" target="_blank"><i class="bi bi-telegram"></i></a>
                     </div>
                 </div>
             </div>
@@ -38,7 +38,7 @@
                 <div class="col-md-6 d-md-block d-flex justify-content-center text-center text-md-start">
                     <div class="footer-bottom">
                         <p class="color-grey mb-0">© {{ date('Y') }} {{ $serverName }}</p>
-                        <p class="color-grey mb-0">Разработка — <a href="https://markelov.by/" class="color-grey" target="_blank">markelov.by</a></p>
+                        <p class="color-grey mb-0">Разработка — <a href="https://markelov.by/" rel="nofollow" class="color-grey" target="_blank">markelov.by</a></p>
                     </div>
                 </div>
                 <div class="col-md-6 d-md-block d-flex justify-content-center">
