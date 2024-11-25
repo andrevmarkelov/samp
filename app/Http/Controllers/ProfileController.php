@@ -8,7 +8,6 @@ use App\Models\User;
 use App\Notifications\PasswordChangedNotification;
 use Exception;
 use Illuminate\Contracts\View\View;
-use Illuminate\Foundation\Application;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
@@ -36,7 +35,12 @@ class ProfileController extends Controller
         }
     }
 
-    public function settings()
+    /**
+     * Страница "Настройки"
+     *
+     * @return View
+     */
+    public function settings(): View
     {
         return view('profile.settings');
     }

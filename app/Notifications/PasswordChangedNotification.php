@@ -41,8 +41,8 @@ class PasswordChangedNotification extends Notification
             ->greeting("Здравствуйте, {$notifiable->username}")
             ->line('Ваш пароль был успешно изменён.')
             ->line('Если вы не совершали это действие, немедленно свяжитесь с нашей поддержкой.')
-            ->action('Связаться с поддержкой', url('/contact'))
-            ->line('Спасибо, что пользуетесь нашим сервисом!');
+            ->action('Связаться с поддержкой', url('/company/about'))
+            ->line('Спасибо, что остаетесь с нами!');
     }
 
     /**

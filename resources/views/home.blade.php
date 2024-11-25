@@ -159,7 +159,7 @@
                         <div class="section-header mb-4">
                             <span class="section-subtitle mb-2 text-white">Присоединяйтесь к нам</span>
                             <h2 class="text-white mb-5">Тысячи игроков уже выбрали нас! Откройте для себя мир новых возможностей и захватывающих приключений</h2>
-                            <a href="samp://{{ $serverIP }}">Присоединиться</a>
+                            <a href="samp://{{ $serverIP }}" class="fw-bold">Присоединиться</a>
                         </div>
                     </div>
                 </div>
