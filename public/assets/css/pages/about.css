@@ -1,0 +1,18 @@
+.about-intro__text h1 {
+    text-transform: uppercase;
+    font-weight: bold;
+    color: var(--dark-blue);
+    font-size: 26px;
+}
+
+.about-img__container {
+    perspective: 1000px;
+}
+
+.about-img {
+    width: 100%;
+    border-radius: 50px 10px;
+    display: block;
+    transition: transform 0.1s ease-out;
+    transform-origin: center;
+}

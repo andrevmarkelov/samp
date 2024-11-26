@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\News;
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -14,8 +14,14 @@ class HomeController extends Controller
      */
     public function index(): View
     {
+        $news = News::select(['title', 'slug', 'image', 'short_description', 'created_at'])
+            ->where('status', 'published')
+            ->orderBy('created_at', 'desc')
+            ->take(3)
+            ->get();
+
         return view('home', [
-           'news' => []
+            'news' => $news
         ]);
     }
 }

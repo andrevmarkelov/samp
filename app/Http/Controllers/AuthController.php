@@ -33,10 +33,7 @@ class AuthController extends Controller
                 return redirect()->route('profile.index');
             }
 
-            return redirect()
-                ->route('home')
-                ->withErrors(['login' => 'Неверный никнейм или пароль.'])
-                ->withInput();
+            return response(['status' => 'error', 'response' => 'Неверный никнейм или пароль.'], HttpResponse::HTTP_UNAUTHORIZED);
         } catch (Exception $e) {
             return response(['status' => 'error', 'response' => [$e->getMessage()]], HttpResponse::HTTP_BAD_REQUEST);
         }

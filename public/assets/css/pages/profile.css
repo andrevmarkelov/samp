@@ -1,0 +1,52 @@
+.profile-page {
+    background-color: #edf2fc;
+    min-height: 80vh;
+}
+
+.profile-card {
+    background: var(--white);
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: rgba(149, 157, 165, 0.2) 0 8px 24px;
+}
+
+.profile-menu {
+    list-style: none;
+}
+
+.profile-menu a,
+.profile-menu button {
+    color: var(--grey);
+    font-weight: 500;
+    transition: 0.3s all;
+}
+
+.profile-menu a:hover,
+.profile-menu button:hover {
+    color: var(--light-blue);
+}
+
+.profile-menu button {
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+.canvas-map {
+    border-radius: 8px;
+    background-color: #edf2fc;
+    cursor: grab;
+}
+
+@media screen and (max-width: 1200px) {
+    .canvas-map {
+        width: 100%;
+        height: auto;
+    }
+}
+
+@media screen and (max-width: 992px) {
+    .profile-card {
+        padding: 20px;
+    }
+}

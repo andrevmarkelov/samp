@@ -1,0 +1,234 @@
+.intro-text h1 {
+    text-transform: uppercase;
+    font-weight: bold;
+    color: var(--dark-blue);
+    font-size: 48px;
+}
+
+.intro-text p {
+    color: var(--grey);
+    font-size: 18px;
+}
+
+.intro-img__container {
+    perspective: 1000px;
+}
+
+.intro-img {
+    width: 100%;
+    border-radius: 50px 10px;
+    display: block;
+    transition: transform 0.1s ease-out;
+    transform-origin: center;
+}
+
+.section-header h2 {
+    color: var(--dark-blue);
+    font-size: 32px;
+    font-weight: 600;
+}
+
+.how-to-play__item h3 {
+    color: var(--dark-blue);
+    font-size: 19px;
+    font-weight: bold;
+}
+
+.how-to-play__item p {
+    color: var(--grey);
+    font-size: 17px;
+    height: 77px;
+}
+
+.how-to-play__item a {
+    color: var(--light-blue-2);
+    font-weight: 700;
+}
+
+.how-to-play__icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 4px;
+    background-color: #e4f1f6;
+}
+
+.how-to-play__icon i {
+    color: var(--light-blue-2);
+    font-size: 27px;
+    font-weight: bold;
+}
+
+.how-to-play__title {
+    width: 532px;
+}
+
+#particles-js {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+
+.roleplay-info {
+    color: var(--grey);
+    font-size: 17px;
+}
+
+.accordion-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: var(--dark-blue);
+    font-size: 17px;
+    font-weight: bold;
+    transition: 0.3s all;
+}
+
+.accordion-header:hover {
+    color: var(--light-blue);
+}
+
+.accordion-header i {
+    color: var(--light-blue);
+    font-weight: bold;
+    font-size: 20px;
+    transition: transform 0.3s ease;
+}
+
+.accordion-header.active i {
+    transform: rotate(-180deg);
+}
+
+.accordion-content {
+    overflow: hidden;
+    max-height: 0;
+    font-size: 17px;
+    color: var(--grey);
+    transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.accordion-content.active {
+    max-height: 200px;
+}
+
+.join-us {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    padding: 195px 0;
+    background-image: url('../../images/home-page/join-us.webp');
+    background-attachment: fixed;
+    background-size: cover;
+    clip-path: polygon(0 0, 100% 0, 100% 84%, 0% 100%);
+}
+
+.join-us span::before {
+    background-color: var(--white);
+}
+
+.join-us a {
+    background-color: var(--white);
+    color: var(--dark-blue);
+    padding: 10px 24px;
+    border-radius: 6px;
+}
+
+.news-item__image {
+    overflow: hidden;
+}
+
+.news-item__image img {
+    width: 100%;
+    height: 257px;
+    object-fit: cover;
+    transition: 0.5s all;
+}
+
+.news-item__image img:hover {
+    transform: scale(1.1);
+}
+
+.news-item__title {
+    display: block;
+    font-weight: bold;
+    font-size: 20px;
+    color: var(--dark-blue);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: 0.3s all;
+}
+
+.news-item__title:hover {
+    color: var(--light-blue);
+}
+
+.news-item__description {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 16px;
+    height: 72px;
+    text-overflow: ellipsis;
+    color: var(--grey);
+}
+
+.news-item__footer {
+    font-size: 14px;
+    color: var(--light-grey-blue);
+}
+
+.contact-item i {
+    color: var(--light-blue);
+    font-size: 28px;
+}
+
+.contact-item a {
+    color: var(--dark-blue);
+    font-weight: bold;
+    font-size: 18px;
+    transition: 0.3s all;
+}
+
+.contact-item a:hover {
+    color: var(--light-blue);
+}
+
+.contact-description {
+    color: var(--grey);
+    font-size: 15px;
+}
+
+@media screen and (max-width: 1200px) {
+    .how-to-play__item p {
+        height: auto;
+    }
+}
+
+@media screen and (max-width: 800px) {
+    .how-to-play__title {
+        width: 100%;
+    }
+
+    .how-to-play__item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .intro-text h1 {
+        font-size: 32px;
+    }
+}
+

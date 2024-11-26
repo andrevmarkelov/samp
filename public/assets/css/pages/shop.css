@@ -1,0 +1,31 @@
+.shop-intro h1 {
+    font-weight: bold;
+    color: var(--dark-blue);
+    font-size: 48px;
+}
+
+.shop-img__container {
+    perspective: 1000px;
+}
+
+.shop-img {
+    width: 100%;
+    border-radius: 50px 10px;
+    display: block;
+    transition: transform 0.1s ease-out;
+    transform-origin: center;
+}
+
+.shop-info {
+    background-color: #edf2fc;
+    clip-path: polygon(0 0, 100% 0, 100% 84%, 0% 100%);
+}
+
+.payment-form__title {
+    color: var(--dark-blue);
+    font-size: 21px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+
