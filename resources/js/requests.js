@@ -5,9 +5,10 @@ document.getElementById('loginModal').addEventListener('submit', async (event) =
     const form = new FormData(event.target);
     const username = form.get('username');
     const password = form.get('password');
+    const remember = form.get('remember');
 
     try {
-        const response = await axios.post('/auth/login', {username, password}, {
+        const response = await axios.post('/auth/login', { username, password, remember }, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'Content-Type': 'application/json',

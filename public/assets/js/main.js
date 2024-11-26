@@ -1,4 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Лоадер
+    const loaderWrapper = document.getElementById('loader-wrapper');
+    loaderWrapper.style.display = 'flex';
+
+    window.addEventListener('load', function () {
+        loaderWrapper.style.display = 'none';
+    });
+
+    // Кнопка наверх
     const toTopBtn = document.getElementById('toTopBtn');
     const progressCircle = document.querySelector('.progress-ring__circle');
 

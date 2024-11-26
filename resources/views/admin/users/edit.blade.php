@@ -47,7 +47,10 @@
 
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" name="email" id="email" class="form-control" value="{{ old('email', $user->email) }}" required>
+                        <input type="email" name="email" id="email" class="form-control {{ is_null($user->email_verified_at) ? 'is-invalid' : '' }}"  value="{{ old('email', $user->email) }}" required>
+                        @if (is_null($user->email_verified_at))
+                            <div class="d-block invalid-feedback">У пользователя не подтверждена почта.</div>
+                        @endif
                     </div>
 
                     <div class="mb-3">

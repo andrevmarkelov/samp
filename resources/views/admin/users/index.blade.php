@@ -31,7 +31,11 @@
                                 <td>{{ $user->id }}</td>
                                 <td>{{ $user->username }}</td>
                                 <td>{{ $user->p_level }}</td>
-                                <td>{{ $user->email }}</td>
+                                <td>
+                                    <span class="{{ is_null($user->email_verified_at) ? 'text-danger' : '' }}">
+                                        {{ $user->email }}
+                                    </span>
+                                </td>
                                 <td>{{ $user->created_at->format('d.m.Y H:i') }}</td>
                                 <td>
                                     <a href="{{ route('admin.users.edit.form', $user->id) }}" class="text-primary-emphasis text-decoration-none" title="Редактировать">

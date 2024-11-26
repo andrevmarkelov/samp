@@ -1,6 +1,7 @@
 <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary min-vh-100" style="width: 280px;">
-    <a href="{{ route('home') }}" class="d-flex align-items-center justify-content-center mb-3 mb-md-0 me-md-auto">
+    <a href="{{ route('home') }}" class="d-flex flex-column align-items-center justify-content-center mb-3 mb-md-0 me-md-auto text-decoration-none">
         <img src="{{ asset('assets/images/logo.png') }}" alt="{{ $serverName }}" width="100">
+        <span class="text-black">{{ $serverName }}</span>
     </a>
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">

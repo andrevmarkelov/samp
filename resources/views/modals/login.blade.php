@@ -16,6 +16,10 @@
                         <label for="password" class="form-label">Пароль</label>
                         <input type="password" class="form-control" id="password" name="password" placeholder="Игровой пароль" minlength="6" required>
                     </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                        <label class="form-check-label" for="remember">Запомнить меня</label>
+                    </div>
                     <div>
                         <button type="submit" class="btn-default">Войти</button>
                         <button type="button" class="btn btn-link color-grey text-decoration-none" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Забыли пароль?</button>
