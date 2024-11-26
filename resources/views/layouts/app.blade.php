@@ -19,6 +19,12 @@
 </head>
 <body>
 
+    {{-- Loader --}}
+    <div id="loader-wrapper">
+        <span class="loader"></span>
+    </div>
+
+
     {{-- Header --}}
     @include('inc.header')
 
