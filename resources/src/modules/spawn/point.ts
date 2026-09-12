@@ -14,48 +14,45 @@ export const NO_TEAM = 255;
 /** Скин для class-селектора, если у игрока ещё нет аккаунта. */
 export const DEFAULT_SPAWN_SKIN = 26;
 
+export const STREET_WORLD = 0;
+
+/** Отдельный VW больницы: игроки и пикапы внутри не пересекаются с улицей. */
+export const HOSPITAL_WORLD = 1;
+
 /** Обычный спавн, пока игрок не в организации. */
 export const DEFAULT_SPAWN: SpawnPoint = {
-  x: 2495.3547,
-  y: -1688.2319,
-  z: 13.6774,
-  angle: 351.1646,
+  x: 1769.1945,
+  y: -1941.5032,
+  z: 13.5696,
+  angle: 308.8943,
   interior: 0,
-  world: 0,
+  world: STREET_WORLD,
 };
 
 export const HOSPITAL_SPAWNS: readonly SpawnPoint[] = [
   {
-    x: 2034.0479,
-    y: -1404.7686,
-    z: 17.2143,
-    angle: 180,
+    x: 1576.0293,
+    y: 1806.7817,
+    z: -20.7665,
+    angle: 179.2983,
     interior: 0,
-    world: 0,
+    world: HOSPITAL_WORLD,
   },
   {
-    x: 2027.5,
-    y: -1412.8,
-    z: 16.9922,
-    angle: 0,
+    x: 1585.931,
+    y: 1807.0443,
+    z: -20.7665,
+    angle: 179.9484,
     interior: 0,
-    world: 0,
+    world: HOSPITAL_WORLD,
   },
   {
-    x: 2041.2,
-    y: -1412.8,
-    z: 16.9922,
-    angle: 0,
+    x: 1596.0117,
+    y: 1807.0649,
+    z: -20.7665,
+    angle: 179.0318,
     interior: 0,
-    world: 0,
-  },
-  {
-    x: 2034.1641,
-    y: -1426.5117,
-    z: 16.9922,
-    angle: 0,
-    interior: 0,
-    world: 0,
+    world: HOSPITAL_WORLD,
   },
 ];
 

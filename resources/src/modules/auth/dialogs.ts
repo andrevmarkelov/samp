@@ -1,8 +1,10 @@
 import { Dialog, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { isPlayerActive } from "../../shared/player";
+import { DEFAULT_SPAWN, STREET_WORLD } from "../spawn/point";
 import type { Gender } from "./gender";
 import { RULES_TITLE, SERVER_RULES } from "./rules";
+import { isAuthenticated } from "./session";
 import { skinListBody } from "./skins";
 
 export const AUTH_DIALOG_ID = 1;
@@ -30,9 +32,28 @@ export function showAuthDialog(
 }
 
 export function prepareAuthView(player: Player): void {
+  player.setInterior(0);
+  player.setVirtualWorld(STREET_WORLD);
+  player.setPos(DEFAULT_SPAWN.x, DEFAULT_SPAWN.y, DEFAULT_SPAWN.z);
   player.toggleSpectating(true);
-  player.setCameraPos(2476.0, -1665.0, 22.0);
-  player.setCameraLookAt(2495.35, -1688.23, 13.67, 2);
+  player.setCameraPos(1779.37, -1932.56, 22.0);
+  player.setCameraLookAt(DEFAULT_SPAWN.x, DEFAULT_SPAWN.y, DEFAULT_SPAWN.z, 2);
+}
+
+export function refreshAuthViewSoon(player: Player): void {
+  for (const delay of [80, 400]) {
+    setTimeout(() => {
+      if (!isPlayerActive(player) || isAuthenticated(player)) {
+        return;
+      }
+
+      try {
+        prepareAuthView(player);
+      } catch {
+        // Слот ещё не готов.
+      }
+    }, delay);
+  }
 }
 
 export function kickLater(player: Player, reason: string): void {

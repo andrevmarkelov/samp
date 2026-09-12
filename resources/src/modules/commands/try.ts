@@ -5,10 +5,10 @@ import { byGender } from "../auth/gender";
 import { getGender } from "../auth/session";
 import { registerCommand } from "./registry";
 
-registerCommand("try", "Случайное действие: удачно или неудачно", (player, args) => {
+registerCommand("try", "Sluchaynoe deystvie: udachno ili neudachno", (player, args) => {
   const text = args.trim().slice(0, CHAT_MAX_LENGTH);
   if (!text) {
-    player.sendClientMessage(Color.error, "Использование: /try [действие]");
+    player.sendClientMessage(Color.error, "Ispol'zovanie: /try [deystvie]");
     return;
   }
 

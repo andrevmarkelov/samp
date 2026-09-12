@@ -8,10 +8,10 @@ import { registerCommand } from "./registry";
 const STATS_DIALOG_ID = 2;
 const DIALOG_STYLE_MSGBOX = 0;
 
-registerCommand("stats", "Статистика персонажа", (player) => {
+registerCommand("stats", "Statistika personazha", (player) => {
   const account = getAccount(player);
   if (!account) {
-    player.sendClientMessage(Color.error, "Сначала войди в аккаунт.");
+    player.sendClientMessage(Color.error, "Snachala voydi v akkaunt.");
     return;
   }
 
@@ -48,6 +48,6 @@ registerCommand("stats", "Статистика персонажа", (player) => 
       ""
     );
   } catch {
-    player.sendClientMessage(Color.error, "Не удалось открыть статистику.");
+    player.sendClientMessage(Color.error, "Ne udalos' otkryt' statistiku.");
   }
 });

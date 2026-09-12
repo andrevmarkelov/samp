@@ -9,6 +9,7 @@ import {
   AUTH_DIALOG_ID,
   kickLater,
   prepareAuthView,
+  refreshAuthViewSoon,
   showBirthDateDialog,
   showEmailDialog,
   showGenderDialog,
@@ -156,6 +157,8 @@ export function holdAtAuth(player: Player): void {
     }
   }
 
+  refreshAuthViewSoon(player);
+
   const state = pendingOf(player);
   if (!state) {
     return;
@@ -178,11 +181,11 @@ export function holdAtAuth(player: Player): void {
 function welcome(player: Player, name: string): void {
   player.sendClientMessage(
     Color.info,
-    `Добро пожаловать на ${SERVER_NAME}, ${name}.`
+    `Dobro pozhalovat' na ${SERVER_NAME}, ${name}.`
   );
   player.sendClientMessage(
     Color.white,
-    `[${SERVER_TAG}] Локальный чат, /s /w /me /do /try /todo /b. Напиши /help.`
+    `[${SERVER_TAG}] Lokal'nyy chat, /s /w /me /do /try /todo /b. Napishi /help.`
   );
 }
 
@@ -224,6 +227,8 @@ export async function beginAuth(player: Player, attempt = 0): Promise<void> {
       // Слот не готов.
     }
   }
+
+  refreshAuthViewSoon(player);
 
   if (!isDatabaseReady()) {
     kickLater(player, "База данных недоступна. Попробуй позже.");
@@ -415,7 +420,7 @@ async function finishRegister(
   spawnIntoWorld(player, account.skin);
   applyWallet(player, account);
   welcome(player, account.name);
-  player.sendClientMessage(Color.gray, "Персонаж создан. /help — список команд.");
+  player.sendClientMessage(Color.gray, "Personazh sozdan. /help — spisok komand.");
   omp.log(`[${SERVER_TAG}] ${account.name} зарегистрировался`);
 }
 

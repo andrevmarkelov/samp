@@ -4,10 +4,10 @@ import { playerName } from "../../shared/player";
 import { playLocalSpeech } from "../chat/talk";
 import { registerCommand } from "./registry";
 
-registerCommand("s", "Крикнуть на большую дистанцию", (player, args) => {
+registerCommand("s", "Kriknut' na bol'shuyu distantsiyu", (player, args) => {
   const text = args.trim().slice(0, CHAT_MAX_LENGTH);
   if (!text) {
-    player.sendClientMessage(Color.error, "Использование: /s [текст]");
+    player.sendClientMessage(Color.error, "Ispol'zovanie: /s [tekst]");
     return;
   }
 

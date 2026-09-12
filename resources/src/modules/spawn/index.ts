@@ -1,4 +1,4 @@
-import { Class, omp, type Player } from "@omp-node/core";
+import { Class, omp, Vehicle, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { playerId } from "../../shared/player";
 import { holdAtAuth } from "../auth/flow";
@@ -11,6 +11,7 @@ import {
   patchAccount,
 } from "../auth/session";
 import { queueSave } from "../persist";
+import { refreshStreamForPlayer } from "../mapping/stream";
 import type { GameModule } from "../types";
 import {
   DEFAULT_SPAWN,
@@ -42,6 +43,9 @@ export const spawnModule: GameModule = {
       0,
       0
     );
+
+    // Временно: тестовая машина у вокзала.
+    new Vehicle(560, 1779.3704, -1932.559, 13.3864, 270.354, 1, 1, 60, false);
 
     omp.on("playerDeath", (player) => {
       if (!isAuthenticated(player)) {
@@ -96,6 +100,7 @@ export const spawnModule: GameModule = {
         try {
           placeAt(player, hospital);
           player.setHealth(HOSPITAL_HEALTH);
+          refreshStreamForPlayer(player);
         } catch {
           // Игрок уже вышел.
         }
@@ -108,7 +113,12 @@ export const spawnModule: GameModule = {
           seenWorldSpawn.add(id);
         }
 
-        player.sendClientMessage(Color.gray, "Ты очнулся в больнице.");
+        player.sendClientMessage(Color.info, "Vy poteryali soznanie...");
+        player.sendClientMessage(
+          Color.gray,
+          "Vrachi dostavili vas v gorodskuyu bolnicu All Saints."
+        );
+        player.sendClientMessage(Color.gray, "Vy prosnulis' v palate. Vam okazali pomoshch'.");
         return;
       }
 
@@ -122,7 +132,7 @@ export const spawnModule: GameModule = {
         applyWallet(player, account);
         player.sendClientMessage(
           Color.gray,
-          "Ты появился на спавне. /help — список команд."
+          "Ty poyavilsya na spawne. /help — spisok komand."
         );
       }
 

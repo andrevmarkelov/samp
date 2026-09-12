@@ -1,6 +1,47 @@
-import { ObjectMp } from "@omp-node/core";
+export type MapMaterial = {
+  index: number;
+  model: number;
+  txd: string;
+  texture: string;
+  color: number;
+};
 
-const DRAW_DISTANCE = 300;
+export type MapMaterialText = {
+  text: string;
+  index: number;
+  size: number;
+  font: string;
+  fontSize: number;
+  bold: boolean;
+  fontColor: number;
+  backColor: number;
+  alignment: number;
+};
+
+export type MapObjectDef = {
+  model: number;
+  x: number;
+  y: number;
+  z: number;
+  rx: number;
+  ry: number;
+  rz: number;
+  materials: MapMaterial[];
+  texts: MapMaterialText[];
+};
+
+export type MapBuildingRemove = {
+  model: number;
+  x: number;
+  y: number;
+  z: number;
+  radius: number;
+};
+
+export type ParsedMap = {
+  objects: MapObjectDef[];
+  removals: MapBuildingRemove[];
+};
 
 function parseArgs(inner: string): Array<string | number> {
   const args: Array<string | number> = [];
@@ -51,13 +92,38 @@ function num(value: string | number): number {
   return typeof value === "number" ? value : Number(value);
 }
 
-export function loadPawnMap(source: string): number {
-  let created = 0;
-  let last: ObjectMp | null = null;
+function toU32(value: string | number): number {
+  const n = num(value);
+  if (!Number.isFinite(n)) {
+    return 0xffffffff;
+  }
+
+  return n >>> 0;
+}
+
+export function parsePawnMap(source: string): ParsedMap {
+  const objects: MapObjectDef[] = [];
+  const removals: MapBuildingRemove[] = [];
+  let last: MapObjectDef | null = null;
 
   for (const rawLine of source.split(/\r?\n/)) {
     const line = rawLine.trim();
     if (!line || line.startsWith("//") || line.startsWith("new ")) {
+      continue;
+    }
+
+    const remove = line.match(/^RemoveBuildingForPlayer\s*\((.*)\)\s*;?\s*$/i);
+    if (remove) {
+      const args = parseArgs(remove[1]);
+      if (args.length >= 6) {
+        removals.push({
+          model: num(args[1]),
+          x: num(args[2]),
+          y: num(args[3]),
+          z: num(args[4]),
+          radius: num(args[5]),
+        });
+      }
       continue;
     }
 
@@ -67,24 +133,22 @@ export function loadPawnMap(source: string): number {
     if (create) {
       const args = parseArgs(create[2]);
       if (args.length < 7) {
+        last = null;
         continue;
       }
 
-      try {
-        last = new ObjectMp(
-          num(args[0]),
-          num(args[1]),
-          num(args[2]),
-          num(args[3]),
-          num(args[4]),
-          num(args[5]),
-          num(args[6]),
-          DRAW_DISTANCE
-        );
-        created++;
-      } catch {
-        last = null;
-      }
+      last = {
+        model: num(args[0]),
+        x: num(args[1]),
+        y: num(args[2]),
+        z: num(args[3]),
+        rx: num(args[4]),
+        ry: num(args[5]),
+        rz: num(args[6]),
+        materials: [],
+        texts: [],
+      };
+      objects.push(last);
       continue;
     }
 
@@ -94,17 +158,17 @@ export function loadPawnMap(source: string): number {
     if (materialText && last) {
       const args = parseArgs(materialText[1]);
       if (args.length >= 10) {
-        last.setMaterialText(
-          String(args[2]),
-          num(args[1]),
-          num(args[3]),
-          String(args[4]),
-          num(args[5]),
-          num(args[6]) !== 0,
-          num(args[7]),
-          num(args[8]),
-          num(args[9])
-        );
+        last.texts.push({
+          text: String(args[2]),
+          index: num(args[1]),
+          size: num(args[3]),
+          font: String(args[4]),
+          fontSize: num(args[5]),
+          bold: num(args[6]) !== 0,
+          fontColor: toU32(args[7]),
+          backColor: toU32(args[8]),
+          alignment: num(args[9]),
+        });
       }
       continue;
     }
@@ -115,16 +179,16 @@ export function loadPawnMap(source: string): number {
     if (material && last) {
       const args = parseArgs(material[1]);
       if (args.length >= 6) {
-        last.setMaterial(
-          num(args[1]),
-          num(args[2]),
-          String(args[3]),
-          String(args[4]),
-          num(args[5])
-        );
+        last.materials.push({
+          index: num(args[1]),
+          model: num(args[2]),
+          txd: String(args[3]),
+          texture: String(args[4]),
+          color: toU32(args[5]),
+        });
       }
     }
   }
 
-  return created;
+  return { objects, removals };
 }

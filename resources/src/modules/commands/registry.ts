@@ -44,7 +44,7 @@ export function handleCommand(player: Player, cmdtext: string): boolean {
   const cmd = commands.get(name);
 
   if (!cmd) {
-    player.sendClientMessage(Color.error, `Неизвестная команда: /${name}`);
+    player.sendClientMessage(Color.error, `Neizvestnaya komanda: /${name}`);
     return true;
   }
 

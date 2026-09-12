@@ -8,6 +8,8 @@ import { sessionModule } from "./modules/session";
 import { chatModule } from "./modules/chat";
 import { commandsModule } from "./modules/commands";
 import { mappingModule } from "./modules/mapping";
+import { hospitalModule } from "./modules/hospital";
+import { zonesModule } from "./modules/zones";
 import { hudModule } from "./modules/hud";
 import type { GameModule } from "./modules/types";
 
@@ -16,6 +18,8 @@ const modules: GameModule[] = [
   persistModule,
   authModule,
   spawnModule,
+  hospitalModule,
+  zonesModule,
   hudModule,
   sessionModule,
   chatModule,
