@@ -4,7 +4,7 @@ import type { Gender } from "./gender";
 
 export const MAX_HEALTH = 100;
 export const MIN_HEALTH = 20;
-export const HOSPITAL_HEALTH = 100;
+export const HOSPITAL_HEALTH = MIN_HEALTH;
 export const STARTING_HEALTH = 100;
 export const HEALTH_DECAY_AMOUNT = 1;
 export const HEALTH_DECAY_MS = 15 * 60 * 1000;
@@ -30,6 +30,7 @@ export type Account = {
   donate: number;
   health: number;
   passport: boolean;
+  hospitalized: boolean;
   birthDate: string;
 };
 
@@ -92,7 +93,7 @@ export function applyHealth(player: Player, health: number): void {
 
 export function patchAccount(
   player: Player,
-  patch: Partial<Pick<Account, "health" | "money" | "passport">>
+  patch: Partial<Pick<Account, "health" | "money" | "passport" | "hospitalized">>
 ): void {
   const account = getAccount(player);
   if (!account) {

@@ -11,6 +11,7 @@ import {
   patchAccount,
 } from "../auth/session";
 import { queueSave } from "../persist";
+import { saveUserHospitalized } from "../auth/repository";
 import { refreshStreamForPlayer } from "../mapping/stream";
 import type { GameModule } from "../types";
 import {
@@ -75,6 +76,11 @@ export const spawnModule: GameModule = {
       } catch {
         // Игрок уже вышел.
       }
+
+      patchAccount(player, { health: HOSPITAL_HEALTH, hospitalized: true });
+      if (account) {
+        void saveUserHospitalized(account.id, true, HOSPITAL_HEALTH);
+      }
     });
 
     omp.on("playerSpawn", (player) => {
@@ -118,7 +124,34 @@ export const spawnModule: GameModule = {
           Color.gray,
           "Vrachi dostavili vas v gorodskuyu bolnicu All Saints."
         );
-        player.sendClientMessage(Color.gray, "Vy prosnulis' v palate. Vam okazali pomoshch'.");
+        player.sendClientMessage(Color.gray, "Zanimite koyku: /hospital.");
+        return;
+      }
+
+      if (account?.hospitalized) {
+        try {
+          const point = pickHospitalSpawn();
+          placeAt(player, point);
+          applyHealth(player, account.health);
+          refreshStreamForPlayer(player);
+        } catch {
+          // Игрок уже вышел.
+        }
+
+        const id = playerId(player);
+        const firstSpawn = id !== null && !seenWorldSpawn.has(id);
+        if (id !== null) {
+          seenWorldSpawn.add(id);
+        }
+
+        if (firstSpawn) {
+          applyWallet(player, account);
+        }
+
+        player.sendClientMessage(
+          Color.gray,
+          "Lechenie ne zakoncheno. Zanimite koyku: /hospital."
+        );
         return;
       }
 

@@ -106,6 +106,10 @@ function decayHealth(player: Player): void {
   }
 
   try {
+    if (account.hospitalized) {
+      return;
+    }
+
     if (!player.isSpawned() || player.getState() === PLAYER_STATE_WASTED) {
       return;
     }

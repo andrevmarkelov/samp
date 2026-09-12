@@ -4,7 +4,8 @@ import { Color } from "../../shared/colors";
 import { SERVER_NAME, SERVER_TAG } from "../../shared/brand";
 import { isDatabaseReady } from "../../shared/database";
 import { isPlayerActive, playerId, playerName } from "../../shared/player";
-import { DEFAULT_SPAWN, writeSpawnInfo } from "../spawn/point";
+import { DEFAULT_SPAWN, pickHospitalSpawn, placeAt, writeSpawnInfo } from "../spawn/point";
+import { refreshStreamForPlayer } from "../mapping/stream";
 import {
   AUTH_DIALOG_ID,
   kickLater,
@@ -28,7 +29,7 @@ import {
   findUserByName,
   isDuplicateKey,
 } from "./repository";
-import { clearAccount, isAuthenticated, setAccount, applyWallet } from "./session";
+import { clearAccount, getAccount, isAuthenticated, setAccount, applyWallet } from "./session";
 import { genderLabel, type Gender } from "./gender";
 import { skinByIndex } from "./skins";
 import {
@@ -101,9 +102,11 @@ function isSamePlayer(player: Player, id: number, name?: string): boolean {
 
 export function spawnIntoWorld(player: Player, skin: number): void {
   const id = playerId(player);
+  const account = getAccount(player);
+  const spawnPoint = account?.hospitalized ? pickHospitalSpawn() : DEFAULT_SPAWN;
 
   try {
-    writeSpawnInfo(player, skin, DEFAULT_SPAWN);
+    writeSpawnInfo(player, skin, spawnPoint);
   } catch {
     // Игрок уже вышел.
   }
@@ -129,6 +132,10 @@ export function spawnIntoWorld(player: Player, skin: number): void {
       player.setSkin(skin);
       if (!player.isSpawned()) {
         player.spawn();
+      }
+      if (account?.hospitalized) {
+        placeAt(player, spawnPoint);
+        refreshStreamForPlayer(player);
       }
       player.setCameraBehind();
     } catch {

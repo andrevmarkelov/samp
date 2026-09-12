@@ -10,6 +10,7 @@ import "./s";
 import "./w";
 import "./stats";
 import "./pass";
+import "./hospital";
 
 export const commandsModule: GameModule = {
   name: "commands",
