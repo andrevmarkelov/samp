@@ -1,7 +1,8 @@
-import { Dialog, omp, type Player } from "@omp-node/core";
+import { Checkpoint, Dialog, omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { isAuthenticated } from "../auth/session";
+import { isMinerOnShift } from "../miner";
 import type { GameModule } from "../types";
 
 export const GPS_DIALOG_ID = 7;
@@ -12,6 +13,7 @@ const GPS_ICON_TYPE = 0;
 const GPS_ICON_COLOR = 0xff0000ff;
 const MAPICON_GLOBAL = 1;
 const ARRIVE_RADIUS = 8;
+const CHECKPOINT_RADIUS = 4;
 const TICK_MS = 200;
 
 type GpsTarget = {
@@ -30,6 +32,13 @@ const TARGETS: readonly GpsTarget[] = [
     x: 1177.869,
     y: -1323.4761,
     z: 14.092,
+  },
+  {
+    key: "mine",
+    label: "Shakhta",
+    x: 1023.8627,
+    y: -368.1405,
+    z: 73.8935,
   },
 ];
 
@@ -121,6 +130,9 @@ function setRoute(player: Player, target: GpsTarget): void {
       GPS_ICON_COLOR,
       MAPICON_GLOBAL
     );
+    if (!isMinerOnShift(player)) {
+      Checkpoint.set(player, target.x, target.y, target.z, CHECKPOINT_RADIUS);
+    }
   } catch {
     player.sendClientMessage(Color.error, "Ne udalos' postavit' metku.");
     return;
@@ -154,6 +166,11 @@ function tickGps(): void {
       const dist = Math.hypot(pos.x - target.x, pos.y - target.y, pos.z - target.z);
       if (dist <= ARRIVE_RADIUS) {
         arrive(player);
+        return;
+      }
+
+      if (!isMinerOnShift(player) && !Checkpoint.isActive(player)) {
+        Checkpoint.set(player, target.x, target.y, target.z, CHECKPOINT_RADIUS);
       }
     } catch {
       // Игрок уже вышел.
@@ -183,6 +200,9 @@ function clearRoute(player: Player, id: number): void {
   activeByPlayer.delete(id);
   try {
     player.removeMapIcon(GPS_ICON_SLOT);
+    if (!isMinerOnShift(player)) {
+      Checkpoint.disable(player);
+    }
   } catch {
     // Игрок уже вышел.
   }

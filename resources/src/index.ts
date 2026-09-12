@@ -12,6 +12,7 @@ import { hospitalModule } from "./modules/hospital";
 import { cityHallModule } from "./modules/cityhall";
 import { gpsModule } from "./modules/gps";
 import { afkModule } from "./modules/afk";
+import { minerModule } from "./modules/miner";
 import { paydayModule } from "./modules/payday";
 import { zonesModule } from "./modules/zones";
 import { hudModule } from "./modules/hud";
@@ -24,6 +25,7 @@ const modules: GameModule[] = [
   spawnModule,
   hospitalModule,
   cityHallModule,
+  minerModule,
   gpsModule,
   afkModule,
   paydayModule,
