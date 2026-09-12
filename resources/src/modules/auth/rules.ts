@@ -1,25 +1,25 @@
 import { SERVER_NAME } from "../../shared/brand";
 
-export const RULES_TITLE = `Правила ${SERVER_NAME}`;
+export const RULES_TITLE = `Pravila ${SERVER_NAME}`;
 
-/** Текст одного диалога регистрации. Лимит SA-MP ~4096 символов. */
-export const SERVER_RULES = `Добро пожаловать на ${SERVER_NAME}.
+/** Tekst odnogo dialoga registracii. Limit SA-MP ~4096 simvolov. */
+export const SERVER_RULES = `Dobro pozhalovat' na ${SERVER_NAME}.
 
-Это roleplay-сервер. Ты играешь персонажа, а не «себя в GTA».
+Eto roleplay-server. Ty igraesh' personazha, a ne «sebya v GTA».
 
-МОЖНО
-• Общаться IC в чате, /me /do /try /todo
-• Конфликты и драки только с игровой причиной
-• OOC — команда /b, коротко и по делу
+MOZHNO
+• Obshchat'sya IC v chate, /me /do /try /todo
+• Konflikty i draki tol'ko s igrovoy prichinoy
+• OOC — komanda /b, korotko i po delu
 
-НЕЛЬЗЯ
-• DM — убивать без RP и причины
-• PG — делать то, чего персонаж не смог бы
-• MG — тащить в игру знания с форума, Discord, /b
-• RK / SK — месть и убийства после смерти / в спавне
-• Читы, баги, флуд, оскорбления игроков и администрации
-• Ник не в формате Name_Surname
+NEL'ZYA
+• DM — ubivat' bez RP i prichiny
+• PG — delat' to, chego personazh ne smog by
+• MG — tashchit' v igru znaniya s foruma, Discord, /b
+• RK / SK — mest' i ubiystva posle smerti / v spawne
+• Chity, bagi, flud, oskorbleniya igrokov i administracii
+• Nik ne v formate Name_Surname
 
-Администрация может наказать за обход правил по смыслу, не только по букве.
+Administraciya mozhet nakazat' za obhod pravil po smyslu, ne tol'ko po bukve.
 
-Нажимая «Принимаю», ты соглашаешься играть по этим правилам.`;
+Nazhimaya «Prinimayu», ty soglashaesh'sya igrat' po etim pravilam.`;

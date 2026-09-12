@@ -13,7 +13,7 @@ export function normalizeEmail(raw: string): string {
 
 export function emailError(email: string): string | null {
   if (email.length < 6 || email.length > 255 || !EMAIL_RE.test(email)) {
-    return "Введи почту вида name@example.com";
+    return "Vvedi pochtu vida name@example.com";
   }
 
   return null;
@@ -21,11 +21,11 @@ export function emailError(email: string): string | null {
 
 export function passwordError(password: string): string | null {
   if (password.length < 6 || password.length > 32) {
-    return "Пароль: от 6 до 32 символов";
+    return "Parol': ot 6 do 32 simvolov";
   }
 
   if (/\s/.test(password)) {
-    return "Пароль не должен содержать пробелы";
+    return "Parol' ne dolzhen soderzhat' probely";
   }
 
   return null;
@@ -34,7 +34,7 @@ export function passwordError(password: string): string | null {
 export function parseBirthDate(raw: string): { iso: string } | { error: string } {
   const match = raw.trim().match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
   if (!match) {
-    return { error: "Дата в формате ДД.ММ.ГГГГ, например 15.04.1998" };
+    return { error: "Data v formate DD.MM.YYYY, naprimer 15.04.1998" };
   }
 
   const day = Number(match[1]);
@@ -47,16 +47,16 @@ export function parseBirthDate(raw: string): { iso: string } | { error: string }
     date.getMonth() !== month - 1 ||
     date.getDate() !== day
   ) {
-    return { error: "Такой даты не существует" };
+    return { error: "Takoy daty ne sushchestvuet" };
   }
 
   const age = ageOn(date, new Date());
   if (age < MIN_AGE) {
-    return { error: `Регистрация с ${MIN_AGE} лет` };
+    return { error: `Registraciya s ${MIN_AGE} let` };
   }
 
   if (age > MAX_AGE) {
-    return { error: "Проверь дату рождения" };
+    return { error: "Prover' datu rozhdeniya" };
   }
 
   const iso = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;

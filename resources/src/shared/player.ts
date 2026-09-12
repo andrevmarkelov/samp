@@ -29,3 +29,15 @@ export function playerId(player: Player): number | null {
     return null;
   }
 }
+
+export function playerIp(player: Player): string {
+  try {
+    const result = player.getIp();
+    const raw = String(result?.ip ?? "").trim();
+    const ipv4Port = raw.match(/^(\d{1,3}(?:\.\d{1,3}){3}):\d+$/);
+    const ip = ipv4Port?.[1] ?? raw;
+    return ip.length > 45 ? ip.slice(0, 45) : ip;
+  } catch {
+    return "";
+  }
+}

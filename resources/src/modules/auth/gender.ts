@@ -4,8 +4,32 @@ export function isGender(value: string): value is Gender {
   return value === "male" || value === "female";
 }
 
+export const GENDER_LIST_MALE = "Muzhskoy";
+export const GENDER_LIST_FEMALE = "Zhenskiy";
+
 export function genderLabel(gender: Gender): string {
-  return gender === "female" ? "женский" : "мужской";
+  return gender === "female" ? GENDER_LIST_FEMALE : GENDER_LIST_MALE;
+}
+
+export function genderFromList(listItem: number, inputText: string): Gender | null {
+  const raw = inputText.trim().toLowerCase();
+  if (raw === GENDER_LIST_MALE.toLowerCase() || raw === "male") {
+    return "male";
+  }
+
+  if (raw === GENDER_LIST_FEMALE.toLowerCase() || raw === "female") {
+    return "female";
+  }
+
+  if (listItem === 0) {
+    return "male";
+  }
+
+  if (listItem === 1) {
+    return "female";
+  }
+
+  return null;
 }
 
 export function byGender(

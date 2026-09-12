@@ -1,4 +1,4 @@
-import { Dialog } from "@omp-node/core";
+import { Dialog, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { formatBirthDate } from "../auth/validation";
 import { genderLabel } from "../auth/gender";
@@ -9,6 +9,10 @@ const STATS_DIALOG_ID = 2;
 const DIALOG_STYLE_MSGBOX = 0;
 
 registerCommand("stats", "Statistika personazha", (player) => {
+  showStatsDialog(player);
+});
+
+export function showStatsDialog(player: Player): void {
   const account = getAccount(player);
   if (!account) {
     player.sendClientMessage(Color.error, "Snachala voydi v akkaunt.");
@@ -26,15 +30,15 @@ registerCommand("stats", "Statistika personazha", (player) => {
   }
 
   const body = [
-    `Имя: ${account.name}`,
-    `Пол: ${genderLabel(account.gender)}`,
-    `Уровень: ${account.level}`,
-    `Скин: ${account.skin}`,
-    `Дата рождения: ${formatBirthDate(account.birthDate)}`,
-    `Почта: ${account.email}`,
-    `Деньги: $${account.money}`,
-    `Донат-счёт: ${account.donate}`,
-    `Здоровье: ${health}`,
+    `Imya: ${account.name}`,
+    `Pol: ${genderLabel(account.gender)}`,
+    `Uroven': ${account.level}`,
+    `Skin: ${account.skin}`,
+    `Data rozhdeniya: ${formatBirthDate(account.birthDate)}`,
+    `Pochta: ${account.email}`,
+    `Den'gi: $${account.money}`,
+    `Donat-schet: ${account.donate}`,
+    `Zdorov'e: ${health}`,
   ].join("\n");
 
   try {
@@ -42,12 +46,12 @@ registerCommand("stats", "Statistika personazha", (player) => {
       player,
       STATS_DIALOG_ID,
       DIALOG_STYLE_MSGBOX,
-      "Статистика",
+      "Statistika",
       body,
-      "Закрыть",
+      "Zakryt'",
       ""
     );
   } catch {
     player.sendClientMessage(Color.error, "Ne udalos' otkryt' statistiku.");
   }
-});
+}

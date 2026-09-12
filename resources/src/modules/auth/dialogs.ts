@@ -2,7 +2,7 @@ import { Dialog, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { isPlayerActive } from "../../shared/player";
 import { DEFAULT_SPAWN, STREET_WORLD } from "../spawn/point";
-import type { Gender } from "./gender";
+import { GENDER_LIST_FEMALE, GENDER_LIST_MALE, type Gender } from "./gender";
 import { RULES_TITLE, SERVER_RULES } from "./rules";
 import { isAuthenticated } from "./session";
 import { skinListBody } from "./skins";
@@ -77,8 +77,8 @@ export function showRulesDialog(player: Player): void {
     DialogStyle.msgbox,
     RULES_TITLE,
     SERVER_RULES,
-    "Принимаю",
-    "Отказаться"
+    "Prinimayu",
+    "Otkazat'sya"
   );
 }
 
@@ -87,10 +87,10 @@ export function showLoginDialog(player: Player, name: string, error?: string): v
   showAuthDialog(
     player,
     DialogStyle.password,
-    "Авторизация",
-    `${prefix}Ник ${name} уже зарегистрирован.\nВведи пароль:`,
-    "Войти",
-    "Выход"
+    "Avtorizaciya",
+    `${prefix}Nik ${name} uzhe zaregistrirovan.\nVvedi parol':`,
+    "Voyti",
+    "Vykhod"
   );
 }
 
@@ -99,10 +99,10 @@ export function showEmailDialog(player: Player, name: string, error?: string): v
   showAuthDialog(
     player,
     DialogStyle.input,
-    "Регистрация",
-    `${prefix}Ник ${name} свободен.\nВведи почту:`,
-    "Далее",
-    "Назад"
+    "Registraciya",
+    `${prefix}Nik ${name} svoboden.\nVvedi pochtu:`,
+    "Dalee",
+    "Nazad"
   );
 }
 
@@ -111,10 +111,10 @@ export function showPasswordDialog(player: Player, error?: string): void {
   showAuthDialog(
     player,
     DialogStyle.password,
-    "Регистрация",
-    `${prefix}Придумай пароль (от 6 символов):`,
-    "Далее",
-    "Назад"
+    "Registraciya",
+    `${prefix}Pridumay parol' (ot 6 simvolov):`,
+    "Dalee",
+    "Nazad"
   );
 }
 
@@ -123,10 +123,10 @@ export function showPasswordConfirmDialog(player: Player, error?: string): void 
   showAuthDialog(
     player,
     DialogStyle.password,
-    "Регистрация",
-    `${prefix}Повтори пароль:`,
-    "Далее",
-    "Назад"
+    "Registraciya",
+    `${prefix}Povtori parol':`,
+    "Dalee",
+    "Nazad"
   );
 }
 
@@ -135,10 +135,10 @@ export function showBirthDateDialog(player: Player, error?: string): void {
   showAuthDialog(
     player,
     DialogStyle.input,
-    "Регистрация",
-    `${prefix}Дата рождения (ДД.ММ.ГГГГ):\nНапример 15.04.1998`,
-    "Далее",
-    "Назад"
+    "Registraciya",
+    `${prefix}Data rozhdeniya (DD.MM.YYYY):\nNaprimer 15.04.1998`,
+    "Dalee",
+    "Nazad"
   );
 }
 
@@ -146,10 +146,10 @@ export function showGenderDialog(player: Player): void {
   showAuthDialog(
     player,
     DialogStyle.list,
-    "Регистрация",
-    "Мужской\nЖенский",
-    "Выбрать",
-    "Назад"
+    "Pol personazha",
+    `${GENDER_LIST_MALE}\n${GENDER_LIST_FEMALE}`,
+    "Vybrat'",
+    "Nazad"
   );
 }
 
@@ -157,10 +157,10 @@ export function showSkinDialog(player: Player, gender: Gender): void {
   showAuthDialog(
     player,
     DialogStyle.list,
-    "Выбор скина",
+    "Vybor skina",
     skinListBody(gender),
-    "Выбрать",
-    "Назад"
+    "Vybrat'",
+    "Nazad"
   );
 }
 
@@ -168,9 +168,9 @@ export function showRegisterConfirmDialog(player: Player, body: string): void {
   showAuthDialog(
     player,
     DialogStyle.msgbox,
-    "Подтверждение",
+    "Podtverzhdenie",
     body,
-    "Готово",
-    "Назад"
+    "Gotovo",
+    "Nazad"
   );
 }

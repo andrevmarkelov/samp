@@ -22,6 +22,7 @@ type UserRow = RowDataPacket & {
   health: number;
   passport?: number | boolean;
   hospitalized?: number | boolean;
+  invited_by?: string | null;
   birth_date: Date | string;
 };
 
@@ -39,6 +40,9 @@ CREATE TABLE IF NOT EXISTS users (
   health FLOAT NOT NULL DEFAULT 100,
   passport TINYINT(1) NOT NULL DEFAULT 0,
   hospitalized TINYINT(1) NOT NULL DEFAULT 0,
+  invited_by VARCHAR(24) NULL DEFAULT NULL,
+  register_ip VARCHAR(45) NULL DEFAULT NULL,
+  last_ip VARCHAR(45) NULL DEFAULT NULL,
   birth_date DATE NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
@@ -72,6 +76,18 @@ const COLUMN_MIGRATIONS = [
     name: "hospitalized",
     sql: "hospitalized TINYINT(1) NOT NULL DEFAULT 0 AFTER passport",
   },
+  {
+    name: "invited_by",
+    sql: "invited_by VARCHAR(24) NULL DEFAULT NULL AFTER hospitalized",
+  },
+  {
+    name: "register_ip",
+    sql: "register_ip VARCHAR(45) NULL DEFAULT NULL AFTER invited_by",
+  },
+  {
+    name: "last_ip",
+    sql: "last_ip VARCHAR(45) NULL DEFAULT NULL AFTER register_ip",
+  },
 ] as const;
 
 export async function ensureUsersTable(): Promise<void> {
@@ -101,7 +117,7 @@ async function columnExists(column: string): Promise<boolean> {
 
 export async function findUserByName(name: string): Promise<UserRow | null> {
   const rows = await query<UserRow>(
-    "SELECT id, name, email, password_hash, gender, skin, level, money, donate, health, passport, hospitalized, birth_date FROM users WHERE name = ? LIMIT 1",
+    "SELECT id, name, email, password_hash, gender, skin, level, money, donate, health, passport, hospitalized, invited_by, birth_date FROM users WHERE name = ? LIMIT 1",
     [name]
   );
   return rows[0] ?? null;
@@ -122,9 +138,11 @@ export async function createUser(input: {
   gender: Gender;
   skin: number;
   birthDate: string;
+  ip: string;
 }): Promise<Account> {
+  const ip = input.ip || null;
   const result = await execute(
-    "INSERT INTO users (name, email, password_hash, gender, skin, level, money, donate, health, passport, hospitalized, birth_date) VALUES (?, ?, ?, ?, ?, 1, ?, 0, ?, 0, 0, ?)",
+    "INSERT INTO users (name, email, password_hash, gender, skin, level, money, donate, health, passport, hospitalized, birth_date, register_ip, last_ip) VALUES (?, ?, ?, ?, ?, 1, ?, 0, ?, 0, 0, ?, ?, ?)",
     [
       input.name,
       input.email,
@@ -134,6 +152,8 @@ export async function createUser(input: {
       STARTING_MONEY,
       STARTING_HEALTH,
       input.birthDate,
+      ip,
+      ip,
     ]
   );
 
@@ -149,6 +169,7 @@ export async function createUser(input: {
     health: STARTING_HEALTH,
     passport: false,
     hospitalized: false,
+    invitedBy: null,
     birthDate: input.birthDate,
   };
 }
@@ -181,6 +202,25 @@ export async function saveUserHospitalized(
   ]);
 }
 
+export async function saveUserInvitedBy(
+  userId: number,
+  invitedBy: string
+): Promise<boolean> {
+  const result = await execute(
+    "UPDATE users SET invited_by = ? WHERE id = ? AND invited_by IS NULL",
+    [invitedBy, userId]
+  );
+  return Number(result.affectedRows) > 0;
+}
+
+export async function saveUserLastIp(userId: number, ip: string): Promise<void> {
+  if (!ip) {
+    return;
+  }
+
+  await execute("UPDATE users SET last_ip = ? WHERE id = ?", [ip, userId]);
+}
+
 export function isDuplicateKey(error: unknown): boolean {
   return (
     typeof error === "object" &&
@@ -203,8 +243,14 @@ export function accountFromRow(row: UserRow): Account {
     health: normalizeHealth(row.health),
     passport: Boolean(Number(row.passport)),
     hospitalized: Boolean(Number(row.hospitalized)),
+    invitedBy: parseInvitedBy(row.invited_by),
     birthDate: toIsoDate(row.birth_date),
   };
+}
+
+function parseInvitedBy(value: string | null | undefined): string | null {
+  const name = String(value ?? "").trim();
+  return name.length > 0 ? name : null;
 }
 
 function parseGender(value: string): Gender {

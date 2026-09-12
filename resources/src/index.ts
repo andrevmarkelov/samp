@@ -10,6 +10,7 @@ import { commandsModule } from "./modules/commands";
 import { mappingModule } from "./modules/mapping";
 import { hospitalModule } from "./modules/hospital";
 import { cityHallModule } from "./modules/cityhall";
+import { gpsModule } from "./modules/gps";
 import { zonesModule } from "./modules/zones";
 import { hudModule } from "./modules/hud";
 import type { GameModule } from "./modules/types";
@@ -21,6 +22,7 @@ const modules: GameModule[] = [
   spawnModule,
   hospitalModule,
   cityHallModule,
+  gpsModule,
   zonesModule,
   hudModule,
   sessionModule,
