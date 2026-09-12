@@ -32,7 +32,7 @@
         "time": 12,
         "use_all_animations": true,
         "use_chat_radius": false,
-        "use_entry_exit_markers": true,
+        "use_entry_exit_markers": false,
         "use_instagib": false,
         "use_manual_engine_and_lights": false,
         "use_nametag_los": true,
