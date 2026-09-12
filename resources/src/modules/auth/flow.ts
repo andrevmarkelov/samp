@@ -30,7 +30,7 @@ import {
   isDuplicateKey,
   saveUserLastIp,
 } from "./repository";
-import { clearAccount, getAccount, isAuthenticated, setAccount, applyWallet } from "./session";
+import { clearAccount, getAccount, isAuthenticated, setAccount, applyWallet, applyScore } from "./session";
 import { genderFromList, genderLabel, type Gender } from "./gender";
 import { skinByIndex } from "./skins";
 import {
@@ -370,6 +370,7 @@ async function finishLogin(player: Player, name: string, password: string): Prom
   clearPending(player);
   spawnIntoWorld(player, account.skin);
   applyWallet(player, account);
+  applyScore(player, account.level);
   welcome(player, account.name);
   const ip = playerIp(player);
   if (ip) {
@@ -435,6 +436,7 @@ async function finishRegister(
   clearPending(player);
   spawnIntoWorld(player, account.skin);
   applyWallet(player, account);
+  applyScore(player, account.level);
   welcome(player, account.name);
   player.sendClientMessage(Color.gray, "Personazh sozdan. /help — spisok komand.");
   omp.log(`[${SERVER_TAG}] ${account.name} зарегистрировался`);

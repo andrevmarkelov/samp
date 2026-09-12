@@ -5,6 +5,7 @@ import { holdAtAuth } from "../auth/flow";
 import {
   HOSPITAL_HEALTH,
   applyHealth,
+  applyScore,
   applyWallet,
   getAccount,
   isAuthenticated,
@@ -96,6 +97,7 @@ export const spawnModule: GameModule = {
         player.setTeam(NO_TEAM);
         if (account) {
           player.setSkin(account.skin);
+          applyScore(player, account.level);
         }
         player.setCameraBehind();
       } catch {

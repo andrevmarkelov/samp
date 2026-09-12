@@ -26,6 +26,7 @@ export type Account = {
   gender: Gender;
   skin: number;
   level: number;
+  exp: number;
   money: number;
   donate: number;
   health: number;
@@ -92,10 +93,18 @@ export function applyHealth(player: Player, health: number): void {
   }
 }
 
+export function applyScore(player: Player, level: number): void {
+  try {
+    player.setScore(Math.max(0, Math.floor(level)));
+  } catch {
+    // Слот ещё не в игре.
+  }
+}
+
 export function patchAccount(
   player: Player,
   patch: Partial<
-    Pick<Account, "health" | "money" | "passport" | "hospitalized" | "invitedBy">
+    Pick<Account, "health" | "money" | "passport" | "hospitalized" | "invitedBy" | "level" | "exp">
   >
 ): void {
   const account = getAccount(player);

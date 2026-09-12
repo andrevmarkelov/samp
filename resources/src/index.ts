@@ -11,6 +11,8 @@ import { mappingModule } from "./modules/mapping";
 import { hospitalModule } from "./modules/hospital";
 import { cityHallModule } from "./modules/cityhall";
 import { gpsModule } from "./modules/gps";
+import { afkModule } from "./modules/afk";
+import { paydayModule } from "./modules/payday";
 import { zonesModule } from "./modules/zones";
 import { hudModule } from "./modules/hud";
 import type { GameModule } from "./modules/types";
@@ -23,6 +25,8 @@ const modules: GameModule[] = [
   hospitalModule,
   cityHallModule,
   gpsModule,
+  afkModule,
+  paydayModule,
   zonesModule,
   hudModule,
   sessionModule,

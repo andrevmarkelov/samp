@@ -3,6 +3,7 @@ import { Color } from "../../shared/colors";
 import { formatBirthDate } from "../auth/validation";
 import { genderLabel } from "../auth/gender";
 import { getAccount } from "../auth/session";
+import { expForNextLevel } from "../payday/progress";
 import { registerCommand } from "./registry";
 
 const STATS_DIALOG_ID = 2;
@@ -33,6 +34,7 @@ export function showStatsDialog(player: Player): void {
     `Imya: ${account.name}`,
     `Pol: ${genderLabel(account.gender)}`,
     `Uroven': ${account.level}`,
+    `Opyt: ${account.exp}/${expForNextLevel(account.level)}`,
     `Skin: ${account.skin}`,
     `Data rozhdeniya: ${formatBirthDate(account.birthDate)}`,
     `Pochta: ${account.email}`,

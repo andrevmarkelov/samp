@@ -1,0 +1,70 @@
+import { omp, type Player } from "@omp-node/core";
+import { Color } from "../../shared/colors";
+import { SERVER_TAG } from "../../shared/brand";
+import { isPlayerActive } from "../../shared/player";
+import { saveUserProgress } from "../auth/repository";
+import { getAccount, isAuthenticated, patchAccount, applyScore } from "../auth/session";
+import type { GameModule } from "../types";
+import { isPlayerAfk } from "../afk";
+import { applyPaydayExp, expForNextLevel, formatClock, hourStamp } from "./progress";
+
+const TICK_MS = 1000;
+
+let lastHour = "";
+
+export const paydayModule: GameModule = {
+  name: "payday",
+  start() {
+    lastHour = hourStamp(new Date());
+
+    setInterval(() => {
+      const now = new Date();
+      const stamp = hourStamp(now);
+      if (stamp === lastHour) {
+        return;
+      }
+
+      lastHour = stamp;
+      runPayday(now);
+    }, TICK_MS);
+  },
+};
+
+function runPayday(now: Date): void {
+  const clock = formatClock(now);
+  omp.log(`[${SERVER_TAG}] payday ${clock}`);
+
+  omp.players.forEach((player) => {
+    if (!isPlayerActive(player) || !isAuthenticated(player) || isPlayerAfk(player)) {
+      return;
+    }
+
+    payPlayer(player, clock);
+  });
+}
+
+function payPlayer(player: Player, clock: string): void {
+  const account = getAccount(player);
+  if (!account) {
+    return;
+  }
+
+  const next = applyPaydayExp(account.level, account.exp);
+  patchAccount(player, { level: next.level, exp: next.exp });
+  applyScore(player, next.level);
+  void saveUserProgress(account.id, next.level, next.exp).catch((error: unknown) => {
+    const message = error instanceof Error ? error.message : String(error);
+    omp.log(`[${SERVER_TAG}] не удалось сохранить payday ${account.name}: ${message}`);
+  });
+
+  const need = expForNextLevel(next.level);
+  player.sendClientMessage(Color.info, clock);
+  player.sendClientMessage(Color.white, `Ochki opyta ${next.exp}/${need}`);
+
+  if (next.leveled) {
+    player.sendClientMessage(
+      Color.tryOk,
+      `Pozdravlyaem, vash igrovoy uroven' byl povyshen do ${next.level}.`
+    );
+  }
+}

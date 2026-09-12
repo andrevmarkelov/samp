@@ -17,12 +17,13 @@ type UserRow = RowDataPacket & {
   gender: string;
   skin: number;
   level: number;
+  exp: number;
   money: number;
   donate: number;
   health: number;
-  passport?: number | boolean;
-  hospitalized?: number | boolean;
-  invited_by?: string | null;
+  passport: number | boolean;
+  hospitalized: number | boolean;
+  invited_by: string | null;
   birth_date: Date | string;
 };
 
@@ -35,6 +36,7 @@ CREATE TABLE IF NOT EXISTS users (
   gender ENUM('male', 'female') NOT NULL,
   skin SMALLINT UNSIGNED NOT NULL,
   level SMALLINT UNSIGNED NOT NULL DEFAULT 1,
+  exp INT UNSIGNED NOT NULL DEFAULT 0,
   money INT NOT NULL DEFAULT 0,
   donate INT UNSIGNED NOT NULL DEFAULT 0,
   health FLOAT NOT NULL DEFAULT 100,
@@ -59,6 +61,10 @@ const COLUMN_MIGRATIONS = [
   {
     name: "money",
     sql: "money INT NOT NULL DEFAULT 0 AFTER level",
+  },
+  {
+    name: "exp",
+    sql: "exp INT UNSIGNED NOT NULL DEFAULT 0 AFTER level",
   },
   {
     name: "donate",
@@ -117,7 +123,7 @@ async function columnExists(column: string): Promise<boolean> {
 
 export async function findUserByName(name: string): Promise<UserRow | null> {
   const rows = await query<UserRow>(
-    "SELECT id, name, email, password_hash, gender, skin, level, money, donate, health, passport, hospitalized, invited_by, birth_date FROM users WHERE name = ? LIMIT 1",
+    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, donate, health, passport, hospitalized, invited_by, birth_date FROM users WHERE name = ? LIMIT 1",
     [name]
   );
   return rows[0] ?? null;
@@ -164,6 +170,7 @@ export async function createUser(input: {
     gender: input.gender,
     skin: input.skin,
     level: 1,
+    exp: 0,
     money: STARTING_MONEY,
     donate: 0,
     health: STARTING_HEALTH,
@@ -221,6 +228,18 @@ export async function saveUserLastIp(userId: number, ip: string): Promise<void> 
   await execute("UPDATE users SET last_ip = ? WHERE id = ?", [ip, userId]);
 }
 
+export async function saveUserProgress(
+  userId: number,
+  level: number,
+  exp: number
+): Promise<void> {
+  await execute("UPDATE users SET level = ?, exp = ? WHERE id = ?", [
+    level,
+    exp,
+    userId,
+  ]);
+}
+
 export function isDuplicateKey(error: unknown): boolean {
   return (
     typeof error === "object" &&
@@ -237,7 +256,8 @@ export function accountFromRow(row: UserRow): Account {
     email: row.email,
     gender: parseGender(row.gender),
     skin: Number(row.skin),
-    level: Number(row.level),
+    level: Number(row.level) || 1,
+    exp: Number(row.exp) || 0,
     money: Number(row.money) || 0,
     donate: Number(row.donate) || 0,
     health: normalizeHealth(row.health),
