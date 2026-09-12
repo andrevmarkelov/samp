@@ -1,0 +1,10 @@
+{
+  "name": "lsrp",
+  "private": true,
+  "scripts": {
+    "build": "npm run build --prefix resources",
+    "dev": "npm run dev --prefix resources",
+    "typecheck": "npm run typecheck --prefix resources",
+    "start": "omp-server.exe"
+  }
+}

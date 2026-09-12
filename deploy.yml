@@ -1,0 +1,94 @@
+# Сборка мода и выкладка на сервер.
+#
+# Секреты репозитория (Settings → Secrets and variables → Actions):
+#   DEPLOY_HOST      — IP или домен
+#   DEPLOY_USER      — SSH-пользователь
+#   DEPLOY_SSH_KEY   — приватный ключ (целиком, включая BEGIN/END)
+#   DEPLOY_PATH      — каталог сервера, например /opt/lsrp
+#   SSH-порт в пайплайне: 22
+#
+# Запуск: Actions → Deploy → Run workflow
+# или git tag v1.0.0 && git push origin v1.0.0
+
+# name: Deploy
+
+# on:
+#   workflow_dispatch:
+#   push:
+#     tags:
+#       - "v*"
+
+# jobs:
+#   build:
+#     name: Typecheck and build
+#     runs-on: ubuntu-latest
+#     defaults:
+#       run:
+#         working-directory: resources
+
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
+
+#       - name: Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: 22
+#           cache: npm
+#           cache-dependency-path: resources/package-lock.json
+
+#       - name: Install
+#         run: npm ci
+
+#       - name: Typecheck
+#         run: npm run typecheck
+
+#       - name: Build
+#         run: npm run build
+
+#       - name: Upload dist
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: lsrp-dist
+#           path: resources/dist/
+#           if-no-files-found: error
+
+#   deploy:
+#     name: Upload to server
+#     needs: build
+#     runs-on: ubuntu-latest
+#     if: ${{ secrets.DEPLOY_HOST != '' }}
+
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
+
+#       - name: Download dist
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: lsrp-dist
+#           path: resources/dist
+
+#       - name: Copy dist and maps
+#         uses: appleboy/scp-action@v0.1.7
+#         with:
+#           host: ${{ secrets.DEPLOY_HOST }}
+#           username: ${{ secrets.DEPLOY_USER }}
+#           key: ${{ secrets.DEPLOY_SSH_KEY }}
+#           port: 22
+#           source: "resources/dist,maps"
+#           target: ${{ secrets.DEPLOY_PATH }}
+#           overwrite: true
+
+#       - name: Restart open.mp
+#         uses: appleboy/ssh-action@v1.2.2
+#         with:
+#           host: ${{ secrets.DEPLOY_HOST }}
+#           username: ${{ secrets.DEPLOY_USER }}
+#           key: ${{ secrets.DEPLOY_SSH_KEY }}
+#           port: 22
+#           script: |
+#             cd "${{ secrets.DEPLOY_PATH }}"
+#             if command -v systemctl >/dev/null && systemctl list-units --type=service --all | grep -q lsrp; then
+#               sudo systemctl restart lsrp
+#             fi

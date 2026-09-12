@@ -1,0 +1,4 @@
+{
+  "name": "lsrp",
+  "entry": "dist/index.js"
+}
