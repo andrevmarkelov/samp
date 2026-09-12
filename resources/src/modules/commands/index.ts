@@ -9,6 +9,7 @@ import "./b";
 import "./s";
 import "./w";
 import "./stats";
+import "./pass";
 
 export const commandsModule: GameModule = {
   name: "commands",

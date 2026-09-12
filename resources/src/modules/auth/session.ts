@@ -29,6 +29,7 @@ export type Account = {
   money: number;
   donate: number;
   health: number;
+  passport: boolean;
   birthDate: string;
 };
 
@@ -91,7 +92,7 @@ export function applyHealth(player: Player, health: number): void {
 
 export function patchAccount(
   player: Player,
-  patch: Partial<Pick<Account, "health" | "money">>
+  patch: Partial<Pick<Account, "health" | "money" | "passport">>
 ): void {
   const account = getAccount(player);
   if (!account) {

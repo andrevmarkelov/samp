@@ -9,6 +9,7 @@ import { chatModule } from "./modules/chat";
 import { commandsModule } from "./modules/commands";
 import { mappingModule } from "./modules/mapping";
 import { hospitalModule } from "./modules/hospital";
+import { cityHallModule } from "./modules/cityhall";
 import { zonesModule } from "./modules/zones";
 import { hudModule } from "./modules/hud";
 import type { GameModule } from "./modules/types";
@@ -19,6 +20,7 @@ const modules: GameModule[] = [
   authModule,
   spawnModule,
   hospitalModule,
+  cityHallModule,
   zonesModule,
   hudModule,
   sessionModule,

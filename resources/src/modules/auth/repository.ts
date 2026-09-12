@@ -20,6 +20,7 @@ type UserRow = RowDataPacket & {
   money: number;
   donate: number;
   health: number;
+  passport?: number | boolean;
   birth_date: Date | string;
 };
 
@@ -35,6 +36,7 @@ CREATE TABLE IF NOT EXISTS users (
   money INT NOT NULL DEFAULT 0,
   donate INT UNSIGNED NOT NULL DEFAULT 0,
   health FLOAT NOT NULL DEFAULT 100,
+  passport TINYINT(1) NOT NULL DEFAULT 0,
   birth_date DATE NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
@@ -59,6 +61,10 @@ const COLUMN_MIGRATIONS = [
   {
     name: "health",
     sql: "health FLOAT NOT NULL DEFAULT 100 AFTER donate",
+  },
+  {
+    name: "passport",
+    sql: "passport TINYINT(1) NOT NULL DEFAULT 0 AFTER health",
   },
 ] as const;
 
@@ -89,7 +95,7 @@ async function columnExists(column: string): Promise<boolean> {
 
 export async function findUserByName(name: string): Promise<UserRow | null> {
   const rows = await query<UserRow>(
-    "SELECT id, name, email, password_hash, gender, skin, level, money, donate, health, birth_date FROM users WHERE name = ? LIMIT 1",
+    "SELECT id, name, email, password_hash, gender, skin, level, money, donate, health, passport, birth_date FROM users WHERE name = ? LIMIT 1",
     [name]
   );
   return rows[0] ?? null;
@@ -112,7 +118,7 @@ export async function createUser(input: {
   birthDate: string;
 }): Promise<Account> {
   const result = await execute(
-    "INSERT INTO users (name, email, password_hash, gender, skin, level, money, donate, health, birth_date) VALUES (?, ?, ?, ?, ?, 1, ?, 0, ?, ?)",
+    "INSERT INTO users (name, email, password_hash, gender, skin, level, money, donate, health, passport, birth_date) VALUES (?, ?, ?, ?, ?, 1, ?, 0, ?, 0, ?)",
     [
       input.name,
       input.email,
@@ -135,6 +141,7 @@ export async function createUser(input: {
     money: STARTING_MONEY,
     donate: 0,
     health: STARTING_HEALTH,
+    passport: false,
     birthDate: input.birthDate,
   };
 }
@@ -149,6 +156,10 @@ export async function saveUserVitals(
     money,
     userId,
   ]);
+}
+
+export async function saveUserPassport(userId: number): Promise<void> {
+  await execute("UPDATE users SET passport = 1 WHERE id = ?", [userId]);
 }
 
 export function isDuplicateKey(error: unknown): boolean {
@@ -171,6 +182,7 @@ export function accountFromRow(row: UserRow): Account {
     money: Number(row.money) || 0,
     donate: Number(row.donate) || 0,
     health: normalizeHealth(row.health),
+    passport: Boolean(Number(row.passport)),
     birthDate: toIsoDate(row.birth_date),
   };
 }
