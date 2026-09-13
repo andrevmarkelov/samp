@@ -7,6 +7,7 @@ import { bindAdminHelp } from "./ahelp";
 import { bindAdminChat } from "./chat";
 import { bindAdminKick } from "./kick";
 import { bindAdminSethp } from "./sethp";
+import { bindAdminMakeadmin } from "./makeadmin";
 import { bindAdminMakeleader } from "./makeleader";
 import { bindAdminMapTeleport } from "./map";
 
@@ -23,6 +24,7 @@ export const adminModule: GameModule = {
     bindAdminAo();
     bindAdminSethp();
     bindAdminMakeleader();
+    bindAdminMakeadmin();
     bindAdminMapTeleport();
 
     omp.on("playerConnect", (player) => {

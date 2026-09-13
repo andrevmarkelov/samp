@@ -8,5 +8,5 @@ export const ADMIN_COMMANDS_BY_LEVEL: readonly (readonly string[])[] = [
   ["/sethp"],
   ["/makeleader"],
   [],
-  [],
+  ["/makeadmin"],
 ];

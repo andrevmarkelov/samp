@@ -83,6 +83,10 @@ function showPasswordDialog(
   }
 }
 
+export function promptAdminPasswordSetup(player: Player): void {
+  showPasswordDialog(player, "set");
+}
+
 function kickAfterFails(player: Player): void {
   player.sendClientMessage(
     Color.error,

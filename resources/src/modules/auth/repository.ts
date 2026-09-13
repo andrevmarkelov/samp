@@ -289,6 +289,16 @@ export async function findAdminCredentials(userId: number): Promise<{
   };
 }
 
+export async function saveAdminAccess(
+  userId: number,
+  adminLevel: number
+): Promise<void> {
+  await execute(
+    "UPDATE users SET admin_level = ?, admin_password_hash = NULL WHERE id = ?",
+    [adminLevel, userId]
+  );
+}
+
 export async function saveAdminPassword(
   userId: number,
   passwordHash: string
