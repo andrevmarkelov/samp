@@ -1,6 +1,7 @@
 import { Color } from "../../shared/colors";
 import { CHAT_MAX_LENGTH, CHAT_RADIUS, sendNearby } from "../../shared/nearby";
-import { playerName } from "../../shared/player";
+import { playerChatName } from "../../shared/player";
+import { hasAdminAccess } from "../admin/session";
 import { registerCommand } from "./registry";
 
 registerCommand("b", "Vneigrovoy chat ryadom (OOC)", (player, args) => {
@@ -10,10 +11,11 @@ registerCommand("b", "Vneigrovoy chat ryadom (OOC)", (player, args) => {
     return;
   }
 
+  const prefix = hasAdminAccess(player, 1) ? "Administrator " : "";
   sendNearby(
     player,
     CHAT_RADIUS,
     Color.ooc,
-    `(( ${playerName(player)}: ${text} ))`
+    `(( ${prefix}${playerChatName(player)}: ${text} ))`
   );
 });

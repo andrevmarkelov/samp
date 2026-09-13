@@ -11,4 +11,5 @@ export const Color = {
   tryFail: 0xcc5555ff,
   shout: 0xffff99ff,
   whisper: 0xc8c8c8ff,
+  adminChat: 0x00ffffff,
 } as const;

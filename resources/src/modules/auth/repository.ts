@@ -25,6 +25,7 @@ type UserRow = RowDataPacket & {
   hospitalized: number | boolean;
   invited_by: string | null;
   birth_date: Date | string;
+  admin_level: number;
 };
 
 const CREATE_USERS_SQL = `
@@ -45,6 +46,8 @@ CREATE TABLE IF NOT EXISTS users (
   invited_by VARCHAR(24) NULL DEFAULT NULL,
   register_ip VARCHAR(45) NULL DEFAULT NULL,
   last_ip VARCHAR(45) NULL DEFAULT NULL,
+  admin_level TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  admin_password_hash VARCHAR(255) NULL DEFAULT NULL,
   birth_date DATE NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
@@ -94,6 +97,14 @@ const COLUMN_MIGRATIONS = [
     name: "last_ip",
     sql: "last_ip VARCHAR(45) NULL DEFAULT NULL AFTER register_ip",
   },
+  {
+    name: "admin_level",
+    sql: "admin_level TINYINT UNSIGNED NOT NULL DEFAULT 0 AFTER last_ip",
+  },
+  {
+    name: "admin_password_hash",
+    sql: "admin_password_hash VARCHAR(255) NULL DEFAULT NULL AFTER admin_level",
+  },
 ] as const;
 
 export async function ensureUsersTable(): Promise<void> {
@@ -123,7 +134,7 @@ async function columnExists(column: string): Promise<boolean> {
 
 export async function findUserByName(name: string): Promise<UserRow | null> {
   const rows = await query<UserRow>(
-    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, donate, health, passport, hospitalized, invited_by, birth_date FROM users WHERE name = ? LIMIT 1",
+    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, donate, health, passport, hospitalized, invited_by, birth_date, admin_level FROM users WHERE name = ? LIMIT 1",
     [name]
   );
   return rows[0] ?? null;
@@ -178,6 +189,7 @@ export async function createUser(input: {
     hospitalized: false,
     invitedBy: null,
     birthDate: input.birthDate,
+    adminLevel: 0,
   };
 }
 
@@ -240,6 +252,38 @@ export async function saveUserProgress(
   ]);
 }
 
+export async function findAdminCredentials(userId: number): Promise<{
+  adminLevel: number;
+  passwordHash: string | null;
+} | null> {
+  const rows = await query<
+    RowDataPacket & { admin_level: number; admin_password_hash: string | null }
+  >(
+    "SELECT admin_level, admin_password_hash FROM users WHERE id = ? LIMIT 1",
+    [userId]
+  );
+  const row = rows[0];
+  if (!row) {
+    return null;
+  }
+
+  const raw = String(row.admin_password_hash ?? "").trim();
+  return {
+    adminLevel: parseAdminLevel(row.admin_level),
+    passwordHash: raw.length > 0 ? raw : null,
+  };
+}
+
+export async function saveAdminPassword(
+  userId: number,
+  passwordHash: string
+): Promise<void> {
+  await execute("UPDATE users SET admin_password_hash = ? WHERE id = ?", [
+    passwordHash,
+    userId,
+  ]);
+}
+
 export function isDuplicateKey(error: unknown): boolean {
   return (
     typeof error === "object" &&
@@ -265,7 +309,19 @@ export function accountFromRow(row: UserRow): Account {
     hospitalized: Boolean(Number(row.hospitalized)),
     invitedBy: parseInvitedBy(row.invited_by),
     birthDate: toIsoDate(row.birth_date),
+    adminLevel: parseAdminLevel(row.admin_level),
   };
+}
+
+function parseAdminLevel(value: unknown): number {
+  const level = Math.floor(Number(value) || 0);
+  if (level < 0) {
+    return 0;
+  }
+  if (level > 7) {
+    return 7;
+  }
+  return level;
 }
 
 function parseInvitedBy(value: string | null | undefined): string | null {

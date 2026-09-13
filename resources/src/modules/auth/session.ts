@@ -34,6 +34,7 @@ export type Account = {
   hospitalized: boolean;
   invitedBy: string | null;
   birthDate: string;
+  adminLevel: number;
 };
 
 const accounts = new Map<number, Account>();
@@ -104,7 +105,17 @@ export function applyScore(player: Player, level: number): void {
 export function patchAccount(
   player: Player,
   patch: Partial<
-    Pick<Account, "health" | "money" | "passport" | "hospitalized" | "invitedBy" | "level" | "exp">
+    Pick<
+      Account,
+      | "health"
+      | "money"
+      | "passport"
+      | "hospitalized"
+      | "invitedBy"
+      | "level"
+      | "exp"
+      | "adminLevel"
+    >
   >
 ): void {
   const account = getAccount(player);

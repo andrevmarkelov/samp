@@ -17,6 +17,7 @@ import { paydayModule } from "./modules/payday";
 import { worldTimeModule } from "./modules/worldtime";
 import { zonesModule } from "./modules/zones";
 import { hudModule } from "./modules/hud";
+import { adminModule } from "./modules/admin";
 import type { GameModule } from "./modules/types";
 
 const modules: GameModule[] = [
@@ -36,6 +37,7 @@ const modules: GameModule[] = [
   sessionModule,
   chatModule,
   commandsModule,
+  adminModule,
   mappingModule,
 ];
 

@@ -8,6 +8,7 @@ export type CommandHandler = (player: Player, args: string) => void;
 type Command = {
   description: string;
   handler: CommandHandler;
+  hidden: boolean;
 };
 
 const commands = new Map<string, Command>();
@@ -15,16 +16,19 @@ const commands = new Map<string, Command>();
 export function registerCommand(
   name: string,
   description: string,
-  handler: CommandHandler
+  handler: CommandHandler,
+  hidden = false
 ): void {
-  commands.set(name.toLowerCase(), { description, handler });
+  commands.set(name.toLowerCase(), { description, handler, hidden });
 }
 
 export function listCommands(): Array<{ name: string; description: string }> {
-  return [...commands.entries()].map(([name, cmd]) => ({
-    name,
-    description: cmd.description,
-  }));
+  return [...commands.entries()]
+    .filter(([, cmd]) => !cmd.hidden)
+    .map(([name, cmd]) => ({
+      name,
+      description: cmd.description,
+    }));
 }
 
 export function handleCommand(player: Player, cmdtext: string): boolean {
