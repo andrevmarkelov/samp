@@ -1,10 +1,13 @@
 import { omp } from "@omp-node/core";
 import type { GameModule } from "../types";
 import { bindAdminsList } from "./admins";
+import { bindAdminAo } from "./ao";
 import { bindAlogin, clearAloginDialog } from "./alogin";
 import { bindAdminHelp } from "./ahelp";
 import { bindAdminChat } from "./chat";
 import { bindAdminKick } from "./kick";
+import { bindAdminSethp } from "./sethp";
+import { bindAdminMakeleader } from "./makeleader";
 import { bindAdminMapTeleport } from "./map";
 
 export { isAdminLoggedIn } from "./session";
@@ -17,6 +20,9 @@ export const adminModule: GameModule = {
     bindAdminHelp();
     bindAdminsList();
     bindAdminKick();
+    bindAdminAo();
+    bindAdminSethp();
+    bindAdminMakeleader();
     bindAdminMapTeleport();
 
     omp.on("playerConnect", (player) => {
