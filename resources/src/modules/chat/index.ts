@@ -1,6 +1,6 @@
 import { omp } from "@omp-node/core";
 import { Color } from "../../shared/colors";
-import { CHAT_MAX_LENGTH, CHAT_RADIUS, sendNearby } from "../../shared/nearby";
+import { CHAT_MAX_LENGTH, CHAT_RADIUS, sanitizeChatText, sendNearby } from "../../shared/nearby";
 import { playerChatName } from "../../shared/player";
 import { getAccount, isAuthenticated } from "../auth/session";
 import { resolveChatColor } from "../org";
@@ -15,7 +15,7 @@ export const chatModule: GameModule = {
         return false;
       }
 
-      const text = String(raw ?? "").trim().slice(0, CHAT_MAX_LENGTH);
+      const text = sanitizeChatText(String(raw ?? "").trim()).slice(0, CHAT_MAX_LENGTH);
       if (!text) {
         return false;
       }

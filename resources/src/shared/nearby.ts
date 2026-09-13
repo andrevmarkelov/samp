@@ -7,6 +7,10 @@ export const WHISPER_RADIUS = 5;
 export const SHOUT_RADIUS = 60;
 export const CHAT_MAX_LENGTH = 128;
 
+export function sanitizeChatText(text: string): string {
+  return text.replace(/\{/g, "");
+}
+
 export function sendNearby(
   source: Player,
   radius: number,

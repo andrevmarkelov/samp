@@ -121,7 +121,7 @@ npm ci --omit=dev
 
 Перед открытием игрокам:
 
-- `rcon.password` — не `changeme1`; RCON лучше оставить `enable: false`
+- `rcon.password` — задай свой **до** включения RCON; `enable` лучше оставить `false`. Не коммить рабочий пароль.
 - `network.public_addr` — белый IP или домен, если за NAT
 - `announce` — `true` только если нужен мастерлист
 - `password` — пароль на вход, если сервер закрытый

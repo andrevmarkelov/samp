@@ -1,6 +1,6 @@
 import { omp } from "@omp-node/core";
 import { Color } from "../../shared/colors";
-import { CHAT_MAX_LENGTH, CHAT_RADIUS } from "../../shared/nearby";
+import { CHAT_MAX_LENGTH, CHAT_RADIUS, sanitizeChatText } from "../../shared/nearby";
 import { isPlayerActive, playerChatName } from "../../shared/player";
 import { getAccount } from "../auth/session";
 import { getMembership } from "../org";
@@ -17,7 +17,7 @@ registerCommand("r", "Raciya organizacii", (player, args) => {
     return;
   }
 
-  const text = args.trim().replace(/\{/g, "").slice(0, CHAT_MAX_LENGTH);
+  const text = sanitizeChatText(args.trim()).slice(0, CHAT_MAX_LENGTH);
   if (!text) {
     player.sendClientMessage(Color.error, "Ispol'zovanie: /r [tekst]");
     return;

@@ -1,6 +1,6 @@
 import { Dialog, omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
-import { isPlayerActive, playerId } from "../../shared/player";
+import { isPlayerActive, kickSamePlayer, playerId } from "../../shared/player";
 import {
   findAdminCredentials,
   saveAdminPassword,
@@ -92,17 +92,7 @@ function kickAfterFails(player: Player): void {
     Color.error,
     "Tri nevernye popytki vhoda v adminku. Kick."
   );
-  setTimeout(() => {
-    if (!isPlayerActive(player)) {
-      return;
-    }
-
-    try {
-      player.kick();
-    } catch {
-      // Уже вышел.
-    }
-  }, 120);
+  kickSamePlayer(player);
 }
 
 async function startAlogin(player: Player): Promise<void> {

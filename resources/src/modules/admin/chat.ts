@@ -1,6 +1,6 @@
 import { omp } from "@omp-node/core";
 import { Color } from "../../shared/colors";
-import { CHAT_MAX_LENGTH } from "../../shared/nearby";
+import { CHAT_MAX_LENGTH, sanitizeChatText } from "../../shared/nearby";
 import { isPlayerActive, playerChatName } from "../../shared/player";
 import { registerCommand } from "../commands/registry";
 import { hasAdminAccess } from "./session";
@@ -28,7 +28,7 @@ export function bindAdminChat(): void {
         return;
       }
 
-      const text = args.trim().slice(0, CHAT_MAX_LENGTH);
+      const text = sanitizeChatText(args.trim()).slice(0, CHAT_MAX_LENGTH);
       if (!text) {
         player.sendClientMessage(Color.error, "Ispol'zovanie: /a [tekst]");
         return;

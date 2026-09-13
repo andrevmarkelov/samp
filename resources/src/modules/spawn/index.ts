@@ -1,4 +1,4 @@
-import { Class, omp, Vehicle, type Player } from "@omp-node/core";
+import { Class, omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { playerId } from "../../shared/player";
 import { holdAtAuth } from "../auth/flow";
@@ -47,8 +47,13 @@ export const spawnModule: GameModule = {
       0
     );
 
-    // Временно: тестовая машина у вокзала.
-    new Vehicle(560, 1779.3704, -1932.559, 13.3864, 270.354, 1, 1, 60, false);
+    omp.on("playerConnect", (player) => {
+      const id = playerId(player);
+      if (id !== null) {
+        pendingHospital.delete(id);
+        seenWorldSpawn.delete(id);
+      }
+    });
 
     omp.on("playerDeath", (player) => {
       if (!isAuthenticated(player)) {

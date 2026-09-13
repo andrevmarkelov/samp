@@ -17,24 +17,30 @@ resources/src/
     auth/                  регистрация и авторизация (диалоги)
     persist/               сохранение HP и денег, медленное падение здоровья
     spawn/                 класс, обычный спавн, больница после смерти
-    hud/                   логотип (textdraw) при входе
+    hospital/              интерьер больницы, койки
+    cityhall/              паспорт, инвайт
+    miner/                 шахта
+    gps/ afk/ payday/ worldtime/ zones/
+    hud/                   логотип textdraw «Los Santos RP»
     session/               лог входа / выхода
     chat/                  локальный чат
-    commands/              /help /me /do /try /todo /b /s /w /stats
-    mapping/               загрузка карт из maps/*.txt
+    commands/              /help /mn /me /do /try /todo /b /s /w /stats /pass /hospital /gps /leaders /r
+    admin/                 /alogin и админ-команды
+    org/                   организации (армия), ворота
+    mapping/               maps/*.txt
 ```
 
 Новая система = новая папка в `modules`, затем импорт в `src/index.ts`.
 
 Новая команда = файл в `modules/commands` по образцу `me.ts` (`registerCommand`), затем `import "./имя"` в `modules/commands/index.ts`.
 
-Маппинг: клади `.txt` с `CreateDynamicObject` / `CreateObject` в папку `maps` в корне сервера и перезапусти. Сейчас там `maps/jail.txt`.
+Маппинг: клади `.txt` с `CreateDynamicObject` / `CreateObject` в папку `maps` в корне сервера и перезапусти. Сейчас: `jail.txt`, `hospital.txt`, `mine.txt`, `army.txt`. Ворота армии в коде (`org/gates.ts`), в `army.txt` их не дублировать.
 
 Обычный чат — 20 м, `/w` шёпот — 5 м, `/s` крик — 60 м. В чате и пузырём над головой. Дальние игроки не видят. Лимит 128 символов.
 
 После смерти игрок оживает в одной больнице, случайно на одной из нескольких точек. Первый вход и без организации — `DEFAULT_SPAWN` в `modules/spawn/point.ts`. Интерьер пока `0`.
 
-При входе в правом верхнем углу — логотип **LS RP** (textdraw, разметка из Pawno). Текст и цвета правятся в `modules/hud/index.ts`.
+При входе в правом верхнем углу — логотип **Los Santos RP** (`modules/hud/index.ts`).
 
 `gamemodes/lsrp.amx` — заглушка Pawn, логика в TS.
 

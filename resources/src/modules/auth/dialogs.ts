@@ -1,6 +1,6 @@
 import { Dialog, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
-import { isPlayerActive } from "../../shared/player";
+import { isPlayerActive, kickSamePlayer } from "../../shared/player";
 import { DEFAULT_SPAWN, STREET_WORLD } from "../spawn/point";
 import { GENDER_LIST_FEMALE, GENDER_LIST_MALE, type Gender } from "./gender";
 import { RULES_TITLE, SERVER_RULES } from "./rules";
@@ -58,17 +58,7 @@ export function refreshAuthViewSoon(player: Player): void {
 
 export function kickLater(player: Player, reason: string): void {
   player.sendClientMessage(Color.error, reason);
-  setTimeout(() => {
-    if (!isPlayerActive(player)) {
-      return;
-    }
-
-    try {
-      player.kick();
-    } catch {
-      // Уже вышел.
-    }
-  }, 120);
+  kickSamePlayer(player);
 }
 
 export function showRulesDialog(player: Player): void {

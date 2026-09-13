@@ -139,6 +139,16 @@ export const hospitalModule: GameModule = {
 
     setInterval(tickHospital, TICK_MS);
 
+    omp.on("playerConnect", (player) => {
+      const id = playerId(player);
+      if (id !== null) {
+        lastTeleportAt.delete(id);
+        lastExitMsgAt.delete(id);
+        iconShown.delete(id);
+        releaseBed(id);
+      }
+    });
+
     omp.on("playerDisconnect", (player) => {
       const id = playerId(player);
       if (id !== null) {
@@ -158,6 +168,12 @@ export function tryOccupyHospitalBed(player: Player): void {
 
   const id = playerId(player);
   if (id === null) {
+    return;
+  }
+
+  const account = getAccount(player);
+  if (!account?.hospitalized) {
+    player.sendClientMessage(Color.error, "Vam ne nuzhno lechenie.");
     return;
   }
 
@@ -408,12 +424,35 @@ function tickHospital(): void {
 function healOccupiedBeds(): void {
   omp.players.forEach((player) => {
     const id = playerId(player);
-    if (id === null || !bedByPlayer.has(id) || !isPlayerActive(player)) {
+    if (id === null || !isPlayerActive(player)) {
+      return;
+    }
+
+    const bedIndex = bedByPlayer.get(id);
+    const bed = bedIndex === undefined ? undefined : BEDS[bedIndex];
+    if (bedIndex === undefined || !bed) {
       return;
     }
 
     const account = getAccount(player);
-    if (!account) {
+    if (!account?.hospitalized) {
+      releaseBed(id);
+      return;
+    }
+
+    try {
+      const pos = player.getPos();
+      if (player.getVirtualWorld() !== HOSPITAL_WORLD) {
+        releaseBed(id);
+        return;
+      }
+
+      if (distance3d(pos.x, pos.y, pos.z, bed.x, bed.y, bed.z) > BED_USE_RADIUS) {
+        releaseBed(id);
+        player.sendClientMessage(Color.gray, "Vy vstali s koyki. Lechenie ostanovleno.");
+        return;
+      }
+    } catch {
       return;
     }
 

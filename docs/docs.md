@@ -2,9 +2,11 @@
 
 **Los Santos Role Play.** Игровой сервер [open.mp](https://open.mp), логика на **TypeScript** через **omp-node**. Клиент: SA-MP 0.3.7 или open.mp. Локально: `127.0.0.1:7777`.
 
-Краткий старт — [README.md](../README.md). Выкладка на сервер — [deploy.md](deploy.md). Пайплайн деплоя — [deploy.yml](../deploy.yml) в корне. Здесь: архитектура, структура файлов, модули, база, команды, конфиг, потоки событий и результаты проверки кода.
+Краткий старт — [README.md](../README.md). Выкладка — [deploy.md](deploy.md). Шаблон пайплайна — [deploy.yml](../deploy.yml) (сейчас закомментирован). Здесь: архитектура, модули, база, команды, конфиг и результаты проверки перед публикацией.
 
 `npm run typecheck` на момент этой документации проходит без ошибок.
+
+Тексты игроку в чате и диалогах — **транслит** (клиент 0.3.7 / CP1251).
 
 ---
 
@@ -18,10 +20,12 @@
 6. [База данных](#база-данных)
 7. [Потоки событий](#потоки-событий)
 8. [Команды игрока](#команды-игрока)
-9. [Конфиг open.mp](#конфиг-openmp)
-10. [Сборка и запуск](#сборка-и-запуск)
-11. [Куда что править](#куда-что-править)
-12. [Проверка проекта](#проверка-проекта)
+9. [Админка](#админка)
+10. [Организации](#организации)
+11. [Конфиг open.mp](#конфиг-openmp)
+12. [Сборка и запуск](#сборка-и-запуск)
+13. [Куда что править](#куда-что-править)
+14. [Проверка проекта](#проверка-проекта)
 
 ---
 
@@ -31,8 +35,8 @@
 
 | Слой | Что грузит | Роль |
 |---|---|---|
-| Pawn | `gamemodes/lsrp.amx` (`pawn.main_scripts`: `lsrp 1`) | Пустышка ~304 байта. Нужна компоненту `Pawn.dll`. Логики нет. |
-| Node | `resources/` → `resources/omp-node.json` → `dist/index.js` | Весь мод: логин, чат, HP, больница, HUD, карты. |
+| Pawn | `gamemodes/lsrp.amx` (`pawn.main_scripts`: `lsrp 1`) | Пустышка. Нужна компоненту `Pawn.dll`. Логики нет. |
+| Node | `resources/` → `resources/omp-node.json` → `dist/index.js` | Весь мод. |
 
 ```
 omp-server.exe
@@ -47,11 +51,11 @@ omp-server.exe
 resources/src/*.ts  →  npm run build (esbuild)  →  resources/dist/index.js
 ```
 
-Сервер исполняет уже собранный JS. После правок исходников: `npm run build`, затем **рестарт** `omp-server.exe`. Hot-reload нет.
+Сервер исполняет уже собранный JS. После правок: `npm run build`, затем **рестарт** `omp-server.exe`. Hot-reload нет.
 
 Цикл разработки: в одном терминале `npm run dev` (watch), сервер перезапускаешь вручную.
 
-Ctrl+C иногда роняет встроенный Node в omp-node — это особенность рантайма, не бага мода. Если консоль зависла: закрыть окно и снова `npm start`.
+Ctrl+C иногда роняет встроенный Node в omp-node — особенность рантайма. Если консоль зависла: закрыть окно и снова `npm start`.
 
 Кириллица в консоли Windows часто кракозябрами; в `log.txt` текст нормальный.
 
@@ -59,36 +63,36 @@ Ctrl+C иногда роняет встроенный Node в omp-node — эт�
 
 ## Дерево проекта
 
-Корень `D:\OSPanel\home\samp\public` — рабочая директория `omp-server.exe` (`process.cwd()`). Отсюда читаются `.env`, `maps/`, `config.json`.
+Корень репозитория — рабочая директория `omp-server.exe` (`process.cwd()`). Отсюда читаются `.env`, `maps/`, `config.json`.
 
 ```
 public/
-  omp-server.exe                 бинарь open.mp
+  omp-server.exe                 бинарь open.mp (Windows)
   libnode.dll                    Node для omp-node
-  config.json                    настройки сервера
-  bans.json                      IP-баны движка (сейчас [])
-  .env / .env.example            доступ к MySQL (.env в .gitignore)
+  config.json                    настройки сервера (в git)
+  bans.json                      IP-баны движка
+  .env / .env.example            MySQL (.env в .gitignore)
   package.json                   npm run build / dev / typecheck / start
-  deploy.yml                     сборка и выкладка (GitHub Actions)
-  README.md                      краткий старт
+  deploy.yml                     шаблон GitHub Actions (закомментирован)
+  README.md
   docs/
     docs.md                      эта документация
-    deploy.md                    как выкатить на VPS
-  maps/                          карты: CreateObject / CreateDynamicObject
-    jail.txt                     интерьер тюрьмы (координаты в небе)
+    deploy.md                    выкладка на VPS
+  maps/                          CreateObject / CreateDynamicObject
+    jail.txt                     интерьер тюрьмы (в небе)
+    hospital.txt
+    mine.txt
+    army.txt                     объекты армии; ворота gates в коде, не дублировать
   sql/schema.sql                 эталон таблицы users
-  gamemodes/lsrp.amx             заглушка Pawn — не удалять, пока в config есть lsrp
-  components/                    DLL: Pawn.dll, omp-node.dll, Objects.dll, …
+  gamemodes/lsrp.amx             заглушка Pawn
+  components/                    DLL open.mp
   resources/
     omp-node.json                { "name": "lsrp", "entry": "dist/index.js" }
-    package.json                 esbuild, tsc, mysql2, @omp-node/core
-    tsconfig.json                strict, moduleResolution: bundler
-    src/                         исходники (править здесь)
-    dist/                        сборка (не править, в .gitignore)
-    node_modules/
+    package.json
+    tsconfig.json                strict
+    src/
+    dist/                        сборка (gitignore)
 ```
-
-Папки `scriptfiles/` и `models/` текущему коду не нужны. `models/` понадобится для кастомных `.dff`/`.txd` (`config.json` → `artwork.models_path`).
 
 **Не удалять:** `components/`, `omp-server.exe`, `libnode.dll`, `config.json`, `resources/`, `maps/`, `sql/`, `bans.json`, `gamemodes/lsrp.amx`.
 
@@ -100,46 +104,37 @@ public/
 
 ```
 resources/src/
-  index.ts                       старт модулей по порядку
+  index.ts
   shared/
-    brand.ts                     SERVER_NAME, SERVER_TAG (= config.json)
-    colors.ts                    цвета чата (RGBA как 0xRRGGBBAA)
-    database.ts                  пул mysql2, парсер .env, query / execute
-    nearby.ts                    локальный чат, радиусы, лимит 128
-    player.ts                    id, имя, isPlayerActive
+    brand.ts                     SERVER_NAME, SERVER_TAG
+    colors.ts
+    database.ts                  пул mysql2, .env из cwd
+    nearby.ts                    локальный чат, sanitizeChatText
+    player.ts                    id, имя, kickSamePlayer
   modules/
-    types.ts                     GameModule { name, start }
-    database/                    SELECT 1 при старте
-    persist/                     сейв HP/денег, урон в память, −1 HP / 15 мин
-    auth/
-      index.ts                   события connect / class / dialog
-      flow.ts                    шаги логина и регистрации
-      dialogs.ts                 показ диалогов, kickLater
-      rules.ts                   текст правил регистрации
-      repository.ts              SQL users + миграции колонок
-      session.ts                 аккаунт в памяти, HP/деньги на игроке
-      password.ts                scrypt
-      validation.ts              ник, почта, пароль, дата рождения
-      gender.ts                  male / female, подписи
-      skins.ts                   списки скинов по полу
-    spawn/
-      index.ts                   Class, смерть → больница, F4
-      point.ts                   DEFAULT_SPAWN, HOSPITAL_SPAWNS
-    hud/                         логотип textdraw
-    session/                     лог connect/disconnect (не путать с auth/session)
-    chat/
-      index.ts                   обычный чат
-      talk.ts                    пузырь + анимация разговора
-    commands/
-      index.ts                   импорт команд + bind
-      registry.ts                registerCommand / handleCommand
-      help.ts me.ts do.ts try.ts todo.ts b.ts s.ts w.ts stats.ts
-    mapping/
-      index.ts                   чтение maps/*.txt
-      pawn-map.ts                парсер CreateObject / материалы
+    types.ts
+    database/                    SELECT 1
+    persist/                     сейв HP; деньги только из account.money
+    auth/                        логин, сессия, scrypt, миграции
+    spawn/                       класс, больница после смерти, HQ при первом спавне
+    hospital/                    интерьер, койки /hospital
+    cityhall/                    паспорт, инвайт
+    miner/                       шахта
+    gps/
+    afk/
+    payday/                      час :00, exp, зарплата органа
+    worldtime/                   реальное локальное время
+    zones/
+    hud/                         textdraw «Los Santos RP»
+    session/                     лог connect (не auth/session)
+    chat/                        IC чат + анимация
+    commands/                    игровые команды
+    admin/                       /alogin и права 1–7
+    org/                         каталог, армия, ворота, внешний вид
+    mapping/                     maps/*.txt
 ```
 
-Сборка: `esbuild` bundler, ESM, `packages=external` (mysql2 и `@omp-node/core` не бандлятся). Target ES2018.
+Сборка: `esbuild`, ESM, `packages=external` (mysql2 и `@omp-node/core` не бандлятся). Target ES2018.
 
 ---
 
@@ -147,15 +142,14 @@ resources/src/
 
 В `src/index.ts` порядок **важен**:
 
-1. `database` — пул MySQL. Если нет — лог, дальше модули всё равно стартуют.
-2. **`persist` до `auth`** — на disconnect сначала `queueSave` (HP/деньги), потом `endAuth` стирает сессию.
-3. `auth` — таблица `users`, диалоги, сессия.
-4. `spawn` — класс, обычный спавн, больница.
-5. `hud` — логотип.
-6. `session` — строки в лог.
-7. `chat` — локальный чат.
-8. `commands` — `/help` и остальные.
-9. `mapping` — объекты из `maps/`.
+1. `database`
+2. **`persist` до `auth`** — на disconnect сначала сейв, потом очистка сессии
+3. `auth`
+4. `spawn`
+5. `hospital`, `cityhall`, `miner`, `gps`, `afk`, `payday`, `worldtime`, `zones`
+6. `hud`, `session`, `chat`, `commands`
+7. `admin`, `org`
+8. `mapping`
 
 События open.mp вызываются у всех подписчиков. Порядок регистрации = порядок `start()`.
 
@@ -163,259 +157,212 @@ resources/src/
 
 ## Модули
 
-### database
+### database / persist
 
-`shared/database.ts` читает `.env` из **корня сервера**, не из `resources/`. Если переменная уже есть в окружении — файл её не перезаписывает.
+`.env` читается из **корня сервера**. Пул mysql2: `connectionLimit: 10`, `utf8mb4`, `dateStrings: true`.
 
-Пул `mysql2`: `connectionLimit: 10`, `charset: utf8mb4`, `dateStrings: true` (даты как строки, без сдвига таймзоны).
+`queueSave` пишет в БД **HP с полоски** и **деньги из памяти аккаунта**, не `player.getMoney()`. Клиентский кэш денег при сейве выравнивается с аккаунтом (трейнер не сохраняется). Экономика (шахта, payday) должна сначала `patchAccount({ money })`, потом `giveMoney`.
 
-Если `SELECT 1` падает — пул закрывается, `isDatabaseReady() === false`. Игрока на входе кикнет «База данных недоступна».
+Выход — сразу. Раз в 3 минуты — все авторизованные. Раз в 15 минут −1 HP, пол 20, если не `hospitalized`.
 
-`closeDatabase()` в коде есть, на стопе сервера **не вызывается**.
+Урон: в память сразу, сверка через 50 мс. В спеке/смерти 0 HP в БД не пишется.
 
-### persist (`modules/persist/index.ts`)
-
-Сохранение персонажа, не логин.
-
-- `queueSave` — живые HP и деньги → память аккаунта → `UPDATE users SET health, money`.
-- Выход с сервера — сразу.
-- Раз в 3 минуты — все авторизованные (на случай краша).
-- Раз в 15 минут −1 HP, пол **20**.
-- Урон (`playerTakeDamage`) сразу в память; через 50 мс сверка с полоской.
-- В спеке и при смерти **0 в БД не пишется** (`readLiveHealth` берёт запасное значение из аккаунта).
-
-Константы в `modules/auth/session.ts`:
-
-| Константа | Значение | Смысл |
-|---|---|---|
-| `MAX_HEALTH` | 100 | потолок HP |
-| `MIN_HEALTH` | 20 | пол при естественном падении |
-| `HOSPITAL_HEALTH` | 100 | после смерти |
-| `STARTING_HEALTH` | 100 | новый персонаж |
-| `HEALTH_DECAY_AMOUNT` | 1 | сколько снимать |
-| `HEALTH_DECAY_MS` | 15 мин | как часто |
-| `VITALS_SAVE_MS` | 3 мин | автосейв |
-
-Деньги в мире читаются только в состояниях on-foot / driver / passenger. В спеке/смерти пишется последнее известное.
+`closeDatabase()` на стопе сервера не вызывается.
 
 ### auth
 
-Ник **только с клиента** SA-MP. Формат `Name_Surname` (латиница, `John_Doe`), 5–24 символа. Регулярка: `^[A-Z][a-z]+_[A-Z][a-z]+$`.
+Ник только с клиента: `Name_Surname`, 5–24, `^[A-Z][a-z]+_[A-Z][a-z]+$`.
 
-**Нет аккаунта:** правила сервера (принять / отказаться) → почта → пароль (6–32, без пробелов) → повтор → дата `ДД.ММ.ГГГГ` (16–80 лет) → пол → скин → подтверждение. «Отказаться» на правилах — кик. «Назад» с почты снова открывает правила. Дальше «Назад» по шагам; с правил — кик «Ты не принял правила сервера.»
+Нет аккаунта: правила → почта → пароль 6–32 → повтор → ДР 16–80 лет → пол → скин → подтверждение.
 
-Текст правил: `modules/auth/rules.ts`.
+Есть аккаунт: пароль, 3 ошибки — кик. Отмена диалога — кик.
 
-**Есть аккаунт:** пароль. 3 ошибки — кик. Отмена диалога — кик.
+До входа: спек, чат и команды закрыты.
 
-До входа: спек, камера на точку спавна (`prepareAuthView`), чат глушится (`return false`), команды глотаются без ответа.
+Пароль: `scrypt:salt:key`. Сессия: `Map<слот, Account>`. На **connect и disconnect** сессия сбрасывается (слот не наследует чужой аккаунт). После `await` — `isSamePlayer`.
 
-Пароль в БД: `scrypt:salt:key` (Node `crypto.scrypt`, ключ 32 байта, salt 16). Проверка `timingSafeEqual`. Почта в нижний регистр, уникальна вместе с ником.
-
-Сессия: `Map<слот, Account>`. После каждого `await` к БД проверяется, что это всё ещё тот же id и ник (`isSamePlayer`).
-
-Диалог авторизации: id **1** (`AUTH_DIALOG_ID`). Статистика: id **2**.
-
-`ensureUsersTable` при старте: `CREATE TABLE IF NOT EXISTS` + `ALTER` для колонок `gender`, `money`, `donate`, `health`, если их нет на старой базе.
+Диалоги: auth **1**, stats **2**, pass **3**, меню **4**, rules **5**, invite **6**, GPS **7**, шахта **8–10**, alogin **11**, makeleader **12**. Не занимать эти id новыми окнами без проверки.
 
 ### spawn
 
-Один `Class` (скин `DEFAULT_SPAWN_SKIN`, точка `DEFAULT_SPAWN`) с командой `255` (`NO_TEAM`). Если всех поставить в team 0, PvP не работает.
-
-- Первый вход и без организации: `DEFAULT_SPAWN` в `point.ts`.
-- Смерть: случайная точка из `HOSPITAL_SPAWNS`. Интерьер пока `0`. HP = 100, сразу в БД, сообщение «Ты очнулся в больнице.»
-- F4 / class: если уже в мире и не wasted — `setSpawnInfo` на текущие XYZ, респавн, HP из аккаунта (не лечение до 100).
-- `playerRequestSpawn` без аккаунта — отказ.
-- Неавторизованный `playerSpawn` — снова спек и диалог.
-
-**Координаты больницы:** `resources/src/modules/spawn/point.ts` → `HOSPITAL_SPAWNS` (`x, y, z, angle, interior, world`). Сейчас All Saints, Jefferson, 4 точки снаружи.
-
-`writeSpawnInfo` вызывает `setSpawnInfo` и **не ставит interior/world** (натив SA-MP их не принимает). Для больницы после спавна вызывается `placeAt`. Для F4 interior/world из текущей позиции в `setSpawnInfo` тоже не попадают — пока все точки `interior: 0`, это незаметно.
+Один `Class`, team `255`. Смерть → случайная точка больницы, `hospitalized`, HP 20. Первый спавн сессии с органом — телепорт на HQ, дальше нет. F4 не лечит.
 
 ### hud
 
-Глобальные textdraw в правом верхнем углу: «LS» + «RP» + «Los Santos» + preview-модель 19066. Показ через 250 мс после connect, скрытие на disconnect.
-
-Это не Pawno-скрипт: те же числа, API `new TextDraw(...)`. Правки — `modules/hud/index.ts`. Файл `.txt` из редактора Pawno сервер сам не грузит.
+Один глобальный textdraw: `Los_Santos_RP` (на экране «Los Santos RP»), позиция 545, 4, цвет `0x0099FFFF`. `modules/hud/index.ts`.
 
 ### chat
 
-Обычный текст — **20 м**, тот же virtual world и interior. Пузырь над головой и анимация (`PED/IDLE_CHAT` или gangs, не в машине). Движок может нарисовать пузырь дальше 20 м; **в чат** дальние не получают.
-
-Лимит **128** символов. `return false` глушит глобальный чат SA-MP.
-
-`config.json` → `game.use_chat_radius: false` — радиус движка выключен, работает свой `sendNearby`.
-
-Анимация снимается по таймеру (1.5–7 с от длины текста). На disconnect таймер чистится.
-
-### commands
-
-Новая команда: файл в `modules/commands/` + `import "./имя"` в `index.ts`. Неавторизованным обработчик не вызывается (тишина, без подсказки).
-
-`playerCommandText` всегда возвращает `true` — Pawn команды не видит.
-
-См. [таблицу команд](#команды-игрока).
+IC **20 м**, VW + interior. Формат `Name_Surname[ID]: text`. У членов органа цвет nametag. `{` в тексте вырезается. Лимит 128. `game.use_chat_radius: false`.
 
 ### mapping
 
-При старте читает `maps/*.txt`. Поддерживается:
+`maps/*.txt`: CreateObject / CreateDynamicObject, материалы, текст. VW/interior streamer **не** применяются (мир 0, draw 300). `army.txt` — здания; ворота армии создаются в `org/gates.ts`, в txt их не дублировать.
 
-- `CreateObject` / `CreateDynamicObject` (первые 7 аргументов: model, x, y, z, rx, ry, rz)
-- `SetObjectMaterial` / `SetDynamicObjectMaterial`
-- `SetObjectMaterialText` / `SetDynamicObjectMaterialText`
-- строки `new …;` и `//` пропускаются
-- `name = CreateDynamicObject(...)` — объект создаётся
+### hospital
 
-**Не применяется:** streamer-аргументы VW, interior, stream distance. Объекты в мире 0, draw distance 300. Битый файл не валит остальные карты.
+Вход с улицы, койки только если `hospitalized`. Лечение +10 / 4.5 с, пока игрок в радиусе койки. Встал — лечение остановилось. Выход на улицу до лечения запрещён.
 
-Сейчас: `maps/jail.txt` — интерьер в небе (~`-96, 2444, 1178`). Без телепорта туда игроки его не видят; отдельного входа в тюрьму в моде нет.
+### cityhall
 
-### session (лог)
+Паспорт, инвайт (одноразово, `invited_by IS NULL`).
 
-Только строки в консоль/`log.txt`: подключился / отключился. Не путать с `auth/session.ts` (аккаунт в памяти).
+### miner
+
+Смена, руда, выплата у точки найма. GPS и шахта делят один чекпоинт.
+
+### payday
+
+В `:00`: +exp всем онлайн; зарплата органа по рангу; без органа зарплаты нет; AFK не платится (нет `playerUpdate` ~8 с или долгий простой).
+
+### worldtime
+
+Часы сервера = локальные `Date`, раз в минуту + на connect/spawn.
+
+### afk
+
+Пауза клиента и простой.
 
 ---
 
 ## База данных
 
-Драйвер `mysql2`, без ORM и без Prisma (нативный engine Prisma плохо живёт с esbuild + omp-node). Плейсхолдеры `?`, запросы не в игровом тике.
+Драйвер `mysql2`, плейсхолдеры `?`. Эталон: `sql/schema.sql`. Таблица и недостающие колонки — при старте (`ensureUsersTable`).
 
-Таблица создаётся при старте. Эталон: `sql/schema.sql`.
+| Колонка | Смысл |
+|---|---|
+| `id` | PK |
+| `name` | ник клиента, UNIQUE |
+| `email` | нижний регистр, UNIQUE |
+| `password_hash` | scrypt |
+| `gender` | male / female |
+| `skin` | гражданский скин |
+| `level` / `exp` | payday |
+| `money` | наличные; новый персонаж **500** |
+| `donate` | счёт, системы нет |
+| `health` | HP, новый **100** |
+| `passport` | мэрия |
+| `hospitalized` | нужно лечь на койку |
+| `invited_by` | ник пригласившего |
+| `register_ip` / `last_ip` | |
+| `admin_level` | 0–7 |
+| `admin_password_hash` | scrypt, NULL = задать при `/alogin` или после `/makeadmin` |
+| `org_id` / `org_rank` | 0 = гражданский; ранг 1–10 |
+| `birth_date` / `created_at` | |
 
-| Колонка | Тип | Смысл |
-|---|---|---|
-| `id` | INT UNSIGNED AI | PK |
-| `name` | VARCHAR(24) UNIQUE | ник с клиента |
-| `email` | VARCHAR(255) UNIQUE | нижний регистр |
-| `password_hash` | VARCHAR(255) | `scrypt:salt:key` |
-| `gender` | ENUM male/female | пол |
-| `skin` | SMALLINT UNSIGNED | модель |
-| `level` | SMALLINT UNSIGNED, default 1 | сейчас всегда 1 |
-| `money` | INT, default 0 | наличные; новый персонаж **500** |
-| `donate` | INT UNSIGNED, default 0 | донат-счёт, сейчас 0 |
-| `health` | FLOAT, default 100 | HP, новый персонаж **100** |
-| `birth_date` | DATE | из регистрации |
-| `created_at` | DATETIME | регистрация |
-
-`.env.example`:
-
-```
-MYSQL_HOST=127.0.0.1
-MYSQL_PORT=3306
-MYSQL_USER=root
-MYSQL_PASSWORD=
-MYSQL_DATABASE=lsrp
-```
-
-На OSPanel хост часто имя сервиса (`MySQL-8.2`), не `127.0.0.1`. Базу `lsrp` нужно создать заранее (сервер таблицу создаст, саму БД — нет).
-
-### Как должны жить HP и деньги
-
-1. Регистрация: 100 HP, $500.
-2. Вход: полоска и кэш из БД, не дефолт движка.
-3. Урон / падение — HP в памяти; выход пишет в БД.
-4. Перезаход — то же HP, что при выходе.
-5. Раз в 15 мин −1 HP, не ниже 20.
-6. Смерть: в БД не пишется 0. Больница → 100 HP в мир и в БД.
-7. Деньги тем же `queueSave`. Экономики (работы, магазины) ещё нет.
+Базу `lsrp` создать заранее. На VPS — отдельный пользователь, не `root` без пароля.
 
 ---
 
 ## Потоки событий
 
-### Подключение и вход
+### Подключение
 
 ```
 playerConnect
-  → spectating on (сразу)
-  → HUD: логотип через 250 мс
+  → сброс auth/admin/spawn/hospital слота
+  → spectating
+  → HUD через 250 мс
   → beginAuth через 500 мс
-       ник не RP / нет БД → kick
-       есть users.name → диалог пароля
-       нет → правила → почта → … → INSERT → spawnIntoWorld
-  → toggleSpectating(false) + spawn через 80 мс
 playerSpawn (первый)
-  → team 255, скин, applyWallet, applyHealth, «на спавне»
+  → wallet/HP из аккаунта, HQ органа если есть
 ```
 
 ### Смерть
 
 ```
-playerDeath
-  → pickHospitalSpawn + setSpawnInfo
-playerSpawn
-  → placeAt(hospital), HP 100, queueSave, «очнулся в больнице»
+playerDeath → hospitalized, HP 20
+playerSpawn → больница, сообщение про /hospital
 ```
 
 ### Выход
 
 ```
-playerDisconnect (persist)  → queueSave HP/money
-playerDisconnect (auth)     → clearPending + clearAccount
-playerDisconnect (spawn)    → сброс hospital / first-spawn флагов
-playerDisconnect (chat/hud) → таймеры анимации, скрыть логотип
+persist queueSave → auth clear → spawn/hospital/admin/chat cleanup
 ```
 
 ---
 
 ## Команды игрока
 
-Радиусы: обычный чат /me /do /try /todo /b — **20 м**; `/s` — **60 м**; `/w` — **5 м**. Лимит текста 128.
+Радиусы: чат /me /do /try /todo /b /r-пузырь — **20 м**; `/s` — **60 м**; `/w` — **5 м**.
 
 | Команда | Что делает |
 |---|---|
-| `/help` | список зарегистрированных команд |
-| `/me [действие]` | `* Имя действие` |
-| `/do [текст]` | обстановка + `(( Имя ))` |
-| `/try [действие]` | 50/50 удачно/неудачно; «попытался/попыталась» по полу |
-| `/todo реплика*действие` | `«реплика», — сказал(а) Имя, действие.` |
-| `/b [текст]` | OOC рядом |
-| `/s [текст]` | крик + пузырь 60 м |
-| `/w [текст]` | шёпот + пузырь 5 м |
-| `/stats` | диалог: имя, пол, уровень, скин, ДР, почта, деньги, донат, HP |
+| `/help` | список игровых команд |
+| `/mn` | меню |
+| `/me` `/do` `/try` `/todo` | RP |
+| `/b` | OOC рядом; после `/alogin`: `Administrator` |
+| `/s` `/w` | крик / шёпот, в строке `[ID]` |
+| `/stats` | диалог персонажа (в т.ч. почта) |
+| `/pass` | паспорт рядом |
+| `/hospital` | занять койку |
+| `/gps` | метки |
+| `/leaders` | лидеры (ранг 10) онлайн |
+| `/r` | рация органа |
 
-Неизвестная команда — сообщение в чат. До логина команды молча игнорируются.
+Неизвестная команда — сообщение. До логина — тишина.
+
+---
+
+## Админка
+
+Права в БД: `admin_level`. Команды работают только после **`/alogin`** и если уровень достаточен. Иначе **тишина** (как неизвестная админ-команда). `/ahelp` показывает команды **только до своего уровня**.
+
+Клик по карте: телепорт (и машина, если за рулём) для любого, кто в `/alogin`.
+
+| Уровень | Команды |
+|---|---|
+| 1 | `/a`, `/ahelp`, `/admins`, телепорт по карте |
+| 2 | `/kick [id] [prichina]` — кик видят все; себя можно |
+| 3 | `/ao [text]` — всем `Administrator Name[ID]:` |
+| 4 | `/sethp [id] [0–100]`; чужому с активным `/alogin` нельзя |
+| 5 | `/makeleader [id]` — список органов или снять; нужен паспорт; ранг 10; без телепорта |
+| 6 | — |
+| 7 | `/makeadmin [id] [0–7]` — сброс пароля админки, цель задаёт новый через диалог |
+
+`/makeadmin 0` снимает админку. Повторная выдача снова сбрасывает пароль.
+
+---
+
+## Организации
+
+Каталог в коде: `modules/org/catalog.ts`. Сейчас **армия id 1** (`army.ts`): цвет `0x9c7a4bff`, спавн HQ, 10 рангов/скинов/окладов (1500…9000).
+
+Ворота: два объекта 19912, клавиша C пешком / сигнал в машине, только армия, автозакрытие ~5 с.
+
+Ранги 1–9 выдаются только правкой БД: игровой команды кроме лидерки нет.
 
 ---
 
 ## Конфиг open.mp
 
-Важное из `config.json`:
+| Ключ | Зачем |
+|---|---|
+| `name` / `game.mode` | как `shared/brand.ts` |
+| `network.port` | 7777 |
+| `max_players` | 50 |
+| `node.resources` | `["resources"]` |
+| `pawn.main_scripts` | `["lsrp 1"]` |
+| `game.use_chat_radius` | `false` |
+| `rcon.enable` | оставить `false`; пароль задать **до** включения, не коммитить |
+| `announce` | мастерлист; для закрытого теста — `false` или `password` |
+| `network.allow_037_clients` | `true` |
 
-| Ключ | Сейчас | Зачем |
-|---|---|---|
-| `name` / `game.mode` | Los Santos Role Play / LSRP | совпадать с `shared/brand.ts` |
-| `network.port` | 7777 | клиент |
-| `max_players` | 50 | слоты |
-| `node.resources` | `["resources"]` | папка omp-node |
-| `pawn.main_scripts` | `["lsrp 1"]` | заглушка AMX |
-| `artwork.models_path` | `models` | кастомные модели позже |
-| `game.use_chat_radius` | `false` | свой локальный чат |
-| `rcon.enable` | `false` | RCON выключен |
-| `rcon.password` | `changeme1` | смени, если включишь |
-| `logging.file` | `log.txt` | лог |
-| `announce` | `true` | мастерлист SA-MP |
-| `network.allow_037_clients` | `true` | клиенты 0.3.7 |
-
-`bans.json` — IP-баны движка. Свой бан в MySQL не сделан.
+`bans.json` — только IP движка. Аккаунт-бана в MySQL нет.
 
 ---
 
 ## Сборка и запуск
 
-Из корня сервера:
-
 ```powershell
-copy .env.example .env     # один раз, прописать MySQL
-npm run build              # esbuild → resources/dist/index.js
-npm run dev                # то же в watch
-npm run typecheck          # tsc --noEmit
-npm start                  # omp-server.exe
+copy .env.example .env
+npm run build
+npm run typecheck
+npm start
 ```
 
-Клиент: `127.0.0.1:7777`, ник `Name_Surname`.
-
-После `build` **перезапусти сервер**. `dist/` в git не коммитится. Прод и пайплайн: [deploy.md](deploy.md), [deploy.yml](../deploy.yml).
+Клиент: `127.0.0.1:7777`, ник `Name_Surname`. После `build` **рестарт**. `dist/` в git нет. Прод: [deploy.md](deploy.md).
 
 ---
 
@@ -423,118 +370,69 @@ npm start                  # omp-server.exe
 
 | Задача | Файл |
 |---|---|
-| Точки больницы / обычный спавн | `modules/spawn/point.ts` |
-| HP min/max, интервал падения, сейв | `modules/auth/session.ts` |
-| Логика сейва и −HP | `modules/persist/index.ts` |
-| Логика логина/регистрации | `modules/auth/flow.ts` |
-| Тексты диалогов | `modules/auth/dialogs.ts` |
-| Правила сервера (окно регистрации) | `modules/auth/rules.ts` |
-| Скины регистрации | `modules/auth/skins.ts` |
-| Правила ника/пароля/возраста | `modules/auth/validation.ts` |
+| Спавн / больничные точки | `modules/spawn/point.ts` |
+| HP, интервалы сейва | `modules/auth/session.ts`, `persist` |
+| Логин | `modules/auth/flow.ts` |
+| Правила | `modules/auth/rules.ts` |
 | Логотип | `modules/hud/index.ts` |
-| Новая команда | `modules/commands/*.ts` + `commands/index.ts` |
-| Карта | `maps/*.txt` + рестарт |
-| Название сервера | `shared/brand.ts` + `config.json` |
-| Схема БД | `sql/schema.sql` и миграции в `auth/repository.ts` |
-| Цвета чата | `shared/colors.ts` |
+| Игровая команда | `modules/commands/*.ts` + `index.ts` |
+| Админ-команда | `modules/admin/*.ts` + `catalog.ts` + `admin/index.ts` |
+| Орган | новый файл + `org/catalog.ts` |
+| Карта | `maps/*.txt` |
+| Название | `brand.ts` + `config.json` |
+| Схема | `sql/schema.sql` + `auth/repository.ts` |
 
 ---
 
 ## Проверка проекта
 
-Просмотрены все 37 файлов `resources/src/**/*.ts`, `config.json`, `sql/schema.sql`, маппинг, конфиг npm. Компилятор: чисто.
+Просмотрены исходники `resources/src`, `config.json`, `sql/schema.sql`, `.gitignore`, деплой-доки. TypeScript `strict`, typecheck чистый.
 
-### Что сделано нормально
+### Что в порядке
 
-- Запросы параметризованы (`?`), SQL-инъекции из ника/почты/пароля нет.
-- Пароли не хранятся открытым текстом; проверка с постоянным временем.
-- После `await` проверяется, что слот всё ещё тот же игрок.
-- До логина нельзя писать в чат и выполнять команды.
-- 3 попытки пароля, кик.
-- Ник жёстко RP-формат, не из диалога (нельзя зарегистрировать чужой ник другим именем клиента).
-- Уникальность почты и ника на уровне БД + обработка `ER_DUP_ENTRY`.
-- HP 0 при смерти в БД не пишется; больница лечит явно.
-- `persist` подписан на disconnect раньше `auth` — сейв успевает до очистки сессии.
-- Карта с ошибкой не валит остальные.
-- `.env` в `.gitignore`.
-- TypeScript `strict`.
+- SQL с `?`, инъекции из ника/почты нет.
+- Пароли игрока и админки — scrypt, не в логах.
+- Команды и чат до логина закрыты.
+- Админ-команды требуют `/alogin` + уровень.
+- Сессия аккаунта сбрасывается на connect.
+- Отложенный kick сверяет слот и ник (не кикает нового на том же id).
+- Деньги в БД не берутся с клиента.
+- Койка лечит только лежащего `hospitalized` в радиусе.
+- `{` в IC/OOC/RP/админ-чате вырезается.
+- `.env` и `dist/` не в git.
 
-### Ошибки и дыры (по серьёзности)
+### Исправлено перед выкладкой
 
-**1. RCON-пароль по умолчанию в `config.json`**
+- Сейв денег с `getMoney()` (чит) → только `account.money`.
+- Наследование сессии на слоте при connect.
+- Kick по чужому слоту после 120 мс.
+- Лечение с койки на улице.
+- Цвет-коды в чате.
+- Тестовый Sultan у вокзала убран.
+- Из `config.json` убран захардкоженный RCON-пароль `changeme1` (RCON выключен, пароль пустой — задай свой, если включишь).
 
-RCON выключен (`enable: false`), но пароль `changeme1`. Если кто-то включит RCON и забудет сменить — полный контроль над сервером. Перед продакшеном сменить и не светить в репозитории.
+### Остаётся (не дыры логина, но знать)
 
-**2. Сервер в мастерлисте (`announce: true`)**
+- Нет антифлуда чата/команд.
+- `/kick` 2-го уровня кикает любого, в том числе 7-го.
+- `/alogin`: 3 ошибки — кик; после перезахода счётчик попыток снова 3 (на процесс — по `account.id`).
+- Нет бана аккаунта, только IP `bans.json`.
+- Пароль игрока 6 символов без сложности.
+- Карты без VW/interior; `setSpawnInfo` их не ставит (больница через `placeAt`).
+- `/stats` показывает почту себе; деньги в статах из памяти аккаунта (это нормально после правки сейва).
+- Несколько лидеров одного органа возможны: `/makeleader` не снимает предыдущего.
+- Ранги 1–9 органа не выдаются игрой.
+- Payday пропускает «AFK» при свёрнутом клиенте (~8 с без update).
+- Ошибка миграции `users` логируется, сервер всё равно «стартует».
+- Интервалы и пул MySQL на `resourceStop` не чистятся.
+- Пароль регистрации в памяти `Pending` до подтверждения.
+- Первый `/alogin` без хеша задаёт пароль админки — так задумано после `/makeadmin`; опасно, если `admin_level` выставить руками в SQL.
+- `announce: true` — сервер может попасть в мастерлист.
 
-Локальный/тестовый сервер может попасть в публичный список. Для закрытой разработки лучше `false` или пароль на вход (`password` в конфиге).
+### Не сделано в моде
 
-**3. Карты без VW/interior**
+Транспорт как система, дома, инвентарь, `/pm` `/report`, бан в БД, снятие/повышение рангов 1–9, hot-reload.
 
-Парсер берёт только model + координаты. Аргументы streamer после rz отбрасываются. Тюрьма висит в небе в мире 0; отдельного входа нет. Если позже понадобятся интерьеры/миры — дописать `setVirtualWorld` / `setInterior` у `ObjectMp` или аналог streamer.
+### Итог
 
-**4. `setSpawnInfo` не знает interior/world**
-
-`SpawnPoint` хранит `interior` и `world`, но `writeSpawnInfo` их не применяет. Больница спасается `placeAt` после спавна. F4 в будущем интерьере может выкинуть на те же XYZ в interior 0.
-
-**5. `/stats` показывает почту и кэш денег из памяти**
-
-Почта в диалоге — лишняя утечка, если кто-то смотрит в монитор. Деньги берутся из `account.money`, а HP — из живой полоски. Если деньги в мире изменились, а автосейв ещё не прошёл (до 3 мин), в статах может быть старое число.
-
-**6. Цвет-коды в чате**
-
-Текст `/me`, `/b`, обычный чат не фильтрует `{RRGGBB}`. Игрок может перекрашивать чужие строки. Имеет смысл вырезать `{` / `}` или паттерн `{[0-9A-Fa-f]{6}}`.
-
-**7. Нет антифлуда**
-
-Чат и команды без кулдауна. Можно спамить локальный чат и диалоги (проверка почты бьёт в БД). Для 50 слотов пока терпимо, для паблика — нет.
-
-**8. Пароль в памяти на время регистрации**
-
-В `Pending` поле `password` лежит открытым текстом до подтверждения. На disconnect чистится. Для игрового сервера нормально; в логи не пишется.
-
-**9. Ошибка `ensureUsersTable` глотается**
-
-Если `CREATE`/`ALTER` упал, в логе строка, сервер «готов». Игроки начнут логиниться и получат ошибку позже. Лучше не стартовать auth без успешной миграции.
-
-**10. `closeDatabase` и `resourceStop` нет**
-
-Пул MySQL и `setInterval` (сейв, −HP) не снимаются. При штатном рестарте процесс умирает целиком — на практике ок. При hot-reload (если появится) будут двойные таймеры и висящие соединения.
-
-**11. Гонка регистрации**
-
-`INSERT` уже прошёл, игрок вышел до `setAccount` — строка в БД есть, следующий вход будет логином. Это ожидаемо. Два клиента с одной почтой: второй получит «почта занята» или `ER_DUP_ENTRY`.
-
-**12. `normalizeHealth`: HP ≤ 0 превращается в 100**
-
-Битая строка в БД (0, NULL, мусор) лечит персонажа до 100 при входе. Нижняя граница 20 при логине **не** применяется: если в БД 15 — войдёт с 15, падение HP его не тронет, пока не станет > 20.
-
-**13. Урон в `playerTakeDamage`**
-
-Сразу пишется `getHealth() - amount`. Если движок уже вычел урон, значение занижается до сверки через 50 мс. Кратковременно статы/сейв могут увидеть чужое HP; через 50 мс обычно выравнивается. На disconnect в эти 50 мс теоретически можно записать чуть меньше.
-
-**14. Команды до логина — тишина**
-
-Игрок не понимает, что `/help` не работает, потому что нет аккаунта. Мелочь UX.
-
-**15. Нет админ-бана в БД**
-
-Только `bans.json` (IP). Смена IP — снова вход. Админки, варнов, ACL нет.
-
-**16. Слабый пароль**
-
-Достаточно 6 символов без пробелов, без цифр/регистра. Для RP-сервера часто так и делают; для паблика мало.
-
-**17. Пустой пароль MySQL в примере**
-
-`.env.example` с `root` без пароля — нормально для OSPanel. На VPS так оставлять нельзя.
-
-### Не баги, а ещё не сделано
-
-Нет: админка, транспорт, дома, инвентарь, работы, голод как шкала, сохранение брони, смена уровня/доната в игре, `/pm` `/report`, вход в тюрьму, hot-reload.
-
-`level` и `donate` в БД и `/stats` есть, игровые системы их не меняют.
-
-### Итог проверки
-
-Каркас (логин, локальный чат, HP, больница, HUD, карты) собирается и по коду согласован. Критичных дыр уровня «обойти логин» или «SQL-инъекция» нет. Перед открытым сервером закрыть: RCON-пароль, `announce`, цвет-коды в чате, антифлуд, VW/interior у карт, не светить почту в `/stats`.
+Обойти логин, выполнить админ-команду без `/alogin` или проинъектить SQL штатным клиентом по коду нельзя. Деньги трейнером в БД больше не пишутся. Перед открытым пабликом: свой RCON (если нужен), пароль входа или `announce`, антифлуд, бан аккаунтов, не светить `.env`.

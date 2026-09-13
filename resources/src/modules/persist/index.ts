@@ -8,6 +8,7 @@ import {
   MAX_HEALTH,
   MIN_HEALTH,
   VITALS_SAVE_MS,
+  applyWallet,
   getAccount,
   isAuthenticated,
   patchAccount,
@@ -51,18 +52,6 @@ function readLiveHealth(player: Player, fallback: number): number {
   return fallback;
 }
 
-function readLiveMoney(player: Player, fallback: number): number {
-  try {
-    if (!isInWorld(player)) {
-      return Math.max(0, fallback);
-    }
-
-    return Math.max(0, player.getMoney());
-  } catch {
-    return Math.max(0, fallback);
-  }
-}
-
 export function queueSave(player: Player): void {
   const account = getAccount(player);
   if (!account) {
@@ -70,8 +59,12 @@ export function queueSave(player: Player): void {
   }
 
   const health = readLiveHealth(player, account.health);
-  const money = readLiveMoney(player, account.money);
+  const money = Math.max(0, Math.floor(account.money));
   patchAccount(player, { health, money });
+
+  if (isInWorld(player)) {
+    applyWallet(player, { ...account, money });
+  }
 
   void saveUserVitals(account.id, health, money).catch((error: unknown) => {
     const message = error instanceof Error ? error.message : String(error);

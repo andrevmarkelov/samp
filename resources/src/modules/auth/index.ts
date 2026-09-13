@@ -27,6 +27,7 @@ export const authModule: GameModule = {
     }
 
     omp.on("playerConnect", (player) => {
+      endAuth(player);
       try {
         player.toggleSpectating(true);
       } catch {

@@ -1,11 +1,11 @@
 import { Color } from "../../shared/colors";
-import { CHAT_MAX_LENGTH, SHOUT_RADIUS, sendNearby } from "../../shared/nearby";
+import { CHAT_MAX_LENGTH, SHOUT_RADIUS, sanitizeChatText, sendNearby } from "../../shared/nearby";
 import { playerChatName } from "../../shared/player";
 import { playLocalSpeech } from "../chat/talk";
 import { registerCommand } from "./registry";
 
 registerCommand("s", "Kriknut' na bol'shuyu distantsiyu", (player, args) => {
-  const text = args.trim().slice(0, CHAT_MAX_LENGTH);
+  const text = sanitizeChatText(args.trim()).slice(0, CHAT_MAX_LENGTH);
   if (!text) {
     player.sendClientMessage(Color.error, "Ispol'zovanie: /s [tekst]");
     return;

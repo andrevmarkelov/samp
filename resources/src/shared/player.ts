@@ -36,6 +36,26 @@ export function playerId(player: Player): number | null {
   }
 }
 
+export function kickSamePlayer(player: Player, delayMs = 120): void {
+  const id = playerId(player);
+  const name = playerName(player);
+  setTimeout(() => {
+    if (!isPlayerActive(player) || playerId(player) !== id) {
+      return;
+    }
+
+    if (playerName(player) !== name) {
+      return;
+    }
+
+    try {
+      player.kick();
+    } catch {
+      // Уже вышел.
+    }
+  }, delayMs);
+}
+
 export function playerIp(player: Player): string {
   try {
     const result = player.getIp();

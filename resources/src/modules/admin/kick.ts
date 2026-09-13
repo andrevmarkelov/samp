@@ -1,7 +1,7 @@
 import { omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
-import { CHAT_MAX_LENGTH } from "../../shared/nearby";
-import { isPlayerActive, playerChatName } from "../../shared/player";
+import { CHAT_MAX_LENGTH, sanitizeChatText } from "../../shared/nearby";
+import { isPlayerActive, kickSamePlayer, playerChatName } from "../../shared/player";
 import { registerCommand } from "../commands/registry";
 import { hasAdminAccess } from "./session";
 
@@ -24,17 +24,7 @@ function broadcastAll(color: number, text: string): void {
 }
 
 function kickSoon(player: Player): void {
-  setTimeout(() => {
-    if (!isPlayerActive(player)) {
-      return;
-    }
-
-    try {
-      player.kick();
-    } catch {
-      // Уже вышел.
-    }
-  }, 120);
+  kickSamePlayer(player);
 }
 
 export function bindAdminKick(): void {
@@ -49,9 +39,10 @@ export function bindAdminKick(): void {
       const raw = args.trim();
       const space = raw.indexOf(" ");
       const idPart = (space === -1 ? raw : raw.slice(0, space)).trim();
-      const reason = (space === -1 ? "" : raw.slice(space + 1).trim())
-        .replace(/\{/g, "")
-        .slice(0, CHAT_MAX_LENGTH);
+      const reason = sanitizeChatText(space === -1 ? "" : raw.slice(space + 1).trim()).slice(
+        0,
+        CHAT_MAX_LENGTH
+      );
 
       if (!idPart) {
         player.sendClientMessage(
