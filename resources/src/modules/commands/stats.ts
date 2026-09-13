@@ -3,6 +3,7 @@ import { Color } from "../../shared/colors";
 import { formatBirthDate } from "../auth/validation";
 import { genderLabel } from "../auth/gender";
 import { getAccount } from "../auth/session";
+import { orgStatsLines, resolvePlayerSkin } from "../org";
 import { expForNextLevel } from "../payday/progress";
 import { registerCommand } from "./registry";
 
@@ -35,12 +36,13 @@ export function showStatsDialog(player: Player): void {
     `Pol: ${genderLabel(account.gender)}`,
     `Uroven': ${account.level}`,
     `Opyt: ${account.exp}/${expForNextLevel(account.level)}`,
-    `Skin: ${account.skin}`,
+    `Skin: ${resolvePlayerSkin(account)}`,
     `Data rozhdeniya: ${formatBirthDate(account.birthDate)}`,
     `Pochta: ${account.email}`,
     `Den'gi: $${account.money}`,
     `Donat-schet: ${account.donate}`,
     `Zdorov'e: ${health}`,
+    ...orgStatsLines(account),
   ].join("\n");
 
   try {

@@ -5,6 +5,7 @@ import { SERVER_NAME, SERVER_TAG } from "../../shared/brand";
 import { isDatabaseReady } from "../../shared/database";
 import { isPlayerActive, playerId, playerIp, playerName } from "../../shared/player";
 import { DEFAULT_SPAWN, pickHospitalSpawn, placeAt, writeSpawnInfo } from "../spawn/point";
+import { applyOrgVisuals, resolveOrgSpawn, resolvePlayerSkin } from "../org";
 import { refreshStreamForPlayer } from "../mapping/stream";
 import {
   AUTH_DIALOG_ID,
@@ -104,10 +105,14 @@ function isSamePlayer(player: Player, id: number, name?: string): boolean {
 export function spawnIntoWorld(player: Player, skin: number): void {
   const id = playerId(player);
   const account = getAccount(player);
-  const spawnPoint = account?.hospitalized ? pickHospitalSpawn() : DEFAULT_SPAWN;
+  const useSkin = account ? resolvePlayerSkin(account) : skin;
+  const orgSpawn = resolveOrgSpawn(account);
+  const spawnPoint = account?.hospitalized
+    ? pickHospitalSpawn()
+    : orgSpawn ?? DEFAULT_SPAWN;
 
   try {
-    writeSpawnInfo(player, skin, spawnPoint);
+    writeSpawnInfo(player, useSkin, spawnPoint);
   } catch {
     // Игрок уже вышел.
   }
@@ -130,12 +135,15 @@ export function spawnIntoWorld(player: Player, skin: number): void {
     }
 
     try {
-      player.setSkin(skin);
+      applyOrgVisuals(player);
       if (!player.isSpawned()) {
         player.spawn();
       }
       if (account?.hospitalized) {
         placeAt(player, spawnPoint);
+        refreshStreamForPlayer(player);
+      } else if (orgSpawn) {
+        placeAt(player, orgSpawn);
         refreshStreamForPlayer(player);
       }
       player.setCameraBehind();

@@ -6,6 +6,7 @@ import {
   normalizeHealth,
   type Account,
 } from "./session";
+import { parseOrgId, parseOrgRank } from "../org/membership";
 
 export const STARTING_MONEY = 500;
 
@@ -26,6 +27,8 @@ type UserRow = RowDataPacket & {
   invited_by: string | null;
   birth_date: Date | string;
   admin_level: number;
+  org_id: number;
+  org_rank: number;
 };
 
 const CREATE_USERS_SQL = `
@@ -48,6 +51,8 @@ CREATE TABLE IF NOT EXISTS users (
   last_ip VARCHAR(45) NULL DEFAULT NULL,
   admin_level TINYINT UNSIGNED NOT NULL DEFAULT 0,
   admin_password_hash VARCHAR(255) NULL DEFAULT NULL,
+  org_id SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+  org_rank TINYINT UNSIGNED NOT NULL DEFAULT 0,
   birth_date DATE NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
@@ -105,6 +110,14 @@ const COLUMN_MIGRATIONS = [
     name: "admin_password_hash",
     sql: "admin_password_hash VARCHAR(255) NULL DEFAULT NULL AFTER admin_level",
   },
+  {
+    name: "org_id",
+    sql: "org_id SMALLINT UNSIGNED NOT NULL DEFAULT 0 AFTER admin_password_hash",
+  },
+  {
+    name: "org_rank",
+    sql: "org_rank TINYINT UNSIGNED NOT NULL DEFAULT 0 AFTER org_id",
+  },
 ] as const;
 
 export async function ensureUsersTable(): Promise<void> {
@@ -134,7 +147,7 @@ async function columnExists(column: string): Promise<boolean> {
 
 export async function findUserByName(name: string): Promise<UserRow | null> {
   const rows = await query<UserRow>(
-    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, donate, health, passport, hospitalized, invited_by, birth_date, admin_level FROM users WHERE name = ? LIMIT 1",
+    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, donate, health, passport, hospitalized, invited_by, birth_date, admin_level, org_id, org_rank FROM users WHERE name = ? LIMIT 1",
     [name]
   );
   return rows[0] ?? null;
@@ -190,6 +203,8 @@ export async function createUser(input: {
     invitedBy: null,
     birthDate: input.birthDate,
     adminLevel: 0,
+    orgId: 0,
+    orgRank: 0,
   };
 }
 
@@ -284,6 +299,18 @@ export async function saveAdminPassword(
   ]);
 }
 
+export async function saveUserOrg(
+  userId: number,
+  orgId: number,
+  orgRank: number
+): Promise<void> {
+  await execute("UPDATE users SET org_id = ?, org_rank = ? WHERE id = ?", [
+    orgId,
+    orgRank,
+    userId,
+  ]);
+}
+
 export function isDuplicateKey(error: unknown): boolean {
   return (
     typeof error === "object" &&
@@ -310,6 +337,8 @@ export function accountFromRow(row: UserRow): Account {
     invitedBy: parseInvitedBy(row.invited_by),
     birthDate: toIsoDate(row.birth_date),
     adminLevel: parseAdminLevel(row.admin_level),
+    orgId: parseOrgId(row.org_id),
+    orgRank: parseOrgRank(row.org_rank),
   };
 }
 

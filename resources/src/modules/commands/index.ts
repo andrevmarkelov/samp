@@ -12,6 +12,8 @@ import "./stats";
 import "./pass";
 import "./hospital";
 import "./gps";
+import "./leaders";
+import "./r";
 import { bindMenuDialogs } from "./mn";
 import { bindGpsDialogs } from "../gps";
 

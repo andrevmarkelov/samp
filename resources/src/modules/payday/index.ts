@@ -6,6 +6,8 @@ import { saveUserProgress } from "../auth/repository";
 import { getAccount, isAuthenticated, patchAccount, applyScore } from "../auth/session";
 import type { GameModule } from "../types";
 import { isPlayerAfk } from "../afk";
+import { queueSave } from "../persist";
+import { orgPaydayPay } from "../org";
 import { applyPaydayExp, expForNextLevel, formatClock, hourStamp } from "./progress";
 
 const TICK_MS = 1000;
@@ -60,6 +62,22 @@ function payPlayer(player: Player, clock: string): void {
   const need = expForNextLevel(next.level);
   player.sendClientMessage(Color.info, clock);
   player.sendClientMessage(Color.white, `Ochki opyta ${next.exp}/${need}`);
+
+  const salary = orgPaydayPay(account);
+  if (salary) {
+    const fresh = getAccount(player) ?? account;
+    patchAccount(player, { money: fresh.money + salary.amount });
+    try {
+      player.giveMoney(salary.amount);
+    } catch {
+      // Слот уже не в мире.
+    }
+    queueSave(player);
+    player.sendClientMessage(
+      Color.tryOk,
+      `Zarplata ${salary.orgName} (${salary.rankTitle}): $${salary.amount}`
+    );
+  }
 
   if (next.leveled) {
     player.sendClientMessage(

@@ -2,7 +2,8 @@ import { Dialog, omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { WHISPER_RADIUS } from "../../shared/nearby";
 import { isPlayerActive, playerId, playerName } from "../../shared/player";
-import { getAccount } from "../auth/session";
+import { getAccount, type Account } from "../auth/session";
+import { orgStatsLines } from "../org";
 import { registerCommand } from "./registry";
 
 const PASSPORT_DIALOG_ID = 3;
@@ -25,7 +26,7 @@ registerCommand("pass", "Pasport: posmotret' ili pokazat' po id", (player, args)
 
   const rawId = args.trim();
   if (!rawId) {
-    showPassport(player, account.name, account.level);
+    showPassport(player, account);
     return;
   }
 
@@ -42,7 +43,7 @@ registerCommand("pass", "Pasport: posmotret' ili pokazat' po id", (player, args)
   }
 
   if (playerId(target) === playerId(player)) {
-    showPassport(player, account.name, account.level);
+    showPassport(player, account);
     return;
   }
 
@@ -56,7 +57,7 @@ registerCommand("pass", "Pasport: posmotret' ili pokazat' po id", (player, args)
     return;
   }
 
-  showPassport(target, account.name, account.level);
+  showPassport(target, account);
   const shownTo = playerName(target);
   player.sendClientMessage(Color.gray, `Vy pokazali pasport: ${shownTo}.`);
   target.sendClientMessage(
@@ -86,8 +87,12 @@ function samePlaceNearby(source: Player, other: Player): boolean {
   }
 }
 
-function showPassport(viewer: Player, name: string, level: number): void {
-  const body = [`Imya: ${name}`, `Uroven': ${level}`].join("\n");
+function showPassport(viewer: Player, owner: Account): void {
+  const body = [
+    `Imya: ${owner.name}`,
+    `Uroven': ${owner.level}`,
+    ...orgStatsLines(owner),
+  ].join("\n");
 
   try {
     Dialog.show(

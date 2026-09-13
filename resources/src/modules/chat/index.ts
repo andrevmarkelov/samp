@@ -2,7 +2,8 @@ import { omp } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { CHAT_MAX_LENGTH, CHAT_RADIUS, sendNearby } from "../../shared/nearby";
 import { playerChatName } from "../../shared/player";
-import { isAuthenticated } from "../auth/session";
+import { getAccount, isAuthenticated } from "../auth/session";
+import { resolveChatColor } from "../org";
 import type { GameModule } from "../types";
 import { clearTalk, playLocalSpeech } from "./talk";
 
@@ -19,10 +20,11 @@ export const chatModule: GameModule = {
         return false;
       }
 
+      const account = getAccount(player);
       sendNearby(
         player,
         CHAT_RADIUS,
-        Color.chat,
+        account ? resolveChatColor(account) : Color.chat,
         `${playerChatName(player)}: ${text}`
       );
       playLocalSpeech(player, text);

@@ -18,6 +18,7 @@ import { worldTimeModule } from "./modules/worldtime";
 import { zonesModule } from "./modules/zones";
 import { hudModule } from "./modules/hud";
 import { adminModule } from "./modules/admin";
+import { orgModule } from "./modules/org";
 import type { GameModule } from "./modules/types";
 
 const modules: GameModule[] = [
@@ -38,6 +39,7 @@ const modules: GameModule[] = [
   chatModule,
   commandsModule,
   adminModule,
+  orgModule,
   mappingModule,
 ];
 

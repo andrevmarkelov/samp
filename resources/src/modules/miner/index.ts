@@ -2,6 +2,7 @@ import { Checkpoint, Dialog, omp, Pickup, TextLabel, type Player } from "@omp-no
 import { Color } from "../../shared/colors";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { getAccount, isAuthenticated, patchAccount } from "../auth/session";
+import { resolvePlayerSkin } from "../org";
 import { queueSave } from "../persist";
 import type { GameModule } from "../types";
 import { STREET_WORLD } from "../spawn/point";
@@ -408,7 +409,7 @@ function finishShift(player: Player): void {
 
   const kg = job.kg;
   const salary = job.salary;
-  restoreWorker(player, account.skin);
+  restoreWorker(player, resolvePlayerSkin(account));
   jobs.delete(id);
 
   if (salary > 0) {
@@ -438,7 +439,7 @@ function abortShift(player: Player, notify: boolean): void {
   }
 
   const account = getAccount(player);
-  restoreWorker(player, account?.skin ?? null);
+  restoreWorker(player, account ? resolvePlayerSkin(account) : null);
   jobs.delete(id);
 
   if (notify && isPlayerActive(player)) {

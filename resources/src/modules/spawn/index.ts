@@ -12,6 +12,7 @@ import {
   patchAccount,
 } from "../auth/session";
 import { queueSave } from "../persist";
+import { applyOrgVisuals, resolveOrgSpawn, resolvePlayerSkin } from "../org";
 import { saveUserHospitalized } from "../auth/repository";
 import { refreshStreamForPlayer } from "../mapping/stream";
 import type { GameModule } from "../types";
@@ -63,7 +64,7 @@ export const spawnModule: GameModule = {
       pendingHospital.set(id, hospital);
 
       const account = getAccount(player);
-      let skin = account?.skin;
+      let skin = account ? resolvePlayerSkin(account) : undefined;
       if (skin === undefined) {
         try {
           skin = player.getSkin();
@@ -95,8 +96,8 @@ export const spawnModule: GameModule = {
 
       try {
         player.setTeam(NO_TEAM);
+        applyOrgVisuals(player);
         if (account) {
-          player.setSkin(account.skin);
           applyScore(player, account.level);
         }
         player.setCameraBehind();
@@ -173,6 +174,17 @@ export const spawnModule: GameModule = {
 
       if (account) {
         applyHealth(player, account.health);
+        if (firstSpawn) {
+          const orgSpawn = resolveOrgSpawn(account);
+          if (orgSpawn) {
+            try {
+              placeAt(player, orgSpawn);
+              refreshStreamForPlayer(player);
+            } catch {
+              // Игрок уже вышел.
+            }
+          }
+        }
       }
     });
 

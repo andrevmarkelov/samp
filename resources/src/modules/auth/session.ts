@@ -35,6 +35,8 @@ export type Account = {
   invitedBy: string | null;
   birthDate: string;
   adminLevel: number;
+  orgId: number;
+  orgRank: number;
 };
 
 const accounts = new Map<number, Account>();
@@ -115,6 +117,8 @@ export function patchAccount(
       | "level"
       | "exp"
       | "adminLevel"
+      | "orgId"
+      | "orgRank"
     >
   >
 ): void {

@@ -7,6 +7,7 @@ import { AUTH_DIALOG_ID } from "./dialogs";
 import { beginAuth, endAuth, handleAuthDialog, holdAtAuth } from "./flow";
 import { ensureUsersTable } from "./repository";
 import { getAccount, isAuthenticated } from "./session";
+import { resolvePlayerSkin } from "../org";
 
 export { isAuthenticated, getAccount, getGender } from "./session";
 export type { Gender } from "./gender";
@@ -55,9 +56,10 @@ export const authModule: GameModule = {
       }
 
       try {
+        const skin = resolvePlayerSkin(account);
         if (player.isSpawned() && player.getState() !== PLAYER_STATE_WASTED) {
           const pos = player.getPos();
-          writeSpawnInfo(player, account.skin, {
+          writeSpawnInfo(player, skin, {
             x: pos.x,
             y: pos.y,
             z: pos.z,
@@ -67,7 +69,7 @@ export const authModule: GameModule = {
           });
         }
 
-        player.setSkin(account.skin);
+        player.setSkin(skin);
         player.spawn();
       } catch {
         // Спавн уже идёт.
