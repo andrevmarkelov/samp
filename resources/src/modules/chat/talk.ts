@@ -14,9 +14,9 @@ type TalkAnim = {
 };
 
 const TALK_ANIMS: TalkAnim[] = [
-  { min: 0, lib: "PED", name: "IDLE_CHAT" },
-  { min: 24, lib: "GANGS", name: "prtial_gngtlkA" },
-  { min: 48, lib: "GANGS", name: "prtial_gngtlkB" },
+  { min: 0, lib: "GANGS", name: "prtial_gngtlkA" },
+  { min: 24, lib: "GANGS", name: "prtial_gngtlkB" },
+  { min: 48, lib: "GANGS", name: "prtial_gngtlkC" },
   { min: 80, lib: "GANGS", name: "prtial_gngtlkG" },
 ];
 
@@ -109,8 +109,8 @@ export function playLocalSpeech(
       anim.name,
       4.1,
       true,
-      false,
-      false,
+      true,
+      true,
       false,
       0,
       ANIM_SYNC_ALL

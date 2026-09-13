@@ -8,6 +8,12 @@ export function playerName(player: Player): string {
   }
 }
 
+export function playerChatName(player: Player): string {
+  const id = playerId(player);
+  const name = playerName(player);
+  return id === null ? name : `${name}[${id}]`;
+}
+
 export function isPlayerActive(player: Player): boolean {
   try {
     return player.getPtr() !== null;

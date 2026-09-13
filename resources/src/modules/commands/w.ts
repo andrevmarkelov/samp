@@ -1,6 +1,6 @@
 import { Color } from "../../shared/colors";
 import { CHAT_MAX_LENGTH, WHISPER_RADIUS, sendNearby } from "../../shared/nearby";
-import { playerName } from "../../shared/player";
+import { playerChatName } from "../../shared/player";
 import { playLocalSpeech } from "../chat/talk";
 import { registerCommand } from "./registry";
 
@@ -15,7 +15,7 @@ registerCommand("w", "Shepnut' tem, kto stoit ryadom", (player, args) => {
     player,
     WHISPER_RADIUS,
     Color.whisper,
-    `${playerName(player)} шепчет: ${text}`
+    `${playerChatName(player)} шепчет: ${text}`
   );
   playLocalSpeech(player, text, { radius: WHISPER_RADIUS, color: Color.whisper });
 });

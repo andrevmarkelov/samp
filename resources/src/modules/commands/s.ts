@@ -1,6 +1,6 @@
 import { Color } from "../../shared/colors";
 import { CHAT_MAX_LENGTH, SHOUT_RADIUS, sendNearby } from "../../shared/nearby";
-import { playerName } from "../../shared/player";
+import { playerChatName } from "../../shared/player";
 import { playLocalSpeech } from "../chat/talk";
 import { registerCommand } from "./registry";
 
@@ -15,7 +15,7 @@ registerCommand("s", "Kriknut' na bol'shuyu distantsiyu", (player, args) => {
     player,
     SHOUT_RADIUS,
     Color.shout,
-    `${playerName(player)} кричит: ${text}`
+    `${playerChatName(player)} кричит: ${text}`
   );
   playLocalSpeech(player, text, { radius: SHOUT_RADIUS, color: Color.shout });
 });
