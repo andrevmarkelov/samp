@@ -40,6 +40,13 @@ const TARGETS: readonly GpsTarget[] = [
     y: -368.1405,
     z: 73.8935,
   },
+  {
+    key: "station",
+    label: "ZHD LS",
+    x: 1814.2401,
+    y: -1889.4424,
+    z: 13.4141,
+  },
 ];
 
 const activeByPlayer = new Map<number, GpsTarget>();

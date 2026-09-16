@@ -25,6 +25,7 @@ import {
   writeSpawnInfo,
   type SpawnPoint,
 } from "./point";
+import { startSpawnHealthPickup } from "./health";
 
 const pendingHospital = new Map<number, SpawnPoint>();
 const seenWorldSpawn = new Set<number>();
@@ -46,6 +47,8 @@ export const spawnModule: GameModule = {
       0,
       0
     );
+
+    startSpawnHealthPickup();
 
     omp.on("playerConnect", (player) => {
       const id = playerId(player);

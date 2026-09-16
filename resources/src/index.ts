@@ -8,6 +8,7 @@ import { sessionModule } from "./modules/session";
 import { chatModule } from "./modules/chat";
 import { commandsModule } from "./modules/commands";
 import { mappingModule } from "./modules/mapping";
+import { vehiclesModule } from "./modules/vehicles";
 import { hospitalModule } from "./modules/hospital";
 import { cityHallModule } from "./modules/cityhall";
 import { gpsModule } from "./modules/gps";
@@ -41,6 +42,7 @@ const modules: GameModule[] = [
   adminModule,
   orgModule,
   mappingModule,
+  vehiclesModule,
 ];
 
 omp.on("resourceStart", async () => {

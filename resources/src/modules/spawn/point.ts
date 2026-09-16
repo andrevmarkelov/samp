@@ -21,10 +21,10 @@ export const HOSPITAL_WORLD = 1;
 
 /** Обычный спавн, пока игрок не в организации. */
 export const DEFAULT_SPAWN: SpawnPoint = {
-  x: 1769.1945,
-  y: -1941.5032,
-  z: 13.5696,
-  angle: 308.8943,
+  x: 1760.2538,
+  y: -1898.8334,
+  z: 13.5629,
+  angle: 269.124,
   interior: 0,
   world: STREET_WORLD,
 };
