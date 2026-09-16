@@ -47,6 +47,13 @@ const TARGETS: readonly GpsTarget[] = [
     y: -1889.4424,
     z: 13.4141,
   },
+  {
+    key: "prison",
+    label: "Tyurma",
+    x: 1810.8636,
+    y: -1576.4412,
+    z: 13.5167,
+  },
 ];
 
 const activeByPlayer = new Map<number, GpsTarget>();
