@@ -2,6 +2,7 @@ import type { Player } from "@omp-node/core";
 import { omp } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { isAuthenticated } from "../auth/session";
+import { MUTED_CHAT_COMMANDS, notifyIfMuted } from "../chat/mute";
 
 export type CommandHandler = (player: Player, args: string) => void;
 
@@ -49,6 +50,10 @@ export function handleCommand(player: Player, cmdtext: string): boolean {
 
   if (!cmd) {
     player.sendClientMessage(Color.error, `Neizvestnaya komanda: /${name}`);
+    return true;
+  }
+
+  if (MUTED_CHAT_COMMANDS.has(name) && notifyIfMuted(player)) {
     return true;
   }
 

@@ -5,6 +5,7 @@ import { playerChatName } from "../../shared/player";
 import { getAccount, isAuthenticated } from "../auth/session";
 import { resolveChatColor } from "../org";
 import type { GameModule } from "../types";
+import { notifyIfMuted, clearMuteWatch, watchMute } from "./mute";
 import { clearTalk, playLocalSpeech } from "./talk";
 
 export const chatModule: GameModule = {
@@ -20,6 +21,10 @@ export const chatModule: GameModule = {
         return false;
       }
 
+      if (notifyIfMuted(player, { bubble: true })) {
+        return false;
+      }
+
       const account = getAccount(player);
       sendNearby(
         player,
@@ -31,8 +36,15 @@ export const chatModule: GameModule = {
       return false;
     });
 
+    omp.on("playerSpawn", (player) => {
+      if (isAuthenticated(player)) {
+        watchMute(player);
+      }
+    });
+
     omp.on("playerDisconnect", (player) => {
       clearTalk(player);
+      clearMuteWatch(player);
     });
   },
 };

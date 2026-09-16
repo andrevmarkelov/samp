@@ -51,6 +51,7 @@ export type Account = {
   adminLevel: number;
   orgId: number;
   orgRank: number;
+  mutedUntil: number | null;
 };
 
 const accounts = new Map<number, Account>();
@@ -136,6 +137,7 @@ export function patchAccount(
       | "orgId"
       | "orgRank"
       | "skin"
+      | "mutedUntil"
     >
   >
 ): void {

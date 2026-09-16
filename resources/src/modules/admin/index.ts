@@ -6,7 +6,9 @@ import { bindAlogin, clearAloginDialog } from "./alogin";
 import { bindAdminHelp } from "./ahelp";
 import { bindAdminChat } from "./chat";
 import { bindAdminKick } from "./kick";
+import { bindAdminMute } from "./mute";
 import { bindAdminSethp } from "./sethp";
+import { bindAdminSetlevel } from "./setlevel";
 import { bindAdminSetskin } from "./setskin";
 import { bindAdminGivemoney } from "./givemoney";
 import { bindAdminMakeadmin } from "./makeadmin";
@@ -25,6 +27,7 @@ export const adminModule: GameModule = {
     bindAdminHelp();
     bindAdminsList();
     bindAdminKick();
+    bindAdminMute();
     bindAdminAo();
     bindAdminTpcor();
     bindAdminSethp();
@@ -32,6 +35,7 @@ export const adminModule: GameModule = {
     bindAdminRespcar();
     bindAdminMakeleader();
     bindAdminGivemoney();
+    bindAdminSetlevel();
     bindAdminMakeadmin();
     bindAdminMapTeleport();
 

@@ -33,6 +33,7 @@ type UserRow = RowDataPacket & {
   admin_level: number;
   org_id: number;
   org_rank: number;
+  muted_until: number | null;
 };
 
 const CREATE_USERS_SQL = `
@@ -59,6 +60,7 @@ CREATE TABLE IF NOT EXISTS users (
   admin_password_hash VARCHAR(255) NULL DEFAULT NULL,
   org_id SMALLINT UNSIGNED NOT NULL DEFAULT 0,
   org_rank TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  muted_until INT UNSIGNED NULL DEFAULT NULL,
   birth_date DATE NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
@@ -132,6 +134,10 @@ const COLUMN_MIGRATIONS = [
     name: "org_rank",
     sql: "org_rank TINYINT UNSIGNED NOT NULL DEFAULT 0 AFTER org_id",
   },
+  {
+    name: "muted_until",
+    sql: "muted_until INT UNSIGNED NULL DEFAULT NULL AFTER org_rank",
+  },
 ] as const;
 
 export async function ensureUsersTable(): Promise<void> {
@@ -161,7 +167,7 @@ async function columnExists(column: string): Promise<boolean> {
 
 export async function findUserByName(name: string): Promise<UserRow | null> {
   const rows = await query<UserRow>(
-    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, bank, donate, lawfulness, health, passport, hospitalized, invited_by, birth_date, admin_level, org_id, org_rank FROM users WHERE name = ? LIMIT 1",
+    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, bank, donate, lawfulness, health, passport, hospitalized, invited_by, birth_date, admin_level, org_id, org_rank, muted_until FROM users WHERE name = ? LIMIT 1",
     [name]
   );
   return rows[0] ?? null;
@@ -221,6 +227,7 @@ export async function createUser(input: {
     adminLevel: 0,
     orgId: 0,
     orgRank: 0,
+    mutedUntil: null,
   };
 }
 
@@ -381,6 +388,13 @@ export async function saveUserOrg(
   ]);
 }
 
+export async function saveUserMutedUntil(
+  userId: number,
+  untilUnix: number | null
+): Promise<void> {
+  await execute("UPDATE users SET muted_until = ? WHERE id = ?", [untilUnix, userId]);
+}
+
 export function isDuplicateKey(error: unknown): boolean {
   return (
     typeof error === "object" &&
@@ -411,7 +425,17 @@ export function accountFromRow(row: UserRow): Account {
     adminLevel: parseAdminLevel(row.admin_level),
     orgId: parseOrgId(row.org_id),
     orgRank: parseOrgRank(row.org_rank),
+    mutedUntil: parseMutedUntil(row.muted_until),
   };
+}
+
+function parseMutedUntil(value: unknown): number | null {
+  const seconds = Math.floor(Number(value) || 0);
+  if (seconds <= 0) {
+    return null;
+  }
+
+  return seconds * 1000;
 }
 
 function parseAdminLevel(value: unknown): number {
