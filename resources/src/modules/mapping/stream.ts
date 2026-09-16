@@ -81,11 +81,13 @@ export function refreshStreamForPlayer(player: Player): void {
   let x = 0;
   let y = 0;
   let z = 0;
+  let world = 0;
   try {
     const pos = player.getPos();
     x = pos.x;
     y = pos.y;
     z = pos.z;
+    world = player.getVirtualWorld();
   } catch {
     return;
   }
@@ -102,8 +104,20 @@ export function refreshStreamForPlayer(player: Player): void {
       continue;
     }
 
-    const dist = Math.hypot(x - def.x, y - def.y, z - def.z);
     const current = bag.get(i);
+    if (!visibleInWorld(def, world)) {
+      if (current) {
+        try {
+          current.destroy();
+        } catch {
+          // Уже уничтожен.
+        }
+        bag.delete(i);
+      }
+      continue;
+    }
+
+    const dist = Math.hypot(x - def.x, y - def.y, z - def.z);
 
     if (dist <= STREAM_IN) {
       if (!current && bag.size < MAX_VISIBLE) {
@@ -176,6 +190,21 @@ function spawnForPlayer(player: Player, def: MapObjectDef): PlayerObject | null 
   } catch {
     return null;
   }
+}
+
+export function assignStreamWorld(
+  world: number,
+  match: (object: Pick<MapObjectDef, "x" | "y" | "z">) => boolean
+): void {
+  for (const def of defs) {
+    if (match(def)) {
+      def.world = world;
+    }
+  }
+}
+
+function visibleInWorld(def: MapObjectDef, world: number): boolean {
+  return def.world === -1 || def.world === world;
 }
 
 function clearPlayerObjects(player: Player): void {

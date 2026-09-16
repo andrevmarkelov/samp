@@ -20,6 +20,7 @@ type UserRow = RowDataPacket & {
   level: number;
   exp: number;
   money: number;
+  bank: number;
   donate: number;
   health: number;
   passport: number | boolean;
@@ -42,6 +43,7 @@ CREATE TABLE IF NOT EXISTS users (
   level SMALLINT UNSIGNED NOT NULL DEFAULT 1,
   exp INT UNSIGNED NOT NULL DEFAULT 0,
   money INT NOT NULL DEFAULT 0,
+  bank INT NOT NULL DEFAULT 0,
   donate INT UNSIGNED NOT NULL DEFAULT 0,
   health FLOAT NOT NULL DEFAULT 100,
   passport TINYINT(1) NOT NULL DEFAULT 0,
@@ -69,6 +71,10 @@ const COLUMN_MIGRATIONS = [
   {
     name: "money",
     sql: "money INT NOT NULL DEFAULT 0 AFTER level",
+  },
+  {
+    name: "bank",
+    sql: "bank INT NOT NULL DEFAULT 0 AFTER money",
   },
   {
     name: "exp",
@@ -147,7 +153,7 @@ async function columnExists(column: string): Promise<boolean> {
 
 export async function findUserByName(name: string): Promise<UserRow | null> {
   const rows = await query<UserRow>(
-    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, donate, health, passport, hospitalized, invited_by, birth_date, admin_level, org_id, org_rank FROM users WHERE name = ? LIMIT 1",
+    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, bank, donate, health, passport, hospitalized, invited_by, birth_date, admin_level, org_id, org_rank FROM users WHERE name = ? LIMIT 1",
     [name]
   );
   return rows[0] ?? null;
@@ -196,6 +202,7 @@ export async function createUser(input: {
     level: 1,
     exp: 0,
     money: STARTING_MONEY,
+    bank: 0,
     donate: 0,
     health: STARTING_HEALTH,
     passport: false,
@@ -211,13 +218,51 @@ export async function createUser(input: {
 export async function saveUserVitals(
   userId: number,
   health: number,
-  money: number
+  money: number,
+  bank: number
 ): Promise<void> {
-  await execute("UPDATE users SET health = ?, money = ? WHERE id = ?", [
+  await execute("UPDATE users SET health = ?, money = ?, bank = ? WHERE id = ?", [
     health,
     money,
+    bank,
     userId,
   ]);
+}
+
+export async function saveUserHealth(userId: number, health: number): Promise<void> {
+  await execute("UPDATE users SET health = ? WHERE id = ?", [health, userId]);
+}
+
+export async function saveUserMoney(
+  userId: number,
+  money: number,
+  bank: number
+): Promise<void> {
+  await execute("UPDATE users SET money = ?, bank = ? WHERE id = ?", [
+    money,
+    bank,
+    userId,
+  ]);
+}
+
+export async function saveUserBankTransfer(
+  fromUserId: number,
+  fromBank: number,
+  toUserId: number,
+  toBank: number
+): Promise<void> {
+  const conn = await getPool().getConnection();
+  try {
+    await conn.beginTransaction();
+    await conn.query("UPDATE users SET bank = ? WHERE id = ?", [fromBank, fromUserId]);
+    await conn.query("UPDATE users SET bank = ? WHERE id = ?", [toBank, toUserId]);
+    await conn.commit();
+  } catch (error) {
+    await conn.rollback();
+    throw error;
+  } finally {
+    conn.release();
+  }
 }
 
 export async function saveUserPassport(userId: number): Promise<void> {
@@ -339,7 +384,8 @@ export function accountFromRow(row: UserRow): Account {
     skin: Number(row.skin),
     level: Number(row.level) || 1,
     exp: Number(row.exp) || 0,
-    money: Number(row.money) || 0,
+    money: Math.max(0, Math.floor(Number(row.money) || 0)),
+    bank: Math.max(0, Math.floor(Number(row.bank) || 0)),
     donate: Number(row.donate) || 0,
     health: normalizeHealth(row.health),
     passport: Boolean(Number(row.passport)),

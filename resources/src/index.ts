@@ -11,6 +11,7 @@ import { mappingModule } from "./modules/mapping";
 import { vehiclesModule } from "./modules/vehicles";
 import { hospitalModule } from "./modules/hospital";
 import { cityHallModule } from "./modules/cityhall";
+import { bankModule } from "./modules/bank";
 import { gpsModule } from "./modules/gps";
 import { prisonModule } from "./modules/prison";
 import { afkModule } from "./modules/afk";
@@ -28,8 +29,10 @@ const modules: GameModule[] = [
   persistModule,
   authModule,
   spawnModule,
+  mappingModule,
   hospitalModule,
   cityHallModule,
+  bankModule,
   minerModule,
   gpsModule,
   prisonModule,
@@ -43,7 +46,6 @@ const modules: GameModule[] = [
   commandsModule,
   adminModule,
   orgModule,
-  mappingModule,
   vehiclesModule,
 ];
 

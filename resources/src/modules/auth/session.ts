@@ -28,6 +28,7 @@ export type Account = {
   level: number;
   exp: number;
   money: number;
+  bank: number;
   donate: number;
   health: number;
   passport: boolean;
@@ -111,6 +112,7 @@ export function patchAccount(
       Account,
       | "health"
       | "money"
+      | "bank"
       | "passport"
       | "hospitalized"
       | "invitedBy"

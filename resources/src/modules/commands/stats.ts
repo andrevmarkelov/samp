@@ -40,6 +40,7 @@ export function showStatsDialog(player: Player): void {
     `Data rozhdeniya: ${formatBirthDate(account.birthDate)}`,
     `Pochta: ${account.email}`,
     `Den'gi: $${account.money}`,
+    `Bank: $${account.bank}`,
     `Donat-schet: ${account.donate}`,
     `Zdorov'e: ${health}`,
     ...orgStatsLines(account),

@@ -26,6 +26,8 @@ export type MapObjectDef = {
   rx: number;
   ry: number;
   rz: number;
+  world: number;
+  interior: number;
   materials: MapMaterial[];
   texts: MapMaterialText[];
 };
@@ -41,6 +43,7 @@ export type MapBuildingRemove = {
 export type ParsedMap = {
   objects: MapObjectDef[];
   removals: MapBuildingRemove[];
+  world: number | null;
 };
 
 function parseArgs(inner: string): Array<string | number> {
@@ -92,6 +95,11 @@ function num(value: string | number): number {
   return typeof value === "number" ? value : Number(value);
 }
 
+function worldId(value: string | number): number {
+  const n = num(value);
+  return Number.isFinite(n) ? n : -1;
+}
+
 function toU32(value: string | number): number {
   const n = num(value);
   if (!Number.isFinite(n)) {
@@ -105,10 +113,20 @@ export function parsePawnMap(source: string): ParsedMap {
   const objects: MapObjectDef[] = [];
   const removals: MapBuildingRemove[] = [];
   let last: MapObjectDef | null = null;
+  let fileWorld: number | null = null;
 
   for (const rawLine of source.split(/\r?\n/)) {
     const line = rawLine.trim();
     if (!line || line.startsWith("//") || line.startsWith("new ")) {
+      continue;
+    }
+
+    const mapWorld = line.match(/^MapVirtualWorld\s*\((.*)\)\s*;?\s*$/i);
+    if (mapWorld) {
+      const args = parseArgs(mapWorld[1]);
+      if (args.length >= 1) {
+        fileWorld = worldId(args[0]);
+      }
       continue;
     }
 
@@ -145,6 +163,8 @@ export function parsePawnMap(source: string): ParsedMap {
         rx: num(args[4]),
         ry: num(args[5]),
         rz: num(args[6]),
+        world: args.length >= 8 ? worldId(args[7]) : -1,
+        interior: args.length >= 9 ? worldId(args[8]) : -1,
         materials: [],
         texts: [],
       };
@@ -190,5 +210,13 @@ export function parsePawnMap(source: string): ParsedMap {
     }
   }
 
-  return { objects, removals };
+  if (fileWorld !== null && fileWorld !== -1) {
+    for (const object of objects) {
+      if (object.world === -1) {
+        object.world = fileWorld;
+      }
+    }
+  }
+
+  return { objects, removals, world: fileWorld };
 }

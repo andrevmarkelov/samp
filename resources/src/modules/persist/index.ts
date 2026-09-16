@@ -1,7 +1,7 @@
 import { omp, type Player } from "@omp-node/core";
 import { SERVER_TAG } from "../../shared/brand";
 import { isPlayerActive } from "../../shared/player";
-import { saveUserVitals } from "../auth/repository";
+import { saveUserHealth, saveUserVitals } from "../auth/repository";
 import {
   HEALTH_DECAY_AMOUNT,
   HEALTH_DECAY_MS,
@@ -14,6 +14,7 @@ import {
   patchAccount,
 } from "../auth/session";
 import { isSafeZoneDamage } from "../zones/safe";
+import { isBankBusy } from "../bank/tellers";
 import type { GameModule } from "../types";
 
 const PLAYER_STATE_ONFOOT = 1;
@@ -60,14 +61,24 @@ export function queueSave(player: Player): void {
   }
 
   const health = readLiveHealth(player, account.health);
+
+  if (isBankBusy(player)) {
+    patchAccount(player, { health });
+    void saveUserHealth(account.id, health).catch((error: unknown) => {
+      const message = error instanceof Error ? error.message : String(error);
+      omp.log(`[${SERVER_TAG}] не удалось сохранить HP ${account.name}: ${message}`);
+    });
+    return;
+  }
   const money = Math.max(0, Math.floor(account.money));
-  patchAccount(player, { health, money });
+  const bank = Math.max(0, Math.floor(account.bank));
+  patchAccount(player, { health, money, bank });
 
   if (isInWorld(player)) {
     applyWallet(player, { ...account, money });
   }
 
-  void saveUserVitals(account.id, health, money).catch((error: unknown) => {
+  void saveUserVitals(account.id, health, money, bank).catch((error: unknown) => {
     const message = error instanceof Error ? error.message : String(error);
     omp.log(`[${SERVER_TAG}] не удалось сохранить персонажа ${account.name}: ${message}`);
   });

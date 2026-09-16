@@ -54,6 +54,13 @@ const TARGETS: readonly GpsTarget[] = [
     y: -1576.4412,
     z: 13.5167,
   },
+  {
+    key: "bank",
+    label: "Bank",
+    x: 1458.5426,
+    y: -1024.3342,
+    z: 23.8281,
+  },
 ];
 
 const activeByPlayer = new Map<number, GpsTarget>();
