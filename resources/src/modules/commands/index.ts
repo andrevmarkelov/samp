@@ -14,8 +14,10 @@ import "./hospital";
 import "./gps";
 import "./leaders";
 import "./r";
+import "./report";
 import { bindMenuDialogs } from "./mn";
 import { bindGpsDialogs } from "../gps";
+import { bindReportDialogs } from "./report";
 
 export const commandsModule: GameModule = {
   name: "commands",
@@ -23,5 +25,6 @@ export const commandsModule: GameModule = {
     bindCommandListener();
     bindMenuDialogs();
     bindGpsDialogs();
+    bindReportDialogs();
   },
 };

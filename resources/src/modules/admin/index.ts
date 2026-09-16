@@ -4,6 +4,7 @@ import { bindAdminsList } from "./admins";
 import { bindAdminAo } from "./ao";
 import { bindAlogin, clearAloginDialog } from "./alogin";
 import { bindAdminHelp } from "./ahelp";
+import { bindAdminAns } from "./ans";
 import { bindAdminChat } from "./chat";
 import { bindAdminKick } from "./kick";
 import { bindAdminMute } from "./mute";
@@ -24,6 +25,7 @@ export const adminModule: GameModule = {
   start() {
     bindAlogin();
     bindAdminChat();
+    bindAdminAns();
     bindAdminHelp();
     bindAdminsList();
     bindAdminKick();
