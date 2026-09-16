@@ -42,7 +42,6 @@ type PendingSend = {
   label: string;
 };
 
-/** Одна линия по X, Y выровнен. */
 const TELLERS: readonly { x: number; y: number; z: number }[] = [
   { x: 1459.9399, y: -1010.5794, z: 38.1769 },
   { x: 1457.865, y: -1010.5794, z: 38.1769 },
