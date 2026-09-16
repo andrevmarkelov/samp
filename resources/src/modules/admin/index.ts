@@ -7,6 +7,7 @@ import { bindAdminHelp } from "./ahelp";
 import { bindAdminChat } from "./chat";
 import { bindAdminKick } from "./kick";
 import { bindAdminSethp } from "./sethp";
+import { bindAdminSetskin } from "./setskin";
 import { bindAdminMakeadmin } from "./makeadmin";
 import { bindAdminMakeleader } from "./makeleader";
 import { bindAdminMapTeleport } from "./map";
@@ -26,6 +27,7 @@ export const adminModule: GameModule = {
     bindAdminAo();
     bindAdminTpcor();
     bindAdminSethp();
+    bindAdminSetskin();
     bindAdminRespcar();
     bindAdminMakeleader();
     bindAdminMakeadmin();

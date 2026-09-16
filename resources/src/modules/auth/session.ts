@@ -135,6 +135,7 @@ export function patchAccount(
       | "adminLevel"
       | "orgId"
       | "orgRank"
+      | "skin"
     >
   >
 ): void {

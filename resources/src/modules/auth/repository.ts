@@ -365,6 +365,10 @@ export async function saveAdminPassword(
   ]);
 }
 
+export async function saveUserSkin(userId: number, skin: number): Promise<void> {
+  await execute("UPDATE users SET skin = ? WHERE id = ?", [skin, userId]);
+}
+
 export async function saveUserOrg(
   userId: number,
   orgId: number,
