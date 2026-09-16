@@ -11,6 +11,7 @@ import { orgPaydayPay } from "../org";
 import { applyPaydayExp, expForNextLevel, formatClock, hourStamp } from "./progress";
 
 const TICK_MS = 1000;
+const MAX_MONEY = 2_147_483_647;
 
 let lastHour = "";
 
@@ -66,16 +67,17 @@ function payPlayer(player: Player, clock: string): void {
   const salary = orgPaydayPay(account);
   if (salary) {
     const fresh = getAccount(player) ?? account;
-    patchAccount(player, { money: fresh.money + salary.amount });
-    try {
-      player.giveMoney(salary.amount);
-    } catch {
-      // Слот уже не в мире.
+    const current = Math.max(0, Math.floor(fresh.bank));
+    const credited = Math.min(salary.amount, Math.max(0, MAX_MONEY - current));
+    if (credited > 0) {
+      patchAccount(player, { bank: current + credited });
+      queueSave(player);
     }
-    queueSave(player);
     player.sendClientMessage(
       Color.tryOk,
-      `Zarplata ${salary.orgName} (${salary.rankTitle}): $${salary.amount}`
+      credited > 0
+        ? `Zarplata ${salary.orgName} (${salary.rankTitle}): $${credited} na bankovskiy schet.`
+        : `Zarplata ne nachislena: bankovskiy schet zapolnen.`
     );
   }
 

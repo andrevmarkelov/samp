@@ -501,15 +501,15 @@ async function sendToPlayer(player: Player, inputText: string): Promise<void> {
   clearPending(player);
 
   if (isAuthenticated(player) && getAccount(player)?.id === senderAccount.id) {
-    patchAccount(player, { bank: nextSenderBank });
+    const next = keepBankExtra(player, senderBank, nextSenderBank);
     player.sendClientMessage(
       Color.tryOk,
-      `Vy pereveli $${amount} igroku ${pending.label}. Balans: $${nextSenderBank}.`
+      `Vy pereveli $${amount} igroku ${pending.label}. Balans: $${next}.`
     );
   }
 
   if (isPlayerActive(target) && getAccount(target)?.id === targetAccount.id) {
-    patchAccount(target, { bank: nextTargetBank });
+    keepBankExtra(target, targetBank, nextTargetBank);
     target.sendClientMessage(
       Color.info,
       `Igrok ${senderAccount.name}[${senderId}] perevel vam $${amount}.`
@@ -663,7 +663,13 @@ async function transfer(
     return;
   }
 
-  patchAccount(player, { money: nextCash, bank: nextBank });
+  const extraCash = Math.max(0, Math.floor(getAccount(player)?.money ?? cash) - cash);
+  const cashNow = Math.min(MAX_MONEY, nextCash + extraCash);
+  const bankNow = keepBankExtra(player, bank, nextBank);
+  patchAccount(player, {
+    money: cashNow,
+    bank: bankNow,
+  });
   const fresh = getAccount(player);
   if (fresh) {
     applyWallet(player, fresh);
@@ -672,18 +678,26 @@ async function transfer(
   if (mode === "deposit") {
     player.sendClientMessage(
       Color.tryOk,
-      `Schet popolnen na $${amount}. Balans: $${nextBank}.`
+      `Schet popolnen na $${amount}. Balans: $${bankNow}.`
     );
   } else {
     player.sendClientMessage(
       Color.tryOk,
-      `Vy snyali $${amount}. Nalichnye: $${nextCash}.`
+      `Vy snyali $${amount}. Nalichnye: $${cashNow}.`
     );
   }
 
   if (isAtTeller(player)) {
     showMenu(player);
   }
+}
+
+function keepBankExtra(player: Player, snapshot: number, nextBank: number): number {
+  const live = Math.max(0, Math.floor(getAccount(player)?.bank ?? snapshot));
+  const extra = Math.max(0, live - snapshot);
+  const result = Math.min(MAX_MONEY, nextBank + extra);
+  patchAccount(player, { bank: result });
+  return result;
 }
 
 function parseAmount(input: string): number | null {
