@@ -14,6 +14,7 @@ import "./hospital";
 import "./gps";
 import "./leaders";
 import "./r";
+import "./limit";
 import "./report";
 import { bindMenuDialogs } from "./mn";
 import { bindGpsDialogs } from "../gps";

@@ -11,6 +11,7 @@ import {
   getOrganization,
 } from "../org";
 import { registerCommand } from "../commands/registry";
+import { syncOrgVehicleAccess } from "../vehicles/access";
 import { hasAdminAccess } from "./session";
 
 export const MAKELEADER_DIALOG_ID = 12;
@@ -137,6 +138,7 @@ async function applyLeader(
 
   patchAccount(target, { orgId, orgRank });
   applyOrgVisuals(target);
+  syncOrgVehicleAccess(target);
 
   const tag = playerChatName(target);
   if (orgId === ORG_NONE) {

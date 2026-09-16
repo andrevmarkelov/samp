@@ -6,8 +6,11 @@ import { STREET_WORLD } from "../spawn/point";
 const PLAYER_STATE_DRIVER = 2;
 /** Left Ctrl. KEY_ACTION = 1. */
 const KEY_ACTION = 1;
+/** LMB. KEY_FIRE = 4. В pawn на этой клавише фары. */
+const KEY_FIRE = 4;
 const PARAM_ON = 1;
 const PARAM_OFF = 0;
+const LIGHTS_SOUND_ID = 4604;
 
 export type ServerVehicleDef = {
   model: number;
@@ -32,19 +35,23 @@ export function startEngineControl(): void {
 
   for (const vehicle of omp.vehicles.all()) {
     setEngine(vehicle, false);
+    setLights(vehicle, false);
   }
 
   omp.on("vehicleSpawn", (vehicle) => {
     setEngine(vehicle, false);
+    setLights(vehicle, false);
   });
 
   omp.on("playerKeyStateChange", (player, newKeys, oldKeys) => {
     const pressed = newKeys & ~oldKeys;
-    if ((pressed & KEY_ACTION) === 0) {
-      return;
+    if ((pressed & KEY_ACTION) !== 0) {
+      toggleEngine(player);
     }
 
-    toggleEngine(player);
+    if ((pressed & KEY_FIRE) !== 0) {
+      toggleLights(player);
+    }
   });
 }
 
@@ -70,6 +77,7 @@ export function createServerVehicle(def: ServerVehicleDef): Vehicle | null {
   try {
     vehicle.setVirtualWorld(def.world ?? STREET_WORLD);
     setEngine(vehicle, false);
+    setLights(vehicle, false);
   } catch {
     // Машина уже в мире — параметры догонятся на vehicleSpawn.
   }
@@ -94,23 +102,48 @@ function setEngine(vehicle: Vehicle, on: boolean): void {
   }
 }
 
-function toggleEngine(player: Player): void {
+function setLights(vehicle: Vehicle, on: boolean): void {
+  try {
+    const params = vehicle.getParamsEx();
+    vehicle.setParamsEx(
+      asParam(params.engine),
+      on ? PARAM_ON : PARAM_OFF,
+      asParam(params.alarm),
+      asParam(params.doors),
+      asParam(params.bonnet),
+      asParam(params.boot),
+      asParam(params.objective)
+    );
+  } catch {
+    // Транспорт уже уничтожен.
+  }
+}
+
+function driverVehicle(player: Player): Vehicle | null {
   if (!isAuthenticated(player)) {
-    return;
+    return null;
   }
 
   try {
     if (player.getState() !== PLAYER_STATE_DRIVER) {
-      return;
+      return null;
     }
 
-    const vehicle = omp.vehicles.at(player.getVehicleID());
-    if (!vehicle) {
-      return;
-    }
+    return omp.vehicles.at(player.getVehicleID()) ?? null;
+  } catch {
+    return null;
+  }
+}
 
-    const running = isEngineOn(vehicle);
-    setEngine(vehicle, !running);
+function toggleEngine(player: Player): void {
+  const vehicle = driverVehicle(player);
+  if (!vehicle) {
+    return;
+  }
+
+  const running = isEngineOn(vehicle);
+  setEngine(vehicle, !running);
+  try {
     player.sendClientMessage(
       Color.info,
       running ? "Dvigatel' zaglushen." : "Dvigatel' zapushchen."
@@ -120,9 +153,41 @@ function toggleEngine(player: Player): void {
   }
 }
 
+function toggleLights(player: Player): void {
+  const vehicle = driverVehicle(player);
+  if (!vehicle) {
+    return;
+  }
+
+  const on = isLightsOn(vehicle);
+  setLights(vehicle, !on);
+  playToggleSound(player);
+}
+
+function playToggleSound(player: Player): void {
+  try {
+    const pos = player.getPos();
+    player.playGameSound(LIGHTS_SOUND_ID, pos.x, pos.y, pos.z);
+  } catch {
+    try {
+      player.playGameSound(LIGHTS_SOUND_ID, 0, 0, 0);
+    } catch {
+      // Слот пустой.
+    }
+  }
+}
+
 export function isEngineOn(vehicle: Vehicle): boolean {
   try {
     return vehicle.getParamsEx().engine === PARAM_ON;
+  } catch {
+    return false;
+  }
+}
+
+export function isLightsOn(vehicle: Vehicle): boolean {
+  try {
+    return vehicle.getParamsEx().lights === PARAM_ON;
   } catch {
     return false;
   }

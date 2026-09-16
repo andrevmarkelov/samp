@@ -1,6 +1,7 @@
 import { TextDraw, omp, type Player, type Vehicle } from "@omp-node/core";
 import { isPlayerActive, playerId } from "../../shared/player";
-import { isEngineOn } from "../vehicles/spawn";
+import { isEngineOn, isLightsOn } from "../vehicles/spawn";
+import { getVehicleLimit } from "../vehicles/limit";
 
 const PLAYER_STATE_DRIVER = 2;
 const UPDATE_MS = 500;
@@ -66,7 +67,7 @@ function createPlayerDraws(): SpeedoDraws | null {
     return draw;
   });
   const status = tryDraw(() => {
-    const draw = new TextDraw(425.0, 416.5, statusLine(false));
+    const draw = new TextDraw(425.0, 416.5, statusLine(false, false, null));
     styleLine(draw);
     return draw;
   });
@@ -135,9 +136,11 @@ function hideFor(player: Player, id: number): void {
   }
 }
 
-function statusLine(engineOn: boolean): string {
+function statusLine(engineOn: boolean, lightsOn: boolean, limitKmh: number | null): string {
   const motor = engineOn ? "~g~M" : "~w~M";
-  return `~g~Open    ~w~max   ~w~E ~w~S   ${motor} ~w~L ~w~B`;
+  const lights = lightsOn ? "~g~L" : "~w~L";
+  const limiter = limitKmh ? `~r~${limitKmh}` : "~w~max";
+  return `~g~Open    ${limiter}   ~w~E ~w~S   ${motor} ${lights} ~w~B`;
 }
 
 function driverVehicle(player: Player): Vehicle | null {
@@ -201,7 +204,9 @@ function updateSpeed(player: Player, id: number): void {
   try {
     hud.speed.setString(`${vehicleSpeedKmh(vehicle)} km/h`);
     hud.health.setString(`${vehicleHealth(vehicle)}`);
-    hud.status.setString(statusLine(isEngineOn(vehicle)));
+    hud.status.setString(
+      statusLine(isEngineOn(vehicle), isLightsOn(vehicle), getVehicleLimit(vehicle))
+    );
   } catch {
     // Textdraw уже уничтожен.
   }
