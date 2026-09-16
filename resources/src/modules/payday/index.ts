@@ -12,6 +12,7 @@ import { applyPaydayExp, expForNextLevel, formatClock, hourStamp } from "./progr
 
 const TICK_MS = 1000;
 const MAX_MONEY = 2_147_483_647;
+const PAYDAY_SOUND_ID = 6400;
 
 let lastHour = "";
 
@@ -42,7 +43,11 @@ function runPayday(now: Date): void {
       return;
     }
 
-    payPlayer(player, clock);
+    try {
+      payPlayer(player, clock);
+    } catch {
+      // Один слот не должен рвать payday остальным.
+    }
   });
 }
 
@@ -63,8 +68,9 @@ function payPlayer(player: Player, clock: string): void {
   });
 
   const need = expForNextLevel(next.level);
-  player.sendClientMessage(Color.info, clock);
-  player.sendClientMessage(Color.white, `Ochki opyta ${next.exp}/${need}`);
+  playPaydaySound(player);
+  tell(player, Color.info, clock);
+  tell(player, Color.white, `Ochki opyta ${next.exp}/${need}`);
 
   const salary = orgPaydayPay(account);
   if (salary) {
@@ -75,7 +81,8 @@ function payPlayer(player: Player, clock: string): void {
       patchAccount(player, { bank: current + credited });
       queueSave(player);
     }
-    player.sendClientMessage(
+    tell(
+      player,
       Color.tryOk,
       credited > 0
         ? `Zarplata ${salary.orgName} (${salary.rankTitle}): $${credited} na bankovskiy schet.`
@@ -84,9 +91,31 @@ function payPlayer(player: Player, clock: string): void {
   }
 
   if (next.leveled) {
-    player.sendClientMessage(
+    tell(
+      player,
       Color.tryOk,
       `Pozdravlyaem, vash igrovoy uroven' byl povyshen do ${next.level}.`
     );
+  }
+}
+
+function tell(player: Player, color: number, text: string): void {
+  try {
+    player.sendClientMessage(color, text);
+  } catch {
+    // Слот пустой.
+  }
+}
+
+function playPaydaySound(player: Player): void {
+  try {
+    const pos = player.getPos();
+    player.playGameSound(PAYDAY_SOUND_ID, pos.x, pos.y, pos.z);
+  } catch {
+    try {
+      player.playGameSound(PAYDAY_SOUND_ID, 0, 0, 0);
+    } catch {
+      // Слот пустой.
+    }
   }
 }
