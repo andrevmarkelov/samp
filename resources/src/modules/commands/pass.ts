@@ -91,6 +91,7 @@ function showPassport(viewer: Player, owner: Account): void {
   const body = [
     `Imya: ${owner.name}`,
     `Uroven': ${owner.level}`,
+    `Zakonoposlushnost': ${owner.lawfulness}`,
     ...orgStatsLines(owner),
   ].join("\n");
 

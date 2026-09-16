@@ -3,7 +3,7 @@ import { Color } from "../../shared/colors";
 import { SERVER_TAG } from "../../shared/brand";
 import { isPlayerActive } from "../../shared/player";
 import { saveUserProgress } from "../auth/repository";
-import { getAccount, isAuthenticated, patchAccount, applyScore } from "../auth/session";
+import { getAccount, isAuthenticated, patchAccount, applyScore, MAX_LAWFULNESS, normalizeLawfulness } from "../auth/session";
 import type { GameModule } from "../types";
 import { isPlayerAfk } from "../afk";
 import { queueSave } from "../persist";
@@ -53,9 +53,11 @@ function payPlayer(player: Player, clock: string): void {
   }
 
   const next = applyPaydayExp(account.level, account.exp);
-  patchAccount(player, { level: next.level, exp: next.exp });
+  const currentLaw = normalizeLawfulness(account.lawfulness);
+  const lawfulness = currentLaw < MAX_LAWFULNESS ? currentLaw + 1 : MAX_LAWFULNESS;
+  patchAccount(player, { level: next.level, exp: next.exp, lawfulness });
   applyScore(player, next.level);
-  void saveUserProgress(account.id, next.level, next.exp).catch((error: unknown) => {
+  void saveUserProgress(account.id, next.level, next.exp, lawfulness).catch((error: unknown) => {
     const message = error instanceof Error ? error.message : String(error);
     omp.log(`[${SERVER_TAG}] не удалось сохранить payday ${account.name}: ${message}`);
   });

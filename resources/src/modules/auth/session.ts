@@ -4,6 +4,9 @@ import type { Gender } from "./gender";
 
 export const MAX_HEALTH = 100;
 export const MIN_HEALTH = 20;
+export const MAX_LAWFULNESS = 100;
+export const MIN_LAWFULNESS = -100;
+export const STARTING_LAWFULNESS = 100;
 export const HOSPITAL_HEALTH = MIN_HEALTH;
 export const STARTING_HEALTH = 100;
 export const HEALTH_DECAY_AMOUNT = 1;
@@ -19,6 +22,15 @@ export function normalizeHealth(value: unknown): number {
   return Math.min(MAX_HEALTH, health);
 }
 
+export function normalizeLawfulness(value: unknown): number {
+  const lawfulness = Math.floor(Number(value));
+  if (!Number.isFinite(lawfulness)) {
+    return STARTING_LAWFULNESS;
+  }
+
+  return Math.min(MAX_LAWFULNESS, Math.max(MIN_LAWFULNESS, lawfulness));
+}
+
 export type Account = {
   id: number;
   name: string;
@@ -30,6 +42,7 @@ export type Account = {
   money: number;
   bank: number;
   donate: number;
+  lawfulness: number;
   health: number;
   passport: boolean;
   hospitalized: boolean;
@@ -113,6 +126,7 @@ export function patchAccount(
       | "health"
       | "money"
       | "bank"
+      | "lawfulness"
       | "passport"
       | "hospitalized"
       | "invitedBy"

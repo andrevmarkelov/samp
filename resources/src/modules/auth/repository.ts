@@ -3,7 +3,9 @@ import { execute, getPool, query } from "../../shared/database";
 import { isGender, type Gender } from "./gender";
 import {
   STARTING_HEALTH,
+  STARTING_LAWFULNESS,
   normalizeHealth,
+  normalizeLawfulness,
   type Account,
 } from "./session";
 import { parseOrgId, parseOrgRank } from "../org/membership";
@@ -22,6 +24,7 @@ type UserRow = RowDataPacket & {
   money: number;
   bank: number;
   donate: number;
+  lawfulness: number;
   health: number;
   passport: number | boolean;
   hospitalized: number | boolean;
@@ -45,6 +48,7 @@ CREATE TABLE IF NOT EXISTS users (
   money INT NOT NULL DEFAULT 0,
   bank INT NOT NULL DEFAULT 0,
   donate INT UNSIGNED NOT NULL DEFAULT 0,
+  lawfulness SMALLINT NOT NULL DEFAULT 100,
   health FLOAT NOT NULL DEFAULT 100,
   passport TINYINT(1) NOT NULL DEFAULT 0,
   hospitalized TINYINT(1) NOT NULL DEFAULT 0,
@@ -83,6 +87,10 @@ const COLUMN_MIGRATIONS = [
   {
     name: "donate",
     sql: "donate INT UNSIGNED NOT NULL DEFAULT 0 AFTER money",
+  },
+  {
+    name: "lawfulness",
+    sql: "lawfulness SMALLINT NOT NULL DEFAULT 100 AFTER donate",
   },
   {
     name: "health",
@@ -153,7 +161,7 @@ async function columnExists(column: string): Promise<boolean> {
 
 export async function findUserByName(name: string): Promise<UserRow | null> {
   const rows = await query<UserRow>(
-    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, bank, donate, health, passport, hospitalized, invited_by, birth_date, admin_level, org_id, org_rank FROM users WHERE name = ? LIMIT 1",
+    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, bank, donate, lawfulness, health, passport, hospitalized, invited_by, birth_date, admin_level, org_id, org_rank FROM users WHERE name = ? LIMIT 1",
     [name]
   );
   return rows[0] ?? null;
@@ -204,6 +212,7 @@ export async function createUser(input: {
     money: STARTING_MONEY,
     bank: 0,
     donate: 0,
+    lawfulness: STARTING_LAWFULNESS,
     health: STARTING_HEALTH,
     passport: false,
     hospitalized: false,
@@ -303,11 +312,13 @@ export async function saveUserLastIp(userId: number, ip: string): Promise<void> 
 export async function saveUserProgress(
   userId: number,
   level: number,
-  exp: number
+  exp: number,
+  lawfulness: number
 ): Promise<void> {
-  await execute("UPDATE users SET level = ?, exp = ? WHERE id = ?", [
+  await execute("UPDATE users SET level = ?, exp = ?, lawfulness = ? WHERE id = ?", [
     level,
     exp,
+    lawfulness,
     userId,
   ]);
 }
@@ -387,6 +398,7 @@ export function accountFromRow(row: UserRow): Account {
     money: Math.max(0, Math.floor(Number(row.money) || 0)),
     bank: Math.max(0, Math.floor(Number(row.bank) || 0)),
     donate: Number(row.donate) || 0,
+    lawfulness: normalizeLawfulness(row.lawfulness),
     health: normalizeHealth(row.health),
     passport: Boolean(Number(row.passport)),
     hospitalized: Boolean(Number(row.hospitalized)),

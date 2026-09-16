@@ -36,6 +36,7 @@ export function showStatsDialog(player: Player): void {
     `Pol: ${genderLabel(account.gender)}`,
     `Uroven': ${account.level}`,
     `Opyt: ${account.exp}/${expForNextLevel(account.level)}`,
+    `Zakonoposlushnost': ${account.lawfulness}`,
     `Skin: ${resolvePlayerSkin(account)}`,
     `Data rozhdeniya: ${formatBirthDate(account.birthDate)}`,
     `Pochta: ${account.email}`,
