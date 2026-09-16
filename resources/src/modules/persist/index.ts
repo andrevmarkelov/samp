@@ -13,6 +13,7 @@ import {
   isAuthenticated,
   patchAccount,
 } from "../auth/session";
+import { isSafeZoneDamage } from "../zones/safe";
 import type { GameModule } from "../types";
 
 const PLAYER_STATE_ONFOOT = 1;
@@ -124,7 +125,10 @@ function decayHealth(player: Player): void {
 export const persistModule: GameModule = {
   name: "persist",
   start() {
-    omp.on("playerTakeDamage", (player, _from, amount) => {
+    omp.on("playerTakeDamage", (player, from, amount) => {
+      if (isSafeZoneDamage(player, from)) {
+        return;
+      }
       const account = getAccount(player);
       if (account) {
         try {

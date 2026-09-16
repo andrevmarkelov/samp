@@ -2,6 +2,7 @@ import { GangZone, omp, type Player } from "@omp-node/core";
 import { isPlayerActive } from "../../shared/player";
 import { isAuthenticated } from "../auth/session";
 import type { GameModule } from "../types";
+import { startSafeZones } from "./safe";
 
 /** Чёрный, альфа FF — без прозрачности. */
 const ZONE_COLOR = 0x000000ff;
@@ -42,6 +43,8 @@ export const zonesModule: GameModule = {
 
       showClosedZones(player);
     });
+
+    startSafeZones();
   },
 };
 
