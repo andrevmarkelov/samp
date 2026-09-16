@@ -7,6 +7,6 @@ export const ADMIN_COMMANDS_BY_LEVEL: readonly (readonly string[])[] = [
   ["/ao", "/tpcor"],
   ["/sethp", "/respcar", "/setskin"],
   ["/makeleader"],
-  [],
+  ["/givemoney"],
   ["/makeadmin"],
 ];
