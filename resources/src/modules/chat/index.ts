@@ -1,12 +1,27 @@
 import { omp } from "@omp-node/core";
-import { Color } from "../../shared/colors";
-import { CHAT_MAX_LENGTH, CHAT_RADIUS, sanitizeChatText, sendNearby } from "../../shared/nearby";
+import { Color, chatColorTag } from "../../shared/colors";
+import {
+  CHAT_MAX_LENGTH,
+  CHAT_RADIUS,
+  CLIENT_MESSAGE_MAX,
+  sanitizeChatText,
+  sendNearby,
+} from "../../shared/nearby";
 import { playerChatName } from "../../shared/player";
 import { getAccount, isAuthenticated } from "../auth/session";
-import { resolveChatColor } from "../org";
+import { getMembership, resolveChatColor } from "../org";
 import type { GameModule } from "../types";
 import { notifyIfMuted, clearMuteWatch, watchMute } from "./mute";
 import { clearTalk, playLocalSpeech } from "./talk";
+
+function nearbyChatLine(playerName: string, text: string, nameColor: number | null): string {
+  if (nameColor === null) {
+    return `${playerName}: ${text}`;
+  }
+
+  const prefix = `${chatColorTag(nameColor)}${playerName}: ${chatColorTag(Color.white)}`;
+  return prefix + text.slice(0, Math.max(0, CLIENT_MESSAGE_MAX - prefix.length));
+}
 
 export const chatModule: GameModule = {
   name: "chat",
@@ -26,11 +41,16 @@ export const chatModule: GameModule = {
       }
 
       const account = getAccount(player);
+      const inOrg = account ? getMembership(account) : null;
       sendNearby(
         player,
         CHAT_RADIUS,
-        account ? resolveChatColor(account) : Color.chat,
-        `${playerChatName(player)}: ${text}`
+        inOrg ? Color.white : Color.chat,
+        nearbyChatLine(
+          playerChatName(player),
+          text,
+          account && inOrg ? resolveChatColor(account) : null
+        )
       );
       playLocalSpeech(player, text);
       return false;

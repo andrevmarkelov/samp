@@ -16,3 +16,9 @@ export const Color = {
   dept: 0xff4c4cff,
   govNews: 0x3399ffff,
 } as const;
+
+/** Цвет в тексте клиентского чата: {RRGGBB}. */
+export function chatColorTag(color: number): string {
+  const rgb = ((color >>> 8) & 0xffffff).toString(16).padStart(6, "0").toUpperCase();
+  return `{${rgb}}`;
+}
