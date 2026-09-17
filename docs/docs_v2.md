@@ -278,6 +278,16 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 
 ---
 
+## Мэрия
+
+`org_id = 3`, `gov: true`. Цвет `0xffff00ff` (ник и чат). Спавн в интерьере мэрии `3`: `357.3111, 162.1018, 1025.7964`. 10 рангов, каталог: `org/meriya.ts`.
+
+`/r`, `/d`, `/gov` (ранг 10), кадры рангов **9–10** — как у армии и больницы.
+
+Транспорт у здания (Washington 421 ×4, Landstalker 400 ×4, Stretch 409, Maverick 487) — белый цвет **1**, только члены мэрии. Координаты: `vehicles/meriya.ts`.
+
+---
+
 ## Банды
 
 Пять illegal-органов. Ник, `/f` и гангзоны — цветом органа. Спавн на улице у HQ.
@@ -300,7 +310,7 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 
 | Команда | Кто |
 |---|---|
-| `/r` | орган с `illegal: false` (армия, больница). Банде — тишина |
+| `/r` | орган с `illegal: false` (армия, больница, мэрия). Банде — тишина |
 | `/f` | только `illegal: true` (банды). Гражданскому / гос. — тишина |
 | `/d` | `gov: true` — общий департамент |
 | `/gov` | `gov` и ранг **10** — новость всем |
@@ -401,6 +411,7 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 | Скутера / общий спавн машин | `vehicles/index.ts`, `vehicles/spawn.ts` |
 | Армейский транспорт | `vehicles/army.ts`, `vehicles/access.ts` |
 | Больница орган / машины | `org/hospital.ts`, `vehicles/hospital.ts` |
+| Мэрия | `org/meriya.ts`, `vehicles/meriya.ts` |
 | Банды | `org/gangs.ts`, `vehicles/gangs.ts` |
 | Инвайт / ранг | `commands/org-staff.ts` |
 | Гангзоны | `zones/turf.ts`, `zones/repository.ts`, `sql/schema.sql` |

@@ -1,5 +1,6 @@
 export { ARMY, ARMY_GATES, ORG_ARMY_ID } from "./army";
 export { HOSPITAL, HOSPITAL_GATES, ORG_HOSPITAL_ID } from "./hospital";
+export { MERIYA, ORG_MERIYA_ID } from "./meriya";
 export {
   AZTECAS,
   BALLAS,

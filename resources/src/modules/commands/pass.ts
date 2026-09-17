@@ -2,12 +2,17 @@ import { Dialog, omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { WHISPER_RADIUS } from "../../shared/nearby";
 import { isPlayerActive, playerId, playerName } from "../../shared/player";
+import { byGender, genderLabel } from "../auth/gender";
 import { getAccount, type Account } from "../auth/session";
-import { orgStatsLines } from "../org";
+import { ageFromBirthDate, formatBirthDate } from "../auth/validation";
+import { getMembership } from "../org";
 import { registerCommand } from "./registry";
 
 const PASSPORT_DIALOG_ID = 3;
 const DIALOG_STYLE_MSGBOX = 0;
+const TITLE = "{FFCC00}";
+const LABEL = "{FFFFFF}";
+const VALUE = "{33CCFF}";
 
 registerCommand("pass", "Pasport: posmotret' ili pokazat' po id", (player, args) => {
   const account = getAccount(player);
@@ -59,11 +64,9 @@ registerCommand("pass", "Pasport: posmotret' ili pokazat' po id", (player, args)
 
   showPassport(target, account);
   const shownTo = playerName(target);
-  player.sendClientMessage(Color.gray, `Vy pokazali pasport: ${shownTo}.`);
-  target.sendClientMessage(
-    Color.gray,
-    `${account.name} pokazal vam pasport.`
-  );
+  const verb = byGender(account.gender, "pokazal", "pokazala");
+  player.sendClientMessage(Color.gray, `Vy ${verb} pasport: ${shownTo}.`);
+  target.sendClientMessage(Color.gray, `${account.name} ${verb} vam pasport.`);
 });
 
 function isAuthenticatedTarget(player: Player): boolean {
@@ -87,12 +90,20 @@ function samePlaceNearby(source: Player, other: Player): boolean {
   }
 }
 
+function passRow(label: string, value: string): string {
+  return `${LABEL}${label}:\t\t${VALUE}${value}`;
+}
+
 function showPassport(viewer: Player, owner: Account): void {
+  const membership = getMembership(owner);
   const body = [
-    `Imya: ${owner.name}`,
-    `Uroven': ${owner.level}`,
-    `Zakonoposlushnost': ${owner.lawfulness}`,
-    ...orgStatsLines(owner),
+    passRow("Imya", owner.name),
+    passRow("Prozhivanie v strane (let)", String(ageFromBirthDate(owner.birthDate))),
+    passRow("Pol", genderLabel(owner.gender)),
+    passRow("Data rozhdeniya", formatBirthDate(owner.birthDate)),
+    passRow("Organizaciya", membership?.org.name ?? "Net"),
+    passRow("Dolzhnost'", membership?.rank.title ?? "Net"),
+    passRow("Zakonoposlushnost'", String(owner.lawfulness)),
   ].join("\n");
 
   try {
@@ -100,7 +111,7 @@ function showPassport(viewer: Player, owner: Account): void {
       viewer,
       PASSPORT_DIALOG_ID,
       DIALOG_STYLE_MSGBOX,
-      "Pasport",
+      `${TITLE}Pasport ${owner.name}`,
       body,
       "Zakryt'",
       ""

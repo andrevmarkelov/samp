@@ -68,6 +68,15 @@ export function formatBirthDate(iso: string): string {
   return `${day}.${month}.${year}`;
 }
 
+export function ageFromBirthDate(iso: string, now = new Date()): number {
+  const [year, month, day] = iso.split("-").map(Number);
+  if (!year || !month || !day) {
+    return 0;
+  }
+
+  return ageOn(new Date(year, month - 1, day), now);
+}
+
 function ageOn(birth: Date, now: Date): number {
   let age = now.getFullYear() - birth.getFullYear();
   const month = now.getMonth() - birth.getMonth();

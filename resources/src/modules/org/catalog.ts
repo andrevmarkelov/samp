@@ -1,9 +1,10 @@
 import { ARMY, ARMY_GATES } from "./army";
 import { GANGS } from "./gangs";
 import { HOSPITAL, HOSPITAL_GATES } from "./hospital";
+import { MERIYA } from "./meriya";
 import type { OrganizationDef, OrgGateDef, OrgRankDef } from "./types";
 
-const ORGANIZATIONS: readonly OrganizationDef[] = [ARMY, HOSPITAL, ...GANGS];
+const ORGANIZATIONS: readonly OrganizationDef[] = [ARMY, HOSPITAL, MERIYA, ...GANGS];
 const ORG_GATES: readonly OrgGateDef[] = [...ARMY_GATES, ...HOSPITAL_GATES];
 
 const byId = new Map(ORGANIZATIONS.map((org) => [org.id, org]));

@@ -4,6 +4,7 @@ import { bindOrgVehicleAccess } from "./access";
 import { spawnArmyVehicles } from "./army";
 import { spawnGangVehicles } from "./gangs";
 import { spawnHospitalVehicles } from "./hospital";
+import { spawnMeriyaVehicles } from "./meriya";
 import { startSpeedLimiter } from "./limit";
 import { createServerVehicle, startEngineControl } from "./spawn";
 
@@ -37,6 +38,7 @@ export const vehiclesModule: GameModule = {
     bindOrgVehicleAccess();
     spawnArmyVehicles();
     spawnHospitalVehicles();
+    spawnMeriyaVehicles();
     spawnGangVehicles();
 
     for (const spot of STATION_SCOOTERS) {
