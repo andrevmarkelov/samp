@@ -21,6 +21,7 @@ import "./report";
 import { bindMenuDialogs } from "./mn";
 import { bindGpsDialogs } from "../gps";
 import { bindReportDialogs } from "./report";
+import { bindOrgStaff } from "./org-staff";
 
 export const commandsModule: GameModule = {
   name: "commands",
@@ -29,5 +30,6 @@ export const commandsModule: GameModule = {
     bindMenuDialogs();
     bindGpsDialogs();
     bindReportDialogs();
+    bindOrgStaff();
   },
 };
