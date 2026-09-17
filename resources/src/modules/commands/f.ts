@@ -12,28 +12,24 @@ import { getMembership } from "../org";
 import { registerCommand } from "./registry";
 
 const BUBBLE_MS = 3000;
-const BUBBLE_TEXT = "Soobschenie po racii.";
+const BUBBLE_TEXT = "Soobschenie bande.";
 
-registerCommand("r", "Raciya organizacii", (player, args) => {
+registerCommand("f", "Chat bandy", (player, args) => {
   const account = getAccount(player);
   const membership = account ? getMembership(account) : null;
-  if (!account || !membership) {
-    player.sendClientMessage(Color.error, "Vy ne sostoite v organizacii.");
-    return;
-  }
-
-  if (membership.org.illegal) {
+  if (!account || !membership?.org.illegal) {
     return;
   }
 
   const text = sanitizeChatText(args.trim()).slice(0, CHAT_MAX_LENGTH);
   if (!text) {
-    player.sendClientMessage(Color.error, "Ispol'zovanie: /r [tekst]");
+    player.sendClientMessage(Color.error, "Ispol'zovanie: /f [tekst]");
     return;
   }
 
+  const color = membership.org.color;
   const line = clipClientMessage(
-    `[R] ${membership.rank.title} ${playerChatName(player)}: ${text}`
+    `[F] ${membership.rank.title} ${playerChatName(player)}: ${text}`
   );
   const orgId = membership.org.id;
 
@@ -57,14 +53,14 @@ registerCommand("r", "Raciya organizacii", (player, args) => {
     }
 
     try {
-      other.sendClientMessage(Color.radio, line);
+      other.sendClientMessage(color, line);
     } catch {
       // Слот пустой.
     }
   });
 
   try {
-    player.setChatBubble(BUBBLE_TEXT, Color.radio, CHAT_RADIUS, BUBBLE_MS);
+    player.setChatBubble(BUBBLE_TEXT, color, CHAT_RADIUS, BUBBLE_MS);
   } catch {
     // Пузырь не обязателен.
   }

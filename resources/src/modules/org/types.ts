@@ -21,6 +21,7 @@ export type OrganizationDef = {
   name: string;
   color: number;
   gov: boolean;
+  illegal: boolean;
   spawn: SpawnPoint;
   ranks: readonly OrgRankDef[];
 };

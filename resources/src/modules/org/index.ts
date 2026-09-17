@@ -1,6 +1,19 @@
 export { ARMY, ARMY_GATES, ORG_ARMY_ID } from "./army";
 export { HOSPITAL, HOSPITAL_GATES, ORG_HOSPITAL_ID } from "./hospital";
 export {
+  AZTECAS,
+  BALLAS,
+  GANGS,
+  GROVE,
+  ORG_AZTECAS_ID,
+  ORG_BALLAS_ID,
+  ORG_GROVE_ID,
+  ORG_RIFA_ID,
+  ORG_VAGOS_ID,
+  RIFA,
+  VAGOS,
+} from "./gangs";
+export {
   applyOrgVisuals,
   resolveChatColor,
   resolveNametagColor,

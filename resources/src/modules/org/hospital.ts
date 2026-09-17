@@ -34,6 +34,7 @@ export const HOSPITAL: OrganizationDef = {
   name: "Bol'nica",
   color: HOSPITAL_COLOR,
   gov: true,
+  illegal: false,
   spawn: {
     x: 1585.8877,
     y: 1797.2903,

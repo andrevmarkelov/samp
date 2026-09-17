@@ -3,6 +3,8 @@ import { isPlayerActive } from "../../shared/player";
 import { isAuthenticated } from "../auth/session";
 import type { GameModule } from "../types";
 import { startSafeZones } from "./safe";
+import { startCapture, refreshCaptureView } from "./capture";
+import { showGangTurf, startGangTurf } from "./turf";
 
 /** Чёрный, альфа FF — без прозрачности. */
 const ZONE_COLOR = 0x000000ff;
@@ -31,7 +33,7 @@ let zones: GangZone[] = [];
 
 export const zonesModule: GameModule = {
   name: "zones",
-  start() {
+  async start() {
     zones = CLOSED_ZONES.map(
       (zone) => new GangZone(zone.minX, zone.minY, zone.maxX, zone.maxY)
     );
@@ -42,9 +44,13 @@ export const zonesModule: GameModule = {
       }
 
       showClosedZones(player);
+      showGangTurf(player);
+      refreshCaptureView(player);
     });
 
     startSafeZones();
+    await startGangTurf();
+    startCapture();
   },
 };
 

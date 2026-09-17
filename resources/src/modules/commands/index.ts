@@ -14,6 +14,8 @@ import "./hospital";
 import "./gps";
 import "./leaders";
 import "./r";
+import "./f";
+import "./capture";
 import "./d";
 import "./gov";
 import "./limit";

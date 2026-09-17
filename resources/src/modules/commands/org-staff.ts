@@ -14,6 +14,7 @@ import {
   getOrganization,
 } from "../org";
 import { syncOrgVehicleAccess } from "../vehicles/access";
+import { refreshCaptureView } from "../zones/capture";
 import { registerCommand } from "./registry";
 
 export const ORG_INVITE_DIALOG_ID = 21;
@@ -173,6 +174,7 @@ async function setOrg(player: Player, orgId: number, orgRank: number): Promise<b
   patchAccount(player, { orgId, orgRank });
   applyOrgVisuals(player);
   syncOrgVehicleAccess(player);
+  refreshCaptureView(player);
   return true;
 }
 
