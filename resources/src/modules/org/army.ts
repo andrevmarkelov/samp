@@ -32,6 +32,7 @@ export const ARMY: OrganizationDef = {
   id: ORG_ARMY_ID,
   name: "Armiya",
   color: ARMY_COLOR,
+  gov: true,
   spawn: {
     x: 2733.9255,
     y: -2449.3652,

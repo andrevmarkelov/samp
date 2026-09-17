@@ -17,6 +17,7 @@ import { bindAdminMakeleader } from "./makeleader";
 import { bindAdminMapTeleport } from "./map";
 import { bindAdminRespcar } from "./respcar";
 import { bindAdminTpcor } from "./tpcor";
+import { bindAdminVeh } from "./veh";
 
 export { isAdminLoggedIn } from "./session";
 
@@ -32,6 +33,7 @@ export const adminModule: GameModule = {
     bindAdminMute();
     bindAdminAo();
     bindAdminTpcor();
+    bindAdminVeh();
     bindAdminSethp();
     bindAdminSetskin();
     bindAdminRespcar();

@@ -12,26 +12,28 @@ import { getMembership } from "../org";
 import { registerCommand } from "./registry";
 
 const BUBBLE_MS = 3000;
-const BUBBLE_TEXT = "Soobschenie po racii.";
+const BUBBLE_TEXT = "Soobschenie po departamentu.";
 
-registerCommand("r", "Raciya organizacii", (player, args) => {
+registerCommand("d", "Raciya departamenta", (player, args) => {
   const account = getAccount(player);
   const membership = account ? getMembership(account) : null;
-  if (!account || !membership) {
-    player.sendClientMessage(Color.error, "Vy ne sostoite v organizacii.");
+  if (!account || !membership || !membership.org.gov) {
+    player.sendClientMessage(
+      Color.error,
+      "Vy ne sostoite v gosudarstvennoy organizacii."
+    );
     return;
   }
 
   const text = sanitizeChatText(args.trim()).slice(0, CHAT_MAX_LENGTH);
   if (!text) {
-    player.sendClientMessage(Color.error, "Ispol'zovanie: /r [tekst]");
+    player.sendClientMessage(Color.error, "Ispol'zovanie: /d [tekst]");
     return;
   }
 
   const line = clipClientMessage(
-    `[R] ${membership.rank.title} ${playerChatName(player)}: ${text}`
+    `[D] ${membership.org.name} - ${membership.rank.title} ${playerChatName(player)}: ${text}`
   );
-  const orgId = membership.org.id;
 
   omp.players.forEach((other) => {
     if (!isPlayerActive(other)) {
@@ -48,19 +50,19 @@ registerCommand("r", "Raciya organizacii", (player, args) => {
 
     const otherAccount = getAccount(other);
     const otherOrg = otherAccount ? getMembership(otherAccount) : null;
-    if (!otherOrg || otherOrg.org.id !== orgId) {
+    if (!otherOrg?.org.gov) {
       return;
     }
 
     try {
-      other.sendClientMessage(Color.radio, line);
+      other.sendClientMessage(Color.dept, line);
     } catch {
       // Слот пустой.
     }
   });
 
   try {
-    player.setChatBubble(BUBBLE_TEXT, Color.radio, CHAT_RADIUS, BUBBLE_MS);
+    player.setChatBubble(BUBBLE_TEXT, Color.dept, CHAT_RADIUS, BUBBLE_MS);
   } catch {
     // Пузырь не обязателен.
   }

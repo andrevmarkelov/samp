@@ -20,6 +20,7 @@ export type OrganizationDef = {
   id: number;
   name: string;
   color: number;
+  gov: boolean;
   spawn: SpawnPoint;
   ranks: readonly OrgRankDef[];
 };

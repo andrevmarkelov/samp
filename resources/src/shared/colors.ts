@@ -12,4 +12,7 @@ export const Color = {
   shout: 0xffff99ff,
   whisper: 0xc8c8c8ff,
   adminChat: 0x00ffffff,
+  radio: 0x33cc66ff,
+  dept: 0xff4c4cff,
+  govNews: 0x3399ffff,
 } as const;

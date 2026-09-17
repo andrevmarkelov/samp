@@ -48,6 +48,13 @@ export function registerOrgVehicle(
   });
 }
 
+export function unregisterOrgVehicle(vehicle: Vehicle): void {
+  const id = liveVehicleId(vehicle);
+  if (id !== null) {
+    byVehicleId.delete(id);
+  }
+}
+
 export function bindOrgVehicleAccess(): void {
   omp.on("vehicleStreamIn", (vehicle, player) => {
     applyDoorLock(vehicle, player);

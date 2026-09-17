@@ -63,17 +63,22 @@ function findTarget(slot: number): Player | null {
   return target;
 }
 
-function showOrgList(player: Player): boolean {
+function orgListLines(): string[] {
   const orgs = allOrganizations();
-  const body = [...orgs.map((org) => org.name), REMOVE_LABEL].join("\n");
+  return [
+    `0. ${REMOVE_LABEL}`,
+    ...orgs.map((org, index) => `${index + 1}. ${org.name}`),
+  ];
+}
 
+function showOrgList(player: Player): boolean {
   try {
     Dialog.show(
       player,
       MAKELEADER_DIALOG_ID,
       DIALOG_STYLE_LIST,
       "Liderka",
-      body,
+      orgListLines().join("\n"),
       "Vybrat'",
       "Otmena"
     );
@@ -84,15 +89,27 @@ function showOrgList(player: Player): boolean {
   }
 }
 
+function stripListPrefix(text: string): string {
+  return text.replace(/^\d+\.\s*/, "").trim();
+}
+
 function pickOrgChoice(
   listItem: number,
   inputText: string
 ): { orgId: number; orgRank: number } | "remove" | null {
   const orgs = allOrganizations();
-  const raw = inputText.trim().toLowerCase();
-
-  if (raw === REMOVE_LABEL.toLowerCase()) {
+  if (listItem === 0) {
     return "remove";
+  }
+
+  const byIndex = orgs[listItem - 1];
+  if (byIndex) {
+    return { orgId: byIndex.id, orgRank: MAX_ORG_RANK };
+  }
+
+  const raw = stripListPrefix(inputText).toLowerCase();
+  if (!raw || raw === REMOVE_LABEL.toLowerCase()) {
+    return raw ? "remove" : null;
   }
 
   for (const org of orgs) {
@@ -101,16 +118,7 @@ function pickOrgChoice(
     }
   }
 
-  if (listItem === orgs.length) {
-    return "remove";
-  }
-
-  const org = orgs[listItem];
-  if (!org) {
-    return null;
-  }
-
-  return { orgId: org.id, orgRank: MAX_ORG_RANK };
+  return null;
 }
 
 async function applyLeader(
