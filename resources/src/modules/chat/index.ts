@@ -3,24 +3,31 @@ import { Color, chatColorTag } from "../../shared/colors";
 import {
   CHAT_MAX_LENGTH,
   CHAT_RADIUS,
-  CLIENT_MESSAGE_MAX,
+  clipClientMessage,
   sanitizeChatText,
   sendNearby,
 } from "../../shared/nearby";
 import { playerChatName } from "../../shared/player";
+import { byGender } from "../auth/gender";
 import { getAccount, isAuthenticated } from "../auth/session";
 import { getMembership, resolveChatColor } from "../org";
 import type { GameModule } from "../types";
 import { notifyIfMuted, clearMuteWatch, watchMute } from "./mute";
 import { clearTalk, playLocalSpeech } from "./talk";
 
-function nearbyChatLine(playerName: string, text: string, nameColor: number | null): string {
+function nearbyChatLine(
+  playerName: string,
+  text: string,
+  nameColor: number | null,
+  verb: string
+): string {
   if (nameColor === null) {
-    return `${playerName}: ${text}`;
+    return clipClientMessage(`${playerName} ${verb}: ${text}`);
   }
 
-  const prefix = `${chatColorTag(nameColor)}${playerName}: ${chatColorTag(Color.white)}`;
-  return prefix + text.slice(0, Math.max(0, CLIENT_MESSAGE_MAX - prefix.length));
+  return clipClientMessage(
+    `${chatColorTag(nameColor)}${playerName}${chatColorTag(Color.white)} ${verb}: ${text}`
+  );
 }
 
 export const chatModule: GameModule = {
@@ -42,6 +49,7 @@ export const chatModule: GameModule = {
 
       const account = getAccount(player);
       const inOrg = account ? getMembership(account) : null;
+      const verb = byGender(account?.gender ?? null, "skazal", "skazala");
       sendNearby(
         player,
         CHAT_RADIUS,
@@ -49,7 +57,8 @@ export const chatModule: GameModule = {
         nearbyChatLine(
           playerChatName(player),
           text,
-          account && inOrg ? resolveChatColor(account) : null
+          account && inOrg ? resolveChatColor(account) : null,
+          verb
         )
       );
       playLocalSpeech(player, text);

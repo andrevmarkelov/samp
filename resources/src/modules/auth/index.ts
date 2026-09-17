@@ -4,7 +4,8 @@ import { isPlayerActive } from "../../shared/player";
 import type { GameModule } from "../types";
 import { writeSpawnInfo } from "../spawn/point";
 import { AUTH_DIALOG_ID } from "./dialogs";
-import { beginAuth, endAuth, handleAuthDialog, holdAtAuth } from "./flow";
+import { beginAuth, endAuth, handleAuthDialog, handleSkinPickerAction, holdAtAuth } from "./flow";
+import { bindSkinPicker } from "./skin-picker";
 import { ensureUsersTable } from "./repository";
 import { getAccount, isAuthenticated } from "./session";
 import { resolvePlayerSkin } from "../org";
@@ -95,5 +96,7 @@ export const authModule: GameModule = {
         String(inputText ?? "")
       );
     });
+
+    bindSkinPicker(handleSkinPickerAction);
   },
 };

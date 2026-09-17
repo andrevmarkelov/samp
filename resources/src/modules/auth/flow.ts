@@ -33,7 +33,16 @@ import {
 } from "./repository";
 import { clearAccount, getAccount, isAuthenticated, setAccount, applyWallet, applyScore } from "./session";
 import { genderFromList, genderLabel, type Gender } from "./gender";
-import { skinByIndex } from "./skins";
+import {
+  closeSkinPicker,
+  cycleSkin,
+  isSkinPicking,
+  openSkinPicker,
+  pauseSkinPicker,
+  resumeSkinPreview,
+  selectedSkin,
+} from "./skin-picker";
+import { hasSkin, skinByIndex } from "./skins";
 import {
   emailError,
   formatBirthDate,
@@ -129,6 +138,14 @@ export function spawnIntoWorld(player: Player, skin: number): void {
     // Спек уже выключен.
   }
 
+  try {
+    player.toggleControllable(true);
+  } catch {
+    // Управление включится на спавне.
+  }
+
+  closeSkinPicker(player);
+
   setTimeout(() => {
     if (id === null || !isSamePlayer(player, id) || !isAuthenticated(player)) {
       return;
@@ -139,13 +156,8 @@ export function spawnIntoWorld(player: Player, skin: number): void {
       if (!player.isSpawned()) {
         player.spawn();
       }
-      if (account?.hospitalized) {
-        placeAt(player, spawnPoint);
-        refreshStreamForPlayer(player);
-      } else if (orgSpawn) {
-        placeAt(player, orgSpawn);
-        refreshStreamForPlayer(player);
-      }
+      placeAt(player, spawnPoint);
+      refreshStreamForPlayer(player);
       player.setCameraBehind();
     } catch {
       // Спавн уже произошёл при выходе из спека.
@@ -163,6 +175,19 @@ function restoreAuthDialog(player: Player, state: Pending): void {
 }
 
 export function holdAtAuth(player: Player): void {
+  const state = pendingOf(player);
+  if (state?.kind === "register" && state.gender) {
+    if (state.step === "skin") {
+      const skin = openSkinPicker(player, state.gender, state.skin);
+      if (skin) {
+        return;
+      }
+      showSkinDialog(player, state.gender);
+    } else if (state.step === "confirm" && resumeSkinPreview(player, state.gender, state.skin)) {
+      return;
+    }
+  }
+
   try {
     prepareAuthView(player);
   } catch {
@@ -175,7 +200,6 @@ export function holdAtAuth(player: Player): void {
 
   refreshAuthViewSoon(player);
 
-  const state = pendingOf(player);
   if (!state) {
     return;
   }
@@ -289,8 +313,70 @@ export async function beginAuth(player: Player, attempt = 0): Promise<void> {
 }
 
 export function endAuth(player: Player): void {
+  closeSkinPicker(player);
   clearPending(player);
   clearAccount(player);
+}
+
+function showSkinPicker(
+  player: Player,
+  state: Extract<Pending, { kind: "register" }>
+): void {
+  if (!state.gender) {
+    state.step = "gender";
+    setPending(player, state);
+    showGenderDialog(player);
+    return;
+  }
+
+  const skin = openSkinPicker(player, state.gender, state.skin);
+  if (!skin) {
+    showSkinDialog(player, state.gender);
+    return;
+  }
+
+  state.skin = skin.id;
+  state.skinLabel = skin.label;
+  setPending(player, state);
+}
+
+export function handleSkinPickerAction(
+  player: Player,
+  action: "prev" | "next" | "select" | "cancel"
+): void {
+  const state = pendingOf(player);
+  if (!state || state.kind !== "register" || state.step !== "skin" || !state.gender) {
+    return;
+  }
+
+  if (action === "cancel") {
+    goBack(player, state);
+    return;
+  }
+
+  if (action === "prev" || action === "next") {
+    const skin = cycleSkin(player, action === "next" ? 1 : -1);
+    if (!skin) {
+      return;
+    }
+    state.skin = skin.id;
+    state.skinLabel = skin.label;
+    setPending(player, state);
+    return;
+  }
+
+  const skin = selectedSkin(player);
+  if (!skin) {
+    showSkinPicker(player, state);
+    return;
+  }
+
+  state.skin = skin.id;
+  state.skinLabel = skin.label;
+  state.step = "confirm";
+  setPending(player, state);
+  pauseSkinPicker(player);
+  showRegisterStep(player, state);
 }
 
 function showRegisterStep(player: Player, state: Extract<Pending, { kind: "register" }>): void {
@@ -319,7 +405,7 @@ function showRegisterStep(player: Player, state: Extract<Pending, { kind: "regis
         showGenderDialog(player);
         break;
       }
-      showSkinDialog(player, state.gender);
+      showSkinPicker(player, state);
       break;
     case "confirm":
       showRegisterConfirmDialog(
@@ -353,8 +439,17 @@ function goBack(player: Player, state: Extract<Pending, { kind: "register" }>): 
     return;
   }
 
+  const leavingStore = state.step === "skin" || state.step === "confirm";
   state.step = order[index - 1];
   setPending(player, state);
+  if (leavingStore && state.step !== "skin") {
+    closeSkinPicker(player);
+    try {
+      prepareAuthView(player);
+    } catch {
+      // Камера авторизации не обязательна.
+    }
+  }
   showRegisterStep(player, state);
 }
 
@@ -404,6 +499,12 @@ async function finishRegister(
       return;
     }
 
+    closeSkinPicker(player);
+    try {
+      prepareAuthView(player);
+    } catch {
+      // Камера авторизации не обязательна.
+    }
     state.step = "email";
     setPending(player, state);
     showEmailDialog(player, state.name, "Eta pochta uzhe zanyata.");
@@ -415,9 +516,22 @@ async function finishRegister(
   }
 
   if (!state.gender) {
+    closeSkinPicker(player);
+    try {
+      prepareAuthView(player);
+    } catch {
+      // Камера авторизации не обязательна.
+    }
     state.step = "gender";
     setPending(player, state);
     showGenderDialog(player);
+    return;
+  }
+
+  if (!hasSkin(state.gender, state.skin)) {
+    state.step = "skin";
+    setPending(player, state);
+    showSkinPicker(player, state);
     return;
   }
 
@@ -608,7 +722,7 @@ async function handleRegister(
       state.gender = gender;
       state.step = "skin";
       setPending(player, state);
-      showSkinDialog(player, gender);
+      showSkinPicker(player, state);
       return;
     }
 
@@ -620,9 +734,14 @@ async function handleRegister(
         return;
       }
 
+      if (isSkinPicking(player)) {
+        showSkinPicker(player, state);
+        return;
+      }
+
       const skin = skinByIndex(state.gender, listItem);
       if (!skin) {
-        showSkinDialog(player, state.gender);
+        showSkinPicker(player, state);
         return;
       }
 
@@ -630,6 +749,7 @@ async function handleRegister(
       state.skinLabel = skin.label;
       state.step = "confirm";
       setPending(player, state);
+      closeSkinPicker(player);
       showRegisterStep(player, state);
       return;
     }
@@ -643,6 +763,12 @@ async function handleRegister(
         }
 
         if (isDuplicateKey(error)) {
+          closeSkinPicker(player);
+          try {
+            prepareAuthView(player);
+          } catch {
+            // Камера авторизации не обязательна.
+          }
           state.step = "email";
           setPending(player, state);
           showEmailDialog(player, state.name, "Eta pochta ili nik uzhe zanyaty.");
