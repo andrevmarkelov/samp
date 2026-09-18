@@ -5,7 +5,7 @@ import { MAX_ORG_RANK } from "./types";
 export const ORG_MERIYA_ID = 3;
 
 const MERIYA_COLOR = 0xffff00ff;
-const CITY_HALL_INTERIOR = 3;
+export const CITY_HALL_INTERIOR = 3;
 
 function meriyaRanks(): OrgRankDef[] {
   const rows: Array<{ title: string; male: number; female: number; pay: number }> = [

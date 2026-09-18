@@ -286,6 +286,10 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 
 Транспорт у здания (Washington 421 ×4, Landstalker 400 ×4, Stretch 409, Maverick 487) — белый цвет **1**, только члены мэрии. Координаты: `vehicles/meriya.ts`.
 
+Склад в интерьере (пикап **19134**, `357.6911, 150.9142, 1025.7891`): броня 100, дубинка 3, Desert Eagle 24 (50 патр.). Только члены мэрии. `org/meriya-locker.ts`.
+
+Служебный вход (пикап **19132**): парковка `1413.03, -1790.49, 15.44` ↔ интерьер `368.42, 194.10, 1008.38`. Только члены мэрии. `org/meriya-doors.ts`.
+
 ---
 
 ## Банды
@@ -411,7 +415,7 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 | Скутера / общий спавн машин | `vehicles/index.ts`, `vehicles/spawn.ts` |
 | Армейский транспорт | `vehicles/army.ts`, `vehicles/access.ts` |
 | Больница орган / машины | `org/hospital.ts`, `vehicles/hospital.ts` |
-| Мэрия | `org/meriya.ts`, `vehicles/meriya.ts` |
+| Мэрия | `org/meriya.ts`, `vehicles/meriya.ts`, `org/meriya-locker.ts`, `org/meriya-doors.ts` |
 | Банды | `org/gangs.ts`, `vehicles/gangs.ts` |
 | Инвайт / ранг | `commands/org-staff.ts` |
 | Гангзоны | `zones/turf.ts`, `zones/repository.ts`, `sql/schema.sql` |
