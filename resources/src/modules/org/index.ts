@@ -1,6 +1,11 @@
 export { ARMY, ARMY_GATES, ORG_ARMY_ID } from "./army";
 export { HOSPITAL, HOSPITAL_GATES, ORG_HOSPITAL_ID } from "./hospital";
 export { MERIYA, ORG_MERIYA_ID } from "./meriya";
+export { ORG_POLICE_ID, POLICE } from "./police";
+export { LSPD, ORG_LSPD_ID } from "./lspd";
+export { FBI, ORG_FBI_ID } from "./fbi";
+export { AUTOSCHOOL, ORG_AUTOSCHOOL_ID } from "./autoschool";
+export { ORG_RADIO_ID, RADIOCENTR } from "./radio";
 export {
   AZTECAS,
   BALLAS,

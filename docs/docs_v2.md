@@ -292,6 +292,22 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 
 ---
 
+## Гос. органы 4–8
+
+Все `gov: true`, `illegal: false`. `/r`, `/d`, `/gov` (ранг 10), кадры **9–10**. Спавн на улице. Общий хелпер: `org/define.ts`.
+
+| id | Имя | Цвет | Файл |
+|---|---|---|---|
+| 4 | Oblastnaya policiya | `0x2641feff` | `org/police.ts` |
+| 5 | LSPD | `0x2641feff` | `org/lspd.ts` |
+| 6 | FBI | `0x000080ff` | `org/fbi.ts` |
+| 7 | Avtoshkola | `0xfff3b0ff` | `org/autoschool.ts` |
+| 8 | Radiocentr | `0xff8c00ff` | `org/radio.ts` |
+
+Ранги полиции (4 и 5) общие: `org/police-ranks.ts`. Машин и пикапов пока нет.
+
+---
+
 ## Банды
 
 Пять illegal-органов. Ник, `/f` и гангзоны — цветом органа. Спавн на улице у HQ.
@@ -314,7 +330,7 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 
 | Команда | Кто |
 |---|---|
-| `/r` | орган с `illegal: false` (армия, больница, мэрия). Банде — тишина |
+| `/r` | орган с `illegal: false` (гос.). Банде — тишина |
 | `/f` | только `illegal: true` (банды). Гражданскому / гос. — тишина |
 | `/d` | `gov: true` — общий департамент |
 | `/gov` | `gov` и ранг **10** — новость всем |
@@ -416,6 +432,7 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 | Армейский транспорт | `vehicles/army.ts`, `vehicles/access.ts` |
 | Больница орган / машины | `org/hospital.ts`, `vehicles/hospital.ts` |
 | Мэрия | `org/meriya.ts`, `vehicles/meriya.ts`, `org/meriya-locker.ts`, `org/meriya-doors.ts` |
+| Полиция / LSPD / FBI / автошкола / радио | `org/police.ts`, `org/lspd.ts`, `org/fbi.ts`, `org/autoschool.ts`, `org/radio.ts` |
 | Банды | `org/gangs.ts`, `vehicles/gangs.ts` |
 | Инвайт / ранг | `commands/org-staff.ts` |
 | Гангзоны | `zones/turf.ts`, `zones/repository.ts`, `sql/schema.sql` |
