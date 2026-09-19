@@ -17,7 +17,7 @@ const ENTER_RANGE = 5;
 const DEFAULT_DENY = "Vy ne mozhete sidet' v etom transporte.";
 
 type OrgVehicleAccess = {
-  orgId: number;
+  orgIds: readonly number[];
   denyMessage: string;
   ptr: number | null;
 };
@@ -27,7 +27,7 @@ const denyAt = new Map<number, number>();
 
 export function registerOrgVehicle(
   vehicle: Vehicle,
-  orgId: number,
+  orgId: number | readonly number[],
   denyMessage?: string,
   retried = false
 ): void {
@@ -41,8 +41,9 @@ export function registerOrgVehicle(
     return;
   }
 
+  const orgIds = typeof orgId === "number" ? [orgId] : [...orgId];
   byVehicleId.set(id, {
-    orgId,
+    orgIds,
     denyMessage: denyMessage?.trim() || DEFAULT_DENY,
     ptr: vehiclePtr(vehicle),
   });
@@ -139,7 +140,7 @@ function denyNearbyIfForbidden(player: Player): void {
   }
 
   const access = accessFor(vehicle);
-  if (!access || canUseOrgVehicle(player, access.orgId)) {
+  if (!access || canUseOrgVehicle(player, access.orgIds)) {
     return;
   }
 
@@ -178,7 +179,7 @@ function nearestVehicle(player: Player, range: number): Vehicle | null {
 
 function refuseIfForbidden(player: Player, vehicle: Vehicle, entering: boolean): boolean {
   const access = accessFor(vehicle);
-  if (!access || canUseOrgVehicle(player, access.orgId)) {
+  if (!access || canUseOrgVehicle(player, access.orgIds)) {
     return false;
   }
 
@@ -201,14 +202,14 @@ function applyDoorLock(vehicle: Vehicle, player: Player): void {
   }
 
   try {
-    const locked = canUseOrgVehicle(player, access.orgId) ? DOORS_UNLOCKED : DOORS_LOCKED;
+    const locked = canUseOrgVehicle(player, access.orgIds) ? DOORS_UNLOCKED : DOORS_LOCKED;
     vehicle.setParamsForPlayer(player, 0, locked);
   } catch {
     // Слот или транспорт уже не в мире.
   }
 }
 
-function canUseOrgVehicle(player: Player, orgId: number): boolean {
+function canUseOrgVehicle(player: Player, orgIds: readonly number[]): boolean {
   if (!isPlayerActive(player)) {
     return false;
   }
@@ -218,7 +219,8 @@ function canUseOrgVehicle(player: Player, orgId: number): boolean {
     return false;
   }
 
-  return getMembership(account)?.org.id === orgId;
+  const orgId = getMembership(account)?.org.id;
+  return orgId !== undefined && orgIds.includes(orgId);
 }
 
 function accessFor(vehicle: Vehicle): OrgVehicleAccess | null {

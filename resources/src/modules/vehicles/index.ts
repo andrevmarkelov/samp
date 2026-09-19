@@ -8,6 +8,7 @@ import { spawnHospitalVehicles } from "./hospital";
 import { spawnMeriyaVehicles } from "./meriya";
 import { spawnLspdVehicles } from "./lspd";
 import { spawnPoliceVehicles } from "./police";
+import { spawnPrisonVehicles } from "./prison";
 import { startSpeedLimiter } from "./limit";
 import { createServerVehicle, startEngineControl } from "./spawn";
 
@@ -45,6 +46,7 @@ export const vehiclesModule: GameModule = {
     spawnPoliceVehicles();
     spawnLspdVehicles();
     spawnFbiVehicles();
+    spawnPrisonVehicles();
     spawnGangVehicles();
 
     for (const spot of STATION_SCOOTERS) {
