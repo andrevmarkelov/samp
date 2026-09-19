@@ -5,8 +5,14 @@ import { Color } from "../../shared/colors";
 import { getMembership } from "./membership";
 
 const CIVILIAN_COLOR = 0xffffffff;
+const JAIL_SKIN_MALE = 42;
+const JAIL_SKIN_FEMALE = 69;
 
 export function resolvePlayerSkin(account: Account): number {
+  if (account.jailSeconds > 0) {
+    return account.gender === "female" ? JAIL_SKIN_FEMALE : JAIL_SKIN_MALE;
+  }
+
   const membership = getMembership(account);
   if (!membership) {
     return account.skin;

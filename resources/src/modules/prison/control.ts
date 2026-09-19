@@ -4,6 +4,7 @@ import { getAccount, isAuthenticated } from "../auth/session";
 import { registerCommand } from "../commands/registry";
 import { LAW_ORG_IDS } from "../org/lspd";
 import { getMembership } from "../org/membership";
+import { isJailed } from "./sentence";
 import { PRISON_WORLD } from "../spawn/point";
 
 export const PRISON_CMD_DIALOG_ID = 26;
@@ -114,6 +115,11 @@ registerCommand(
     }
 
     if (!isLawStaff(player, true)) {
+      return;
+    }
+
+    if (isJailed(player)) {
+      tell(player, Color.error, "Vy otbyvaete srok.");
       return;
     }
 

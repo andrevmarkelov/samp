@@ -34,6 +34,7 @@ type UserRow = RowDataPacket & {
   org_id: number;
   org_rank: number;
   muted_until: number | null;
+  jail_seconds: number;
 };
 
 const CREATE_USERS_SQL = `
@@ -61,6 +62,7 @@ CREATE TABLE IF NOT EXISTS users (
   org_id SMALLINT UNSIGNED NOT NULL DEFAULT 0,
   org_rank TINYINT UNSIGNED NOT NULL DEFAULT 0,
   muted_until INT UNSIGNED NULL DEFAULT NULL,
+  jail_seconds INT UNSIGNED NOT NULL DEFAULT 0,
   birth_date DATE NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
@@ -138,6 +140,10 @@ const COLUMN_MIGRATIONS = [
     name: "muted_until",
     sql: "muted_until INT UNSIGNED NULL DEFAULT NULL AFTER org_rank",
   },
+  {
+    name: "jail_seconds",
+    sql: "jail_seconds INT UNSIGNED NOT NULL DEFAULT 0 AFTER muted_until",
+  },
 ] as const;
 
 export async function ensureUsersTable(): Promise<void> {
@@ -167,7 +173,7 @@ async function columnExists(column: string): Promise<boolean> {
 
 export async function findUserByName(name: string): Promise<UserRow | null> {
   const rows = await query<UserRow>(
-    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, bank, donate, lawfulness, health, passport, hospitalized, invited_by, birth_date, admin_level, org_id, org_rank, muted_until FROM users WHERE name = ? LIMIT 1",
+    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, bank, donate, lawfulness, health, passport, hospitalized, invited_by, birth_date, admin_level, org_id, org_rank, muted_until, jail_seconds FROM users WHERE name = ? LIMIT 1",
     [name]
   );
   return rows[0] ?? null;
@@ -228,6 +234,7 @@ export async function createUser(input: {
     orgId: 0,
     orgRank: 0,
     mutedUntil: null,
+    jailSeconds: 0,
   };
 }
 
@@ -395,6 +402,13 @@ export async function saveUserMutedUntil(
   await execute("UPDATE users SET muted_until = ? WHERE id = ?", [untilUnix, userId]);
 }
 
+export async function saveUserJailedSeconds(userId: number, seconds: number): Promise<void> {
+  await execute("UPDATE users SET jail_seconds = ? WHERE id = ?", [
+    Math.max(0, Math.floor(seconds)),
+    userId,
+  ]);
+}
+
 export function isDuplicateKey(error: unknown): boolean {
   return (
     typeof error === "object" &&
@@ -426,7 +440,13 @@ export function accountFromRow(row: UserRow): Account {
     orgId: parseOrgId(row.org_id),
     orgRank: parseOrgRank(row.org_rank),
     mutedUntil: parseMutedUntil(row.muted_until),
+    jailSeconds: parseJailSeconds(row.jail_seconds),
   };
+}
+
+function parseJailSeconds(value: unknown): number {
+  const seconds = Math.floor(Number(value) || 0);
+  return seconds > 0 ? seconds : 0;
 }
 
 function parseMutedUntil(value: unknown): number | null {

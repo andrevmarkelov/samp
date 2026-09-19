@@ -52,6 +52,7 @@ export type Account = {
   orgId: number;
   orgRank: number;
   mutedUntil: number | null;
+  jailSeconds: number;
 };
 
 const accounts = new Map<number, Account>();
@@ -138,6 +139,7 @@ export function patchAccount(
       | "orgRank"
       | "skin"
       | "mutedUntil"
+      | "jailSeconds"
     >
   >
 ): void {

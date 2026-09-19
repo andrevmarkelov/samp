@@ -6,6 +6,7 @@ import { assignStreamWorld, refreshStreamForPlayer } from "../mapping/stream";
 import { LAW_ORG_IDS } from "../org/lspd";
 import { getMembership } from "../org/membership";
 import { bindPrisonControl, isPrisonYardOpen } from "./control";
+import { bindJailSentence, isJailed, JAIL_INMATE_DENY } from "./sentence";
 import { bindPrisonLocker } from "./prison-locker";
 import { PRISON_WORLD, PRISON_YARD_WORLD, STREET_WORLD, placeAt, type SpawnPoint } from "../spawn/point";
 import type { GameModule } from "../types";
@@ -220,6 +221,7 @@ export const prisonModule: GameModule = {
     assignStreamWorld(PRISON_WORLD, isPrisonInteriorObject);
     bindPrisonLocker();
     bindPrisonControl();
+    bindJailSentence();
 
     for (const door of DOORS) {
       new Pickup(
@@ -301,6 +303,11 @@ function tickPrison(): void {
 }
 
 function tryUse(player: Player, door: PrisonDoor): void {
+  if (isJailed(player) && (door.staffOnly || door.dest.world === STREET_WORLD)) {
+    deny(player, JAIL_INMATE_DENY);
+    return;
+  }
+
   if (door.staffOnly) {
     const account = getAccount(player);
     if (account?.hospitalized) {

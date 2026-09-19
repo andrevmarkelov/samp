@@ -1,7 +1,7 @@
 import { omp, type Player } from "@omp-node/core";
 import { SERVER_TAG } from "../../shared/brand";
 import { isPlayerActive } from "../../shared/player";
-import { saveUserHealth, saveUserVitals } from "../auth/repository";
+import { saveUserHealth, saveUserJailedSeconds, saveUserVitals } from "../auth/repository";
 import {
   HEALTH_DECAY_AMOUNT,
   HEALTH_DECAY_MS,
@@ -54,11 +54,20 @@ function readLiveHealth(player: Player, fallback: number): number {
   return fallback;
 }
 
+function persistJailSeconds(userId: number, seconds: number, name: string): void {
+  void saveUserJailedSeconds(userId, seconds).catch((error: unknown) => {
+    const message = error instanceof Error ? error.message : String(error);
+    omp.log(`[${SERVER_TAG}] не удалось сохранить срок ${name}: ${message}`);
+  });
+}
+
 export function queueSave(player: Player): void {
   const account = getAccount(player);
   if (!account) {
     return;
   }
+
+  persistJailSeconds(account.id, account.jailSeconds, account.name);
 
   const health = readLiveHealth(player, account.health);
 

@@ -9,6 +9,7 @@ import "./b";
 import "./s";
 import "./w";
 import "./stats";
+import "./time";
 import "./pass";
 import "./hospital";
 import "./gps";
@@ -24,6 +25,7 @@ import { bindMenuDialogs } from "./mn";
 import { bindGpsDialogs } from "../gps";
 import { bindReportDialogs } from "./report";
 import { bindOrgStaff } from "./org-staff";
+import { bindTimeLabels } from "./time";
 
 export const commandsModule: GameModule = {
   name: "commands",
@@ -33,5 +35,6 @@ export const commandsModule: GameModule = {
     bindGpsDialogs();
     bindReportDialogs();
     bindOrgStaff();
+    bindTimeLabels();
   },
 };

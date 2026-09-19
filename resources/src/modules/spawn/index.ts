@@ -4,6 +4,7 @@ import { playerId } from "../../shared/player";
 import { holdAtAuth } from "../auth/flow";
 import {
   HOSPITAL_HEALTH,
+  MAX_HEALTH,
   applyHealth,
   applyScore,
   applyWallet,
@@ -13,6 +14,7 @@ import {
 } from "../auth/session";
 import { queueSave } from "../persist";
 import { applyOrgVisuals, resolveOrgSpawn, resolvePlayerSkin } from "../org";
+import { isJailed, isJailedAccount, pickJailCell, placeInJail } from "../prison/sentence";
 import { saveUserHospitalized } from "../auth/repository";
 import { refreshStreamForPlayer } from "../mapping/stream";
 import type { GameModule } from "../types";
@@ -68,9 +70,6 @@ export const spawnModule: GameModule = {
         return;
       }
 
-      const hospital = pickHospitalSpawn();
-      pendingHospital.set(id, hospital);
-
       const account = getAccount(player);
       let skin = account ? resolvePlayerSkin(account) : undefined;
       if (skin === undefined) {
@@ -80,6 +79,20 @@ export const spawnModule: GameModule = {
           skin = DEFAULT_SPAWN_SKIN;
         }
       }
+
+      if (isJailed(player)) {
+        pendingHospital.delete(id);
+        try {
+          writeSpawnInfo(player, skin, pickJailCell());
+        } catch {
+          // Игрок уже вышел.
+        }
+        patchAccount(player, { health: MAX_HEALTH });
+        return;
+      }
+
+      const hospital = pickHospitalSpawn();
+      pendingHospital.set(id, hospital);
 
       try {
         writeSpawnInfo(player, skin, hospital);
@@ -111,6 +124,28 @@ export const spawnModule: GameModule = {
         player.setCameraBehind();
       } catch {
         // Игрок уже вышел.
+      }
+
+      if (account && isJailedAccount(account)) {
+        const id = playerId(player);
+        const firstSpawn = id !== null && !seenWorldSpawn.has(id);
+        if (id !== null) {
+          seenWorldSpawn.add(id);
+        }
+
+        try {
+          placeInJail(player);
+          applyHealth(player, account.health);
+        } catch {
+          // Игрок уже вышел.
+        }
+
+        if (firstSpawn) {
+          applyWallet(player, account);
+        }
+
+        player.sendClientMessage(Color.error, "Vy otbyvaete srok v tyur'me.");
+        return;
       }
 
       if (hospital) {

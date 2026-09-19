@@ -6,6 +6,7 @@ import { bindAlogin, clearAloginDialog } from "./alogin";
 import { bindAdminHelp } from "./ahelp";
 import { bindAdminAns } from "./ans";
 import { bindAdminChat } from "./chat";
+import { bindAdminJail } from "./jail";
 import { bindAdminKick } from "./kick";
 import { bindAdminMute } from "./mute";
 import { bindAdminSethp } from "./sethp";
@@ -31,6 +32,7 @@ export const adminModule: GameModule = {
     bindAdminHelp();
     bindAdminsList();
     bindAdminKick();
+    bindAdminJail();
     bindAdminMute();
     bindAdminAo();
     bindAdminTpcor();

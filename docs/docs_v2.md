@@ -69,8 +69,9 @@ GPS v2: метки **ZHD LS**, **Tyurma**, **Bank**, **Oblastnaya policiya**, **
 | `bank` | INT, банковский счёт, по умолчанию 0 |
 | `lawfulness` | SMALLINT, −100…100, новый персонаж **100** |
 | `muted_until` | INT UNSIGNED NULL, unix **секунды**; NULL = нет мута |
+| `jail_seconds` | INT UNSIGNED, оставшийся срок; 0 = не в тюрьме. Тикает **только онлайн** |
 
-В памяти: `Account.bank`, `Account.lawfulness`, `Account.mutedUntil` (мс).
+В памяти: `Account.bank`, `Account.lawfulness`, `Account.mutedUntil` (мс), `Account.jailSeconds`.
 
 Таблица **`gang_zones`**: клетка карты банд. Seed в том же `schema.sql` (104 строки). Координаты и стартовый владелец из seed; **`org_id` при повторном seed не перезаписывается** (капты).
 
@@ -200,6 +201,8 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 
 Пульт `/pult` (текст у `-96.09, 2434.69`, только те же органы и только у подсказки): двор открыть/закрыть, камеры — заглушка. Закрытый двор не пускает с интерьера. Диалоги **26–27**. `prison/control.ts`.
 
+`/jail [id] [minuty] [prichina]` — админ **3+**, 1–10080 минут. Админа с `adminLevel >= 1` посадить нельзя. Кто уже сидит — повторно посадить нельзя. Пишется в `jail_seconds`. Случайная камера (20 точек, VW **3**). Скин заключённого: мужской **42**, женский **69**. Смерть, килл и реконнект не сбрасывают срок: снова камера, больница пропускается. Пока срок > 0: холл/камеры, спортзал, кухня, двор (если открыт) — можно; улица, охрана и `/pult` — нельзя. Истекло: улица `1806.36, -1574.08, 13.45`. `/unjail [id]` — выпуск: спавн органа или дефолтный; оффлайн и не сидящий — отказ. `prison/sentence.ts`, `admin/jail.ts`.
+
 ---
 
 ## Репорт и ответ админа
@@ -243,6 +246,8 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 | 1 | `/ans [id] [tekst]` | ответ на репорт, см. выше |
 | 2 | `/mute [id] [min] [prichina]` | мут чата |
 | 3 | `/veh` `/delveh` | создать / удалить админ-машину |
+| 3 | `/jail [id] [min] [prichina]` | посадка в тюрьму, см. выше |
+| 3 | `/unjail [id]` | выпуск из тюрьмы на спавн органа / дефолт |
 | 3 | `/tpcor [x] [y] [z]` | телепорт, VW/interior не сбрасываются; за рулём едет машина |
 | 4 | `/respcar` | через 30 с респавн **пустых** машин; таймер доигрывает, даже если админ вышел |
 | 4 | `/setskin [id] [1–311]` | гражданский скин в БД; скин органа пока в органе |
@@ -437,6 +442,7 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 | `/invite` `/uninvite` `/rank` | кадры органа, ранг 9–10 |
 | `/r` `/f` `/d` `/gov` | рации, см. Банды |
 | `/capture` | захват гангзоны, ранг банды 8+ |
+| `/time` | часы; если есть мут или срок — оставшееся время; label `Posmotrel(a) na chasy.` |
 
 `/stats` и `/pass`: банк, законопослушность, орган.
 
@@ -506,12 +512,14 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 | `/limit` | `vehicles/limit.ts`, `commands/limit.ts` |
 | Спидометр | `hud/speedo.ts` |
 | Банк | `modules/bank/` |
-| Репорт | `commands/report.ts` |
+| `/time` | `commands/time.ts` |
 | `/ans` | `admin/ans.ts` + `admin/catalog.ts` |
 | Мут | `admin/mute.ts`, `chat/mute.ts` |
 | Payday / закон | `payday/index.ts`, `auth/session.ts` |
 | Сейф-зоны | `zones/safe.ts` |
 | Тюрьма (иконка / вход) | `prison/index.ts` |
+| Срок / камеры | `prison/sentence.ts` |
+| `/jail` `/unjail` | `admin/jail.ts` + `admin/catalog.ts` |
 | Оружейка тюрьмы | `prison/prison-locker.ts` |
 | Пульт тюрьмы `/pult` | `prison/control.ts` |
 | Схема БД | `sql/schema.sql` + `auth/repository.ts` |
