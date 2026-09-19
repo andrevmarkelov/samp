@@ -4,9 +4,8 @@ import { isPlayerActive, playerId } from "../../shared/player";
 import { getAccount, isAuthenticated } from "../auth/session";
 import { refreshStreamForPlayer } from "../mapping/stream";
 import { STREET_WORLD, placeAt, type SpawnPoint } from "../spawn/point";
+import { FBI_INTERIOR, ORG_FBI_ID } from "./fbi";
 import { getMembership } from "./membership";
-import { LAW_ORG_IDS } from "./lspd";
-import { POLICE_INTERIOR } from "./police";
 
 const PICKUP_MODEL = 19132;
 const PICKUP_TYPE = 1;
@@ -17,92 +16,40 @@ const PICKUP_RADIUS = 1.5;
 const TICK_MS = 200;
 const LABEL_HEIGHT = 0.85;
 const LABEL_DRAW_DISTANCE = 12;
-const DENY = "Otkryt' mogut sotrudniki LSPD, oblastnoy policii i FBI.";
+const DENY = "Vy ne sostoite v FBI.";
 
-type PoliceDoor = {
+type FbiDoor = {
   pickup: { x: number; y: number; z: number; interior: number };
   dest: SpawnPoint;
   label: string;
   staffOnly: boolean;
 };
 
-const DOORS: readonly PoliceDoor[] = [
+const DOORS: readonly FbiDoor[] = [
   {
-    pickup: { x: 626.973, y: -571.7709, z: 17.9207, interior: 0 },
+    pickup: { x: 607.137, y: -1458.5026, z: 14.3807, interior: 0 },
     dest: {
-      x: 246.66,
-      y: 65.8,
-      z: 1003.64,
-      angle: 0,
-      interior: POLICE_INTERIOR,
+      x: 238.6755,
+      y: 140.5196,
+      z: 1003.0234,
+      angle: 0.3367,
+      interior: FBI_INTERIOR,
       world: STREET_WORLD,
     },
-    label: "Oblastnaya policiya\nVkhod",
-    staffOnly: false,
+    label: "FBI\nSluzhebnyy vkhod",
+    staffOnly: true,
   },
   {
-    pickup: { x: 246.757, y: 62.4475, z: 1003.6406, interior: POLICE_INTERIOR },
+    pickup: { x: 238.5941, y: 138.995, z: 1003.0234, interior: FBI_INTERIOR },
     dest: {
-      x: 631.6352,
-      y: -571.7485,
-      z: 16.3359,
-      angle: 268.9851,
+      x: 610.2761,
+      y: -1458.6161,
+      z: 14.378,
+      angle: 269.6083,
       interior: 0,
       world: STREET_WORLD,
     },
     label: "Vykhod na ulicu",
-    staffOnly: false,
-  },
-  {
-    pickup: { x: 611.0726, y: -583.5037, z: 18.2109, interior: 0 },
-    dest: {
-      x: 245.1678,
-      y: 66.2916,
-      z: 1003.6406,
-      angle: 267.5659,
-      interior: POLICE_INTERIOR,
-      world: STREET_WORLD,
-    },
-    label: "Parkovka\nSluzhebnyy vkhod",
-    staffOnly: true,
-  },
-  {
-    pickup: { x: 242.477, y: 66.3774, z: 1003.6406, interior: POLICE_INTERIOR },
-    dest: {
-      x: 611.0386,
-      y: -586.416,
-      z: 17.2266,
-      angle: 181.2275,
-      interior: 0,
-      world: STREET_WORLD,
-    },
-    label: "Parkovka\nSluzhebnyy vykhod",
-    staffOnly: true,
-  },
-  {
-    pickup: { x: 621.258, y: -569.2031, z: 26.1432, interior: 0 },
-    dest: {
-      x: 246.3152,
-      y: 86.1715,
-      z: 1003.6406,
-      angle: 178.2883,
-      interior: POLICE_INTERIOR,
-      world: STREET_WORLD,
-    },
-    label: "Krysha\nSluzhebnyy vkhod",
-    staffOnly: true,
-  },
-  {
-    pickup: { x: 246.3991, y: 88.0064, z: 1003.6406, interior: POLICE_INTERIOR },
-    dest: {
-      x: 621.1804,
-      y: -571.1289,
-      z: 26.1432,
-      angle: 178.1175,
-      interior: 0,
-      world: STREET_WORLD,
-    },
-    label: "Krysha\nSluzhebnyy vykhod",
     staffOnly: true,
   },
 ];
@@ -110,7 +57,7 @@ const DOORS: readonly PoliceDoor[] = [
 const lastTeleportAt = new Map<number, number>();
 const lastDenyAt = new Map<number, number>();
 
-export function bindPoliceDoors(): void {
+export function bindFbiDoors(): void {
   for (const door of DOORS) {
     new Pickup(
       PICKUP_MODEL,
@@ -132,7 +79,7 @@ export function bindPoliceDoors(): void {
     );
   }
 
-  setInterval(tickPoliceDoors, TICK_MS);
+  setInterval(tickFbiDoors, TICK_MS);
 
   omp.on("playerConnect", (player) => {
     clearPlayer(player);
@@ -142,7 +89,7 @@ export function bindPoliceDoors(): void {
   });
 }
 
-function tickPoliceDoors(): void {
+function tickFbiDoors(): void {
   omp.players.forEach((player) => {
     if (!isPlayerActive(player) || !isAuthenticated(player)) {
       return;
@@ -175,7 +122,7 @@ function tickPoliceDoors(): void {
   });
 }
 
-function tryUse(player: Player, door: PoliceDoor): void {
+function tryUse(player: Player, door: FbiDoor): void {
   if (door.staffOnly) {
     const account = getAccount(player);
     if (account?.hospitalized) {
@@ -184,8 +131,7 @@ function tryUse(player: Player, door: PoliceDoor): void {
     }
 
     const membership = account ? getMembership(account) : null;
-    const orgId = membership?.org.id;
-    if (orgId === undefined || !(LAW_ORG_IDS as readonly number[]).includes(orgId)) {
+    if (!membership || membership.org.id !== ORG_FBI_ID) {
       deny(player, DENY);
       return;
     }

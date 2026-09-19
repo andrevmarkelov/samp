@@ -1,12 +1,21 @@
-import { defineGovOrg, defineRanks, streetSpawn } from "./define";
+import { STREET_WORLD } from "../spawn/point";
+import { defineGovOrg, defineRanks } from "./define";
 
 export const ORG_FBI_ID = 6;
+export const FBI_INTERIOR = 3;
 
 export const FBI = defineGovOrg(
   ORG_FBI_ID,
   "FBI",
   0x000080ff,
-  streetSpawn(609.8445, -1475.0566, 14.6137, 359.8291),
+  {
+    x: 268.0897,
+    y: 188.476,
+    z: 1008.1719,
+    angle: 356.89,
+    interior: FBI_INTERIOR,
+    world: STREET_WORLD,
+  },
   defineRanks([
     { title: "Stazher", male: 286, female: 306, pay: 2200 },
     { title: "Ml. agent", male: 286, female: 306, pay: 2800 },

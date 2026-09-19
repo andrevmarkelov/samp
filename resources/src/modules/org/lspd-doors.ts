@@ -4,9 +4,8 @@ import { isPlayerActive, playerId } from "../../shared/player";
 import { getAccount, isAuthenticated } from "../auth/session";
 import { refreshStreamForPlayer } from "../mapping/stream";
 import { STREET_WORLD, placeAt, type SpawnPoint } from "../spawn/point";
+import { LAW_ORG_IDS, LSPD_INTERIOR } from "./lspd";
 import { getMembership } from "./membership";
-import { LAW_ORG_IDS } from "./lspd";
-import { POLICE_INTERIOR } from "./police";
 
 const PICKUP_MODEL = 19132;
 const PICKUP_TYPE = 1;
@@ -19,34 +18,34 @@ const LABEL_HEIGHT = 0.85;
 const LABEL_DRAW_DISTANCE = 12;
 const DENY = "Otkryt' mogut sotrudniki LSPD, oblastnoy policii i FBI.";
 
-type PoliceDoor = {
+type LspdDoor = {
   pickup: { x: number; y: number; z: number; interior: number };
   dest: SpawnPoint;
   label: string;
   staffOnly: boolean;
 };
 
-const DOORS: readonly PoliceDoor[] = [
+const DOORS: readonly LspdDoor[] = [
   {
-    pickup: { x: 626.973, y: -571.7709, z: 17.9207, interior: 0 },
+    pickup: { x: 1555.1888, y: -1675.5829, z: 16.1953, interior: 0 },
     dest: {
-      x: 246.66,
-      y: 65.8,
-      z: 1003.64,
+      x: 246.0688,
+      y: 108.9703,
+      z: 1003.2188,
       angle: 0,
-      interior: POLICE_INTERIOR,
+      interior: LSPD_INTERIOR,
       world: STREET_WORLD,
     },
-    label: "Oblastnaya policiya\nVkhod",
+    label: "LSPD\nVkhod",
     staffOnly: false,
   },
   {
-    pickup: { x: 246.757, y: 62.4475, z: 1003.6406, interior: POLICE_INTERIOR },
+    pickup: { x: 246.3908, y: 107.4583, z: 1003.2188, interior: LSPD_INTERIOR },
     dest: {
-      x: 631.6352,
-      y: -571.7485,
-      z: 16.3359,
-      angle: 268.9851,
+      x: 1552.6929,
+      y: -1675.5747,
+      z: 16.1953,
+      angle: 91.0569,
       interior: 0,
       world: STREET_WORLD,
     },
@@ -54,55 +53,29 @@ const DOORS: readonly PoliceDoor[] = [
     staffOnly: false,
   },
   {
-    pickup: { x: 611.0726, y: -583.5037, z: 18.2109, interior: 0 },
+    pickup: { x: 214.1955, y: 120.771, z: 999.0156, interior: LSPD_INTERIOR },
     dest: {
-      x: 245.1678,
-      y: 66.2916,
-      z: 1003.6406,
-      angle: 267.5659,
-      interior: POLICE_INTERIOR,
-      world: STREET_WORLD,
-    },
-    label: "Parkovka\nSluzhebnyy vkhod",
-    staffOnly: true,
-  },
-  {
-    pickup: { x: 242.477, y: 66.3774, z: 1003.6406, interior: POLICE_INTERIOR },
-    dest: {
-      x: 611.0386,
-      y: -586.416,
-      z: 17.2266,
-      angle: 181.2275,
+      x: 1527.4255,
+      y: -1677.9736,
+      z: 5.8906,
+      angle: 269.8995,
       interior: 0,
       world: STREET_WORLD,
     },
-    label: "Parkovka\nSluzhebnyy vykhod",
+    label: "Garazh\nSluzhebnyy vykhod",
     staffOnly: true,
   },
   {
-    pickup: { x: 621.258, y: -569.2031, z: 26.1432, interior: 0 },
+    pickup: { x: 1524.7473, y: -1677.832, z: 5.8906, interior: 0 },
     dest: {
-      x: 246.3152,
-      y: 86.1715,
-      z: 1003.6406,
-      angle: 178.2883,
-      interior: POLICE_INTERIOR,
+      x: 216.286,
+      y: 120.5165,
+      z: 999.0156,
+      angle: 267.6828,
+      interior: LSPD_INTERIOR,
       world: STREET_WORLD,
     },
-    label: "Krysha\nSluzhebnyy vkhod",
-    staffOnly: true,
-  },
-  {
-    pickup: { x: 246.3991, y: 88.0064, z: 1003.6406, interior: POLICE_INTERIOR },
-    dest: {
-      x: 621.1804,
-      y: -571.1289,
-      z: 26.1432,
-      angle: 178.1175,
-      interior: 0,
-      world: STREET_WORLD,
-    },
-    label: "Krysha\nSluzhebnyy vykhod",
+    label: "Garazh\nSluzhebnyy vkhod",
     staffOnly: true,
   },
 ];
@@ -110,7 +83,7 @@ const DOORS: readonly PoliceDoor[] = [
 const lastTeleportAt = new Map<number, number>();
 const lastDenyAt = new Map<number, number>();
 
-export function bindPoliceDoors(): void {
+export function bindLspdDoors(): void {
   for (const door of DOORS) {
     new Pickup(
       PICKUP_MODEL,
@@ -132,7 +105,7 @@ export function bindPoliceDoors(): void {
     );
   }
 
-  setInterval(tickPoliceDoors, TICK_MS);
+  setInterval(tickLspdDoors, TICK_MS);
 
   omp.on("playerConnect", (player) => {
     clearPlayer(player);
@@ -142,7 +115,7 @@ export function bindPoliceDoors(): void {
   });
 }
 
-function tickPoliceDoors(): void {
+function tickLspdDoors(): void {
   omp.players.forEach((player) => {
     if (!isPlayerActive(player) || !isAuthenticated(player)) {
       return;
@@ -175,7 +148,7 @@ function tickPoliceDoors(): void {
   });
 }
 
-function tryUse(player: Player, door: PoliceDoor): void {
+function tryUse(player: Player, door: LspdDoor): void {
   if (door.staffOnly) {
     const account = getAccount(player);
     if (account?.hospitalized) {

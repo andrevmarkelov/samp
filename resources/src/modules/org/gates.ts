@@ -10,6 +10,8 @@ import type { OrgGateDef } from "./types";
 const KEY_CROUCH = 2;
 const HOLD_OPEN_MS = 5000;
 const MOVE_SPEED = 3;
+const BARRIER_TRAVEL_MS = 1200;
+const BARRIER_Z_BUMP = 0.02;
 const DRAW_DISTANCE = 280;
 const DENY_COOLDOWN_MS = 2500;
 const PLAYER_STATE_ONFOOT = 1;
@@ -38,18 +40,40 @@ function canUseKeys(player: Player): boolean {
   }
 }
 
+function isBarrier(def: OrgGateDef): boolean {
+  return def.ryOpen !== undefined && Math.abs(def.zClosed - def.zOpen) < 0.001;
+}
+
+function allowedOrgIds(def: OrgGateDef): readonly number[] {
+  return def.orgIds ?? [def.orgId];
+}
+
 function travelMs(def: OrgGateDef): number {
+  if (isBarrier(def)) {
+    return BARRIER_TRAVEL_MS;
+  }
+
   const dist = Math.abs(def.zClosed - def.zOpen);
   return Math.max(400, Math.round((dist / MOVE_SPEED) * 1000));
 }
 
-function moveGate(gate: LiveGate, z: number): void {
+function moveGate(gate: LiveGate, open: boolean): void {
   const { def, object } = gate;
+  const ry = open && def.ryOpen !== undefined ? def.ryOpen : def.ry;
+  const z = isBarrier(def)
+    ? open
+      ? def.zClosed + BARRIER_Z_BUMP
+      : def.zClosed
+    : open
+      ? def.zOpen
+      : def.zClosed;
+  const speed = isBarrier(def) ? BARRIER_Z_BUMP / (BARRIER_TRAVEL_MS / 1000) : MOVE_SPEED;
+
   try {
     if (object.isMoving()) {
       object.stop();
     }
-    object.move(def.x, def.y, z, MOVE_SPEED, def.rx, def.ry, def.rz);
+    object.move(def.x, def.y, z, speed, def.rx, ry, def.rz);
   } catch {
     // Объект ещё не готов.
   }
@@ -61,10 +85,10 @@ function openGate(gate: LiveGate): void {
     gate.closeTimer = null;
   }
 
-  moveGate(gate, gate.def.zOpen);
+  moveGate(gate, true);
   gate.closeTimer = setTimeout(() => {
     gate.closeTimer = null;
-    moveGate(gate, gate.def.zClosed);
+    moveGate(gate, false);
   }, travelMs(gate.def) + HOLD_OPEN_MS);
 }
 
@@ -117,7 +141,8 @@ function onGateKey(player: Player): void {
 
   const account = getAccount(player);
   const membership = account ? getMembership(account) : null;
-  if (!membership || membership.org.id !== gate.def.orgId) {
+  const orgId = membership?.org.id;
+  if (orgId === undefined || !allowedOrgIds(gate.def).includes(orgId)) {
     denyOpen(player, gate.def.denyMessage);
     return;
   }

@@ -19,6 +19,12 @@ export const STREET_WORLD = 0;
 /** Отдельный VW больницы: игроки и пикапы внутри не пересекаются с улицей. */
 export const HOSPITAL_WORLD = 1;
 
+/** Отдельный VW тюрьмы: интерьер в небе не пересекается с улицей. Банк = 2. */
+export const PRISON_WORLD = 3;
+
+/** Двор тюрьмы на координатах участка: игроки не пересекаются с улицей. */
+export const PRISON_YARD_WORLD = 4;
+
 /** Обычный спавн, пока игрок не в организации. */
 export const DEFAULT_SPAWN: SpawnPoint = {
   x: 1760.2538,

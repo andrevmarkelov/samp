@@ -693,7 +693,7 @@ SetDynamicObjectMaterial(jailint, 5, 10101, "2notherbuildsfe", "ws_rooftarmac1",
 SetDynamicObjectMaterial(jailint, 1, 10101, "2notherbuildsfe", "ws_rooftarmac1", 0);
 SetDynamicObjectMaterial(jailint, 0, 10856, "bakerybit_sfse", "ws_oldwarehouse10a", 0);
 jailint = CreateDynamicObject(19481, -57.826958, 2435.228516, 1185.775269, 0.000000, 0.000000, 180.000000);
-SetDynamicObjectMaterialText(jailint, 0, "SAMPBIO COUNTRY\nSTATE PRISON", 130, "Fixedsys", 20, 1, 0xFF000000, 0, 1);
+SetDynamicObjectMaterialText(jailint, 0, "LOS SANTOS COUNTRY\nSTATE PRISON", 130, "Fixedsys", 20, 1, 0xFF000000, 0, 1);
 CreateDynamicObject(2525, -64.395782, 2421.133301, 1182.149658, 0.000000, -0.000151, 179.999084);
 jailint = CreateDynamicObject(19377, -63.976715, 2422.229492, 1187.295898, 0.000000, 0.000159, 0.000000);
 SetDynamicObjectMaterial(jailint, 5, 10101, "2notherbuildsfe", "ws_rooftarmac1", 0);

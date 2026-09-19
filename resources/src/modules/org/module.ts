@@ -5,6 +5,12 @@ import { bindMeriyaStaffDoors } from "./meriya-doors";
 import { bindMeriyaLocker } from "./meriya-locker";
 import { bindPoliceDoors } from "./police-doors";
 import { bindPoliceLocker } from "./police-locker";
+import { bindFbiDoors } from "./fbi-doors";
+import { bindFbiLocker } from "./fbi-locker";
+import { bindFbiMapIcon } from "./fbi-map";
+import { bindLspdDoors } from "./lspd-doors";
+import { bindLspdLocker } from "./lspd-locker";
+import { bindLspdMapIcon } from "./lspd-map";
 import { bindPoliceMapIcon } from "./police-map";
 
 export const orgModule: GameModule = {
@@ -15,7 +21,13 @@ export const orgModule: GameModule = {
     bindMeriyaStaffDoors();
     bindMeriyaLocker();
     bindPoliceDoors();
+    bindLspdDoors();
     bindPoliceLocker();
+    bindLspdLocker();
+    bindFbiLocker();
     bindPoliceMapIcon();
+    bindLspdMapIcon();
+    bindFbiDoors();
+    bindFbiMapIcon();
   },
 };

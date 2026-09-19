@@ -62,6 +62,20 @@ const TARGETS: readonly GpsTarget[] = [
     z: 16.3359,
   },
   {
+    key: "lspd",
+    label: "LSPD",
+    x: 1543.1873,
+    y: -1675.8076,
+    z: 13.556,
+  },
+  {
+    key: "fbi",
+    label: "FBI",
+    x: 617.4481,
+    y: -1458.5858,
+    z: 14.4322,
+  },
+  {
     key: "bank",
     label: "Bank",
     x: 1458.5426,

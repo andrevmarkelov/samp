@@ -28,6 +28,8 @@ export type OrganizationDef = {
 
 export type OrgGateDef = {
   orgId: number;
+  /** Если задано — открыть может любой из этих органов. Иначе только `orgId`. */
+  orgIds?: readonly number[];
   model: number;
   x: number;
   y: number;
@@ -36,6 +38,8 @@ export type OrgGateDef = {
   rx: number;
   ry: number;
   rz: number;
+  /** Шлагбаум: закрыт `ry`, открыт `ryOpen` (тот же XYZ). */
+  ryOpen?: number;
   radius: number;
   denyMessage: string;
 };

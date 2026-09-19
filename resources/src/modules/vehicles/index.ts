@@ -2,9 +2,11 @@ import { STREET_WORLD } from "../spawn/point";
 import type { GameModule } from "../types";
 import { bindOrgVehicleAccess } from "./access";
 import { spawnArmyVehicles } from "./army";
+import { spawnFbiVehicles } from "./fbi";
 import { spawnGangVehicles } from "./gangs";
 import { spawnHospitalVehicles } from "./hospital";
 import { spawnMeriyaVehicles } from "./meriya";
+import { spawnLspdVehicles } from "./lspd";
 import { spawnPoliceVehicles } from "./police";
 import { startSpeedLimiter } from "./limit";
 import { createServerVehicle, startEngineControl } from "./spawn";
@@ -41,6 +43,8 @@ export const vehiclesModule: GameModule = {
     spawnHospitalVehicles();
     spawnMeriyaVehicles();
     spawnPoliceVehicles();
+    spawnLspdVehicles();
+    spawnFbiVehicles();
     spawnGangVehicles();
 
     for (const spot of STATION_SCOOTERS) {
