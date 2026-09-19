@@ -54,7 +54,7 @@ resources/src/modules/
   org/          армия, больница, банды 9–13
 ```
 
-GPS v2: метки **ZHD LS**, **Tyurma**, **Bank**.
+GPS v2: метки **ZHD LS**, **Tyurma**, **Bank**, **Oblastnaya policiya**.
 
 `/mn`: пункт **Svyaz' s administraciey** → диалог репорта.
 
@@ -294,7 +294,7 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 
 ## Гос. органы 4–8
 
-Все `gov: true`, `illegal: false`. `/r`, `/d`, `/gov` (ранг 10), кадры **9–10**. Спавн на улице. Общий хелпер: `org/define.ts`.
+Все `gov: true`, `illegal: false`. `/r`, `/d`, `/gov` (ранг 10), кадры **9–10**. Спавн на улице, кроме областной полиции (interior **6**). Общий хелпер: `org/define.ts`.
 
 | id | Имя | Цвет | Файл |
 |---|---|---|---|
@@ -304,7 +304,19 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 | 7 | Avtoshkola | `0xfff3b0ff` | `org/autoschool.ts` |
 | 8 | Radiocentr | `0xff8c00ff` | `org/radio.ts` |
 
-Ранги полиции (4 и 5) общие: `org/police-ranks.ts`. Машин и пикапов пока нет.
+Ранги полиции (4 и 5) общие: `org/police-ranks.ts`.
+
+Транспорт областной полиции у участка Dillimore (Police LS 596 ×7, Ranger 599 ×2, Cheetah 415, Maverick 497, HPV1000 523 ×5) — цвета из спавна, только `org_id = 4`. LSPD сесть не может. `vehicles/police.ts`.
+
+Иконка на карте (слот 7, тип 30) в радиусе ~300 м: `632.74, -566.99, 16.34`. GPS: **Oblastnaya policiya** `635.69, -571.67, 16.34`.
+
+Вход с улицы (пикап **19132**, любой): `626.97, -571.77, 17.92` ↔ interior **6** `246.76, 62.45, 1003.64`. Выход на улицу: `631.64, -571.75, 16.34`.
+
+Служебная парковка (только `org_id = 4`): улица `611.07, -583.50, 18.21` ↔ интерьер `242.48, 66.38, 1003.64`. LSPD не проходит.
+
+Крыша (только `org_id = 4`): `621.26, -569.20, 26.14` ↔ интерьер `246.40, 88.01, 1003.64`. `org/police-doors.ts`.
+
+Оружейка в интерьере (пикап **19134**, диалог **22**, только `org_id = 4`): броня, дубинка, Deagle, Shotgun, MP5, M4, временный скин SWAT **285** (сбрасывается смертью/релогом). `org/police-locker.ts`.
 
 ---
 
@@ -408,6 +420,7 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 | 13–19 | банк |
 | 20 | репорт |
 | 21 | инвайт в орган |
+| 22 | оружейка областной полиции |
 
 ---
 
@@ -433,6 +446,10 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 | Больница орган / машины | `org/hospital.ts`, `vehicles/hospital.ts` |
 | Мэрия | `org/meriya.ts`, `vehicles/meriya.ts`, `org/meriya-locker.ts`, `org/meriya-doors.ts` |
 | Полиция / LSPD / FBI / автошкола / радио | `org/police.ts`, `org/lspd.ts`, `org/fbi.ts`, `org/autoschool.ts`, `org/radio.ts` |
+| Машины областной полиции | `vehicles/police.ts` |
+| Иконка областной полиции | `org/police-map.ts` |
+| Вход областной полиции | `org/police-doors.ts` |
+| Оружейка областной полиции | `org/police-locker.ts` |
 | Банды | `org/gangs.ts`, `vehicles/gangs.ts` |
 | Инвайт / ранг | `commands/org-staff.ts` |
 | Гангзоны | `zones/turf.ts`, `zones/repository.ts`, `sql/schema.sql` |

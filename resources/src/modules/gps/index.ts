@@ -55,6 +55,13 @@ const TARGETS: readonly GpsTarget[] = [
     z: 13.5167,
   },
   {
+    key: "police",
+    label: "Oblastnaya policiya",
+    x: 635.6895,
+    y: -571.6663,
+    z: 16.3359,
+  },
+  {
     key: "bank",
     label: "Bank",
     x: 1458.5426,
