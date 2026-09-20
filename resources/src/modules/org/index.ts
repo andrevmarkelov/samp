@@ -5,7 +5,13 @@ export { ORG_POLICE_ID, POLICE } from "./police";
 export { LSPD, LSPD_GATES, LSPD_INTERIOR, ORG_LSPD_ID } from "./lspd";
 export { FBI, FBI_INTERIOR, ORG_FBI_ID } from "./fbi";
 export { AUTOSCHOOL, AUTOSCHOOL_INTERIOR, ORG_AUTOSCHOOL_ID } from "./autoschool";
-export { ORG_RADIO_ID, RADIOCENTR } from "./radio";
+export {
+  ORG_RADIO_ID,
+  RADIOCENTR,
+  RADIO_GATES,
+  RADIO_INTERIOR,
+  RADIO_WORLD,
+} from "./radio";
 export {
   AZTECAS,
   BALLAS,

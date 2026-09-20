@@ -7,7 +7,7 @@ import { LCN_GATES, MAFIAS, RUSSIAN_MAFIA_GATES, YAKUZA_GATES } from "./mafias";
 import { MERIYA } from "./meriya";
 import { LSPD, LSPD_GATES } from "./lspd";
 import { POLICE } from "./police";
-import { RADIOCENTR } from "./radio";
+import { RADIOCENTR, RADIO_GATES } from "./radio";
 import type { OrganizationDef, OrgGateDef, OrgRankDef } from "./types";
 
 const ORGANIZATIONS: readonly OrganizationDef[] = [
@@ -26,6 +26,7 @@ const ORG_GATES: readonly OrgGateDef[] = [
   ...ARMY_GATES,
   ...HOSPITAL_GATES,
   ...LSPD_GATES,
+  ...RADIO_GATES,
   ...LCN_GATES,
   ...YAKUZA_GATES,
   ...RUSSIAN_MAFIA_GATES,

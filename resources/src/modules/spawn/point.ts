@@ -26,6 +26,7 @@ export const PRISON_WORLD = 3;
 export const PRISON_YARD_WORLD = 4;
 
 /** Мафии (интерьер 5): LCN VW 14, Yakuza 15, Russkaya 16 — `org/mafias.ts`. */
+/** Radiocentr (кастомный интерьер): VW 8 — `org/radio.ts`. */
 
 /** Обычный спавн, пока игрок не в организации. */
 export const DEFAULT_SPAWN: SpawnPoint = {

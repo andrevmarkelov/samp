@@ -11,6 +11,7 @@ import { spawnMeriyaVehicles } from "./meriya";
 import { spawnLspdVehicles } from "./lspd";
 import { spawnPoliceVehicles } from "./police";
 import { spawnPrisonVehicles } from "./prison";
+import { spawnRadioVehicles } from "./radio";
 import { startSpeedLimiter } from "./limit";
 import { createServerVehicle, startEngineControl } from "./spawn";
 
@@ -49,6 +50,7 @@ export const vehiclesModule: GameModule = {
     spawnLspdVehicles();
     spawnFbiVehicles();
     spawnAutoschoolVehicles();
+    spawnRadioVehicles();
     spawnPrisonVehicles();
     spawnGangVehicles();
     spawnMafiaVehicles();

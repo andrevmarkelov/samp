@@ -15,6 +15,8 @@ import { bindAutoschoolDoors } from "./autoschool-doors";
 import { bindAutoschoolMapIcon } from "./autoschool-map";
 import { bindMafiaDoors } from "./mafia-doors";
 import { bindPoliceMapIcon } from "./police-map";
+import { bindRadioDoors } from "./radio-doors";
+import { bindRadioLocker } from "./radio-locker";
 
 export const orgModule: GameModule = {
   name: "org",
@@ -35,5 +37,7 @@ export const orgModule: GameModule = {
     bindMafiaDoors();
     bindAutoschoolDoors();
     bindAutoschoolMapIcon();
+    bindRadioDoors();
+    bindRadioLocker();
   },
 };

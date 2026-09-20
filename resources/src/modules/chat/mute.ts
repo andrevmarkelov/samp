@@ -17,6 +17,7 @@ export const MUTED_CHAT_COMMANDS = new Set([
   "d",
   "gov",
   "f",
+  "ad",
 ]);
 
 const BUBBLE_MS = 3500;

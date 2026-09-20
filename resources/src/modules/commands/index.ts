@@ -23,12 +23,14 @@ import "./d";
 import "./gov";
 import "./limit";
 import "./report";
+import "./ads";
 import { bindMenuDialogs } from "./mn";
 import { bindGpsDialogs } from "../gps";
 import { bindReportDialogs } from "./report";
 import { bindOrgStaff } from "./org-staff";
 import { bindSellLic } from "./selllic";
 import { bindTimeLabels } from "./time";
+import { bindAds } from "./ads";
 
 export const commandsModule: GameModule = {
   name: "commands",
@@ -40,5 +42,6 @@ export const commandsModule: GameModule = {
     bindOrgStaff();
     bindSellLic();
     bindTimeLabels();
+    bindAds();
   },
 };
