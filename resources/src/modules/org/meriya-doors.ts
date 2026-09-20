@@ -16,7 +16,7 @@ const PICKUP_RADIUS = 1.5;
 const TICK_MS = 200;
 const LABEL_HEIGHT = 0.85;
 const LABEL_DRAW_DISTANCE = 12;
-const DENY = "Vy ne sostoite v merii.";
+const DENY = "Вы не состоите в мэрии.";
 
 type StaffDoor = {
   pickup: { x: number; y: number; z: number; interior: number; world: number };
@@ -41,7 +41,7 @@ const DOORS: readonly StaffDoor[] = [
       interior: CITY_HALL_INTERIOR,
       world: STREET_WORLD,
     },
-    label: "Meriya\nSluzhebnyy vkhod",
+    label: "Мэрия\nСлужебный вход",
   },
   {
     pickup: {
@@ -59,7 +59,7 @@ const DOORS: readonly StaffDoor[] = [
       interior: 0,
       world: STREET_WORLD,
     },
-    label: "Parkovka\nSluzhebnyy vykhod",
+    label: "Парковка\nСлужебный выход",
   },
   {
     pickup: {
@@ -77,7 +77,7 @@ const DOORS: readonly StaffDoor[] = [
       interior: 0,
       world: STREET_WORLD,
     },
-    label: "Meriya\nKrysha",
+    label: "Мэрия\nКрыша",
   },
   {
     pickup: {
@@ -95,7 +95,7 @@ const DOORS: readonly StaffDoor[] = [
       interior: CITY_HALL_INTERIOR,
       world: STREET_WORLD,
     },
-    label: "Meriya\nS kryshi",
+    label: "Мэрия\nС крыши",
   },
 ];
 
@@ -167,7 +167,7 @@ function tickStaffDoors(): void {
 function tryUse(player: Player, dest: SpawnPoint): void {
   const account = getAccount(player);
   if (account?.hospitalized) {
-    deny(player, "Vam nuzhno lechenie. Zanimite koyku: /hospital.");
+    deny(player, "Вам нужно лечение. Займите койку: /hospital.");
     return;
   }
 

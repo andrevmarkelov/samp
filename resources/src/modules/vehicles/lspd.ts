@@ -4,7 +4,7 @@ import { registerOrgVehicle } from "./access";
 import { createServerVehicle } from "./spawn";
 
 const RESPAWN_SEC = 100;
-const DENY = "Vy ne sostoite v LSPD.";
+const DENY = "Вы не состоите в LSPD.";
 
 function policeColors(model: number): { color1: number; color2: number } {
   if (model === 415) {

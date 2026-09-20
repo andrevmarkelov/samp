@@ -144,7 +144,7 @@ export const spawnModule: GameModule = {
           applyWallet(player, account);
         }
 
-        player.sendClientMessage(Color.error, "Vy otbyvaete srok v tyur'me.");
+        player.sendClientMessage(Color.error, "Вы отбываете срок в тюрьме.");
         return;
       }
 
@@ -165,12 +165,12 @@ export const spawnModule: GameModule = {
           seenWorldSpawn.add(id);
         }
 
-        player.sendClientMessage(Color.info, "Vy poteryali soznanie...");
+        player.sendClientMessage(Color.info, "Вы потеряли сознание...");
         player.sendClientMessage(
           Color.gray,
-          "Vrachi dostavili vas v gorodskuyu bolnicu All Saints."
+          "Врачи доставили вас в городскую больницу All Saints."
         );
-        player.sendClientMessage(Color.gray, "Zanimite koyku: /hospital.");
+        player.sendClientMessage(Color.gray, "Займите койку: /hospital.");
         return;
       }
 
@@ -196,7 +196,7 @@ export const spawnModule: GameModule = {
 
         player.sendClientMessage(
           Color.gray,
-          "Lechenie ne zakoncheno. Zanimite koyku: /hospital."
+          "Лечение не закончено. Займите койку: /hospital."
         );
         return;
       }
@@ -211,7 +211,7 @@ export const spawnModule: GameModule = {
         applyWallet(player, account);
         player.sendClientMessage(
           Color.gray,
-          "Ty poyavilsya na spawne. /help — spisok komand."
+          "Ты появился на спавне. /help — список команд."
         );
       }
 

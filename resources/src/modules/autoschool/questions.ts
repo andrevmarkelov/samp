@@ -7,67 +7,67 @@ export type ExamQuestion = {
 };
 
 export const EXAM_RULES =
-  "Kratkie pravila PDD:\n" +
-  "1. Na krasnyy svet — polnaya ostanovka.\n" +
-  "2. V gorode — ne vyshe 60 km/h.\n" +
-  "3. Na ravnoznachnom perekrestke ustupayte pomeshe sprava.\n" +
-  "4. Obgon cherez sploshnuyu liniyu zapreshchyon.\n" +
-  "5. Remen' bezopasnosti / shlem obyazatel'ny.\n\n" +
-  "Dalee test iz 5 voprosov. Nuzhno otvetit' na vse pravil'no.\n" +
-  "Stoimost' testa: $500.";
+  "Краткие правила ПДД:\n" +
+  "1. На красный свет — полная остановка.\n" +
+  "2. В городе — не выше 60 km/h.\n" +
+  "3. На равнозначном перекрёстке уступайте помехе справа.\n" +
+  "4. Обгон через сплошную линию запрещён.\n" +
+  "5. Ремень безопасности / шлем обязательны.\n\n" +
+  "Далее тест из 5 вопросов. Нужно ответить на все правильно.\n" +
+  "Стоимость теста: $500.";
 
 const CAR_QUESTIONS: readonly ExamQuestion[] = [
   {
-    text: "Chto delat' na krasnyy signal svetofora?",
-    answers: ["Ostanovit'sya", "Proekhat' bystree", "Podat' signal i ehat'"],
+    text: "Что делать на красный сигнал светофора?",
+    answers: ["Остановиться", "Проехать быстрее", "Подать сигнал и ехать"],
     correct: 0,
   },
   {
-    text: "Kakaya maksimal'naya skorost' v gorode?",
+    text: "Какая максимальная скорость в городе?",
     answers: ["120 km/h", "60 km/h", "200 km/h"],
     correct: 1,
   },
   {
-    text: "Komu ustupat' na ravnoznachnom perekrestke?",
-    answers: ["Pomeshe sleva", "Nikomu", "Pomeshe sprava"],
+    text: "Кому уступать на равнозначном перекрёстке?",
+    answers: ["Помехе слева", "Никому", "Помехе справа"],
     correct: 2,
   },
   {
-    text: "Mozhno li obgonyat' cherez sploshnuyu liniyu?",
-    answers: ["Net", "Da", "Tol'ko noch'yu"],
+    text: "Можно ли обгонять через сплошную линию?",
+    answers: ["Нет", "Да", "Только ночью"],
     correct: 0,
   },
   {
-    text: "Nuzhen li remen' bezopasnosti?",
-    answers: ["Net", "Tol'ko na trasse", "Da, obyazatelen"],
+    text: "Нужен ли ремень безопасности?",
+    answers: ["Нет", "Только на трассе", "Да, обязателен"],
     correct: 2,
   },
 ];
 
 const MOTO_QUESTIONS: readonly ExamQuestion[] = [
   {
-    text: "Chto delat' na krasnyy signal svetofora?",
-    answers: ["Ostanovit'sya", "Ob'ekhat' po obochine", "Proekhat', esli nikogo net"],
+    text: "Что делать на красный сигнал светофора?",
+    answers: ["Остановиться", "Объехать по обочине", "Проехать, если никого нет"],
     correct: 0,
   },
   {
-    text: "Nuzhen li shlem na motocikle?",
-    answers: ["Net", "Da, obyazatelen", "Tol'ko za gorodom"],
+    text: "Нужен ли шлем на мотоцикле?",
+    answers: ["Нет", "Да, обязателен", "Только за городом"],
     correct: 1,
   },
   {
-    text: "Mozhno li ehat' mezhdu ryadami mashin?",
-    answers: ["Da, vsegda", "Tol'ko na pustom shosse", "Net"],
+    text: "Можно ли ехать между рядами машин?",
+    answers: ["Да, всегда", "Только на пустом шоссе", "Нет"],
     correct: 2,
   },
   {
-    text: "Kakaya maksimal'naya skorost' v gorode?",
-    answers: ["60 km/h", "140 km/h", "Bez ogranicheniy"],
+    text: "Какая максимальная скорость в городе?",
+    answers: ["60 km/h", "140 km/h", "Без ограничений"],
     correct: 0,
   },
   {
-    text: "Mozhno li obgonyat' cherez sploshnuyu liniyu?",
-    answers: ["Da, na motocikle mozhno", "Net", "Tol'ko sprava"],
+    text: "Можно ли обгонять через сплошную линию?",
+    answers: ["Да, на мотоцикле можно", "Нет", "Только справа"],
     correct: 1,
   },
 ];

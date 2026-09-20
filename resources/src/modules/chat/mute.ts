@@ -21,7 +21,7 @@ export const MUTED_CHAT_COMMANDS = new Set([
 ]);
 
 const BUBBLE_MS = 3500;
-const BUBBLE_TEXT = "Pytaetsya chto-to skazat'...";
+const BUBBLE_TEXT = "Пытается что-то сказать...";
 const MUTE_RED = 0xff0000ff;
 
 type MuteTimer = {
@@ -54,7 +54,7 @@ export function notifyIfMuted(player: Player, options?: { bubble?: boolean }): b
 
   player.sendClientMessage(
     Color.error,
-    `U vas zapret na chat. Ostalos': ${formatMuteLeft(left)}.`
+    `У вас запрет на чат. Осталось: ${formatMuteLeft(left)}.`
   );
 
   if (options?.bubble) {
@@ -134,7 +134,7 @@ function expireMute(player: Player, notify: boolean): void {
   });
 
   if (notify && isPlayerActive(player)) {
-    player.sendClientMessage(Color.info, "Vy snova mozhete pol'zovat'sya chatom.");
+    player.sendClientMessage(Color.info, "Вы снова можете пользоваться чатом.");
   }
 }
 
@@ -145,13 +145,13 @@ export function formatMuteLeft(ms: number): string {
   const seconds = totalSec % 60;
   const parts: string[] = [];
   if (hours > 0) {
-    parts.push(`${hours} ch.`);
+    parts.push(`${hours} ч.`);
   }
   if (minutes > 0) {
-    parts.push(`${minutes} min.`);
+    parts.push(`${minutes} мин.`);
   }
   if (seconds > 0 || parts.length === 0) {
-    parts.push(`${seconds} sek.`);
+    parts.push(`${seconds} сек.`);
   }
   return parts.join(" ");
 }

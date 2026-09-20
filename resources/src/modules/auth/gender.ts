@@ -4,8 +4,8 @@ export function isGender(value: string): value is Gender {
   return value === "male" || value === "female";
 }
 
-export const GENDER_LIST_MALE = "Muzhskoy";
-export const GENDER_LIST_FEMALE = "Zhenskiy";
+export const GENDER_LIST_MALE = "Мужской";
+export const GENDER_LIST_FEMALE = "Женский";
 
 export function genderLabel(gender: Gender): string {
   return gender === "female" ? GENDER_LIST_FEMALE : GENDER_LIST_MALE;

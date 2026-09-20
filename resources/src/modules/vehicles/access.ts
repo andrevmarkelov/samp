@@ -19,7 +19,7 @@ const DENY_COOLDOWN_MS = 2500;
 /** F / Enter. KEY_SECONDARY_ATTACK = 16. */
 const KEY_ENTER_VEHICLE = 16;
 const ENTER_RANGE = 5;
-const DEFAULT_DENY = "Vy ne mozhete sidet' v etom transporte.";
+const DEFAULT_DENY = "Вы не можете сидеть в этом транспорте.";
 
 type OrgVehicleAccess = {
   orgIds: readonly number[];

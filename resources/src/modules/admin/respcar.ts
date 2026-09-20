@@ -76,7 +76,7 @@ function respawnEmptyVehicles(): void {
 export function bindAdminRespcar(): void {
   registerCommand(
     "respcar",
-    "Respawn vseh mashin cherez 30 sekund",
+    "Респаун всех машин через 30 секунд",
     (player) => {
       if (!hasAdminAccess(player, MIN_LEVEL)) {
         return;
@@ -85,7 +85,7 @@ export function bindAdminRespcar(): void {
       if (pending) {
         player.sendClientMessage(
           Color.error,
-          "Taymer respawna transporta uzhe zapushchen."
+          "Таймер респауна транспорта уже запущен."
         );
         return;
       }
@@ -93,7 +93,7 @@ export function bindAdminRespcar(): void {
       const tag = playerChatName(player);
       broadcastAll(
         Color.info,
-        `Administrator ${tag} zapustil respawn transporta. Mashiny bez igrokov vernutsya na tochki cherez 30 sekund.`
+        `Администратор ${tag} запустил респаун транспорта. Машины без игроков вернутся на точки через 30 секунд.`
       );
 
       pending = setTimeout(() => {
@@ -101,7 +101,7 @@ export function bindAdminRespcar(): void {
         respawnEmptyVehicles();
         broadcastAll(
           Color.info,
-          `Administrator ${tag} respavnil ves' svobodnyy transport na servere.`
+          `Администратор ${tag} респавнил весь свободный транспорт на сервере.`
         );
       }, DELAY_MS);
     },

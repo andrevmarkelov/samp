@@ -12,22 +12,22 @@ import { getMembership } from "../org";
 import { registerCommand } from "./registry";
 
 const BUBBLE_MS = 3000;
-const BUBBLE_TEXT = "Soobschenie po departamentu.";
+const BUBBLE_TEXT = "Сообщение по департаменту.";
 
-registerCommand("d", "Raciya departamenta", (player, args) => {
+registerCommand("d", "Рация департамента", (player, args) => {
   const account = getAccount(player);
   const membership = account ? getMembership(account) : null;
   if (!account || !membership || !membership.org.gov) {
     player.sendClientMessage(
       Color.error,
-      "Vy ne sostoite v gosudarstvennoy organizacii."
+      "Вы не состоите в государственной организации."
     );
     return;
   }
 
   const text = sanitizeChatText(args.trim()).slice(0, CHAT_MAX_LENGTH);
   if (!text) {
-    player.sendClientMessage(Color.error, "Ispol'zovanie: /d [tekst]");
+    player.sendClientMessage(Color.error, "Использование: /d [текст]");
     return;
   }
 

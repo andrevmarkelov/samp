@@ -7,7 +7,7 @@ const RESPAWN_SEC = 100;
 const RANDOM_COLOR = -1;
 const ARMY_CAR_COLOR = 173;
 const COLORED_MODELS = new Set([431, 445, 500]);
-const DENY = "Vy ne sostoite v armii.";
+const DENY = "Вы не состоите в армии.";
 
 const ARMY_VEHICLES: ReadonlyArray<{
   model: number;

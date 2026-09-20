@@ -8,16 +8,16 @@ const ARMY_COLOR = 0x9c7a4bff;
 
 function armyRanks(): OrgRankDef[] {
   const rows: Array<{ title: string; male: number; female: number; pay: number }> = [
-    { title: "Ryadovoy", male: 287, female: 191, pay: 1500 },
-    { title: "Efreytor", male: 287, female: 191, pay: 1900 },
-    { title: "Serzhant", male: 179, female: 191, pay: 2400 },
-    { title: "Starshina", male: 179, female: 191, pay: 3000 },
-    { title: "Leytenant", male: 255, female: 191, pay: 3700 },
-    { title: "Kapitan", male: 255, female: 191, pay: 4500 },
-    { title: "Mayor", male: 255, female: 191, pay: 5400 },
-    { title: "Podpolkovnik", male: 61, female: 191, pay: 6400 },
-    { title: "Polkovnik", male: 61, female: 191, pay: 7500 },
-    { title: "General", male: 61, female: 191, pay: 9000 },
+    { title: "Рядовой", male: 287, female: 191, pay: 1500 },
+    { title: "Ефрейтор", male: 287, female: 191, pay: 1900 },
+    { title: "Сержант", male: 179, female: 191, pay: 2400 },
+    { title: "Старшина", male: 179, female: 191, pay: 3000 },
+    { title: "Лейтенант", male: 255, female: 191, pay: 3700 },
+    { title: "Капитан", male: 255, female: 191, pay: 4500 },
+    { title: "Майор", male: 255, female: 191, pay: 5400 },
+    { title: "Подполковник", male: 61, female: 191, pay: 6400 },
+    { title: "Полковник", male: 61, female: 191, pay: 7500 },
+    { title: "Генерал", male: 61, female: 191, pay: 9000 },
   ];
 
   return rows.map((row, index) => ({
@@ -30,7 +30,7 @@ function armyRanks(): OrgRankDef[] {
 
 export const ARMY: OrganizationDef = {
   id: ORG_ARMY_ID,
-  name: "Armiya",
+  name: "Армия",
   color: ARMY_COLOR,
   gov: true,
   illegal: false,
@@ -46,7 +46,7 @@ export const ARMY: OrganizationDef = {
 };
 
 if (ARMY.ranks.length !== MAX_ORG_RANK) {
-  throw new Error("Armiya: nuzhno 10 rangov");
+  throw new Error("Армия: нужно 10 рангов");
 }
 
 const ARMY_GATE = {
@@ -56,7 +56,7 @@ const ARMY_GATE = {
   ry: 0,
   rz: 90,
   radius: 14,
-  denyMessage: "Vy ne sostoite v armii.",
+  denyMessage: "Вы не состоите в армии.",
 } as const;
 
 export const ARMY_GATES: OrgGateDef[] = [

@@ -22,7 +22,7 @@ function broadcastAll(color: number, text: string): void {
 export function bindAdminAo(): void {
   registerCommand(
     "ao",
-    "Obyavlenie vsem igrokam",
+    "Объявление всем игрокам",
     (player, args) => {
       if (!hasAdminAccess(player, 3)) {
         return;
@@ -30,13 +30,13 @@ export function bindAdminAo(): void {
 
       const text = sanitizeChatText(args.trim()).slice(0, CHAT_MAX_LENGTH);
       if (!text) {
-        player.sendClientMessage(Color.error, "Ispol'zovanie: /ao [tekst]");
+        player.sendClientMessage(Color.error, "Использование: /ao [текст]");
         return;
       }
 
       broadcastAll(
         Color.info,
-        `Administrator ${playerChatName(player)}: ${text}`
+        `Администратор ${playerChatName(player)}: ${text}`
       );
     },
     true

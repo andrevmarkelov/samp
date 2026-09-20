@@ -143,7 +143,7 @@ function toggleEngine(player: Player): void {
   try {
     player.sendClientMessage(
       Color.info,
-      running ? "Dvigatel' zaglushen." : "Dvigatel' zapushchen."
+      running ? "Двигатель заглушен." : "Двигатель запущен."
     );
   } catch {
     // Игрок уже вышел.

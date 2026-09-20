@@ -25,9 +25,9 @@ export const PRISON_WORLD = 3;
 /** Двор тюрьмы на координатах участка: игроки не пересекаются с улицей. */
 export const PRISON_YARD_WORLD = 4;
 
-/** Мафии (интерьер 5): LCN VW 14, Yakuza 15, Russkaya 16 — `org/mafias.ts`. */
+/** Мафии (интерьер 5): LCN VW 14, Yakuza 15, Русская 16 — `org/mafias.ts`. */
 /** Банды (дома): Grove VW 9, Ballas 10, Vagos 11, Rifa 12, Aztecas 13 — `org/gangs.ts`. */
-/** Radiocentr (кастомный интерьер): VW 8 — `org/radio.ts`. */
+/** Радиоцентр (кастомный интерьер): VW 8 — `org/radio.ts`. */
 
 /** Обычный спавн, пока игрок не в организации. */
 export const DEFAULT_SPAWN: SpawnPoint = {

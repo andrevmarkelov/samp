@@ -5,7 +5,7 @@ import { byGender } from "../auth/gender";
 import { getGender } from "../auth/session";
 import { registerCommand } from "./registry";
 
-registerCommand("todo", "Replika i deystvie cherez *", (player, args) => {
+registerCommand("todo", "Реплика и действие через *", (player, args) => {
   const split = args.indexOf("*");
   const speech = sanitizeChatText((split === -1 ? args : args.slice(0, split)).trim()).slice(0, CHAT_MAX_LENGTH);
   const action = sanitizeChatText((split === -1 ? "" : args.slice(split + 1).trim())).slice(0, CHAT_MAX_LENGTH);
@@ -13,9 +13,9 @@ registerCommand("todo", "Replika i deystvie cherez *", (player, args) => {
   if (!speech || !action) {
     player.sendClientMessage(
       Color.error,
-      "Ispol'zovanie: /todo [replika]*[deystvie]"
+      "Использование: /todo [реплика]*[действие]"
     );
-    player.sendClientMessage(Color.gray, "Primer: /todo Privet*mahaya rukoy");
+    player.sendClientMessage(Color.gray, "Пример: /todo Привет*махая рукой");
     return;
   }
 

@@ -55,7 +55,7 @@ function findTarget(slot: number): Player | null {
 export function bindAdminSetlevel(): void {
   registerCommand(
     "setlevel",
-    "Ustanovit' igrovoy uroven'",
+    "Установить игровой уровень",
     (player, args) => {
       if (!hasAdminAccess(player, MIN_ADMIN_LEVEL)) {
         return;
@@ -65,19 +65,19 @@ export function bindAdminSetlevel(): void {
       if (!parsed) {
         player.sendClientMessage(
           Color.error,
-          `Ispol'zovanie: /setlevel [id] [lvl] (${MIN_PLAYER_LEVEL}-${MAX_LEVEL})`
+          `Использование: /setlevel [id] [lvl] (${MIN_PLAYER_LEVEL}-${MAX_LEVEL})`
         );
         return;
       }
 
       const target = findTarget(parsed.slot);
       if (!target) {
-        player.sendClientMessage(Color.error, "Igrok ne nayden.");
+        player.sendClientMessage(Color.error, "Игрок не найден.");
         return;
       }
 
       if (!getAccount(target)) {
-        player.sendClientMessage(Color.error, "Igrok ne nayden.");
+        player.sendClientMessage(Color.error, "Игрок не найден.");
         return;
       }
 
@@ -94,7 +94,7 @@ async function applyLevel(admin: Player, target: Player, level: number): Promise
   }
 
   if (pending.has(account.id)) {
-    admin.sendClientMessage(Color.error, "Uroven' etogo igroka uzhe menyayut. Podozhdite.");
+    admin.sendClientMessage(Color.error, "Уровень этого игрока уже меняют. Подождите.");
     return;
   }
 
@@ -110,7 +110,7 @@ async function applyLevel(admin: Player, target: Player, level: number): Promise
     if (!isPlayerActive(target) || getAccount(target)?.id !== account.id) {
       admin.sendClientMessage(
         Color.info,
-        `Vy ustanovili uroven' ${level}. Igrok vyshel, uroven' sohranen.`
+        `Вы установили уровень ${level}. Игрок вышел, уровень сохранён.`
       );
       return;
     }
@@ -129,17 +129,17 @@ async function applyLevel(admin: Player, target: Player, level: number): Promise
 
     admin.sendClientMessage(
       Color.info,
-      `Vy ustanovili uroven' igroku ${targetTag}: ${level}. Opyt: 0/${need}.`
+      `Вы установили уровень игроку ${targetTag}: ${level}. Опыт: 0/${need}.`
     );
 
     if (isPlayerActive(target)) {
       target.sendClientMessage(
         Color.info,
-        `Administrator ${adminTag} ustanovil vam uroven' ${level}. Opyt: 0/${need}.`
+        `Администратор ${adminTag} установил вам уровень ${level}. Опыт: 0/${need}.`
       );
     }
   } catch {
-    admin.sendClientMessage(Color.error, "Ne udalos' sohranit' uroven'.");
+    admin.sendClientMessage(Color.error, "Не удалось сохранить уровень.");
   } finally {
     pending.delete(account.id);
   }

@@ -12,8 +12,8 @@ export const TPINT_DIALOG_ID = 41;
 const MIN_LEVEL = 4;
 const DIALOG_STYLE_LIST = 2;
 const PAGE_SIZE = 16;
-const BACK_LABEL = "<<< Nazad";
-const NEXT_LABEL = ">>> Dalee";
+const BACK_LABEL = "<<< Назад";
+const NEXT_LABEL = ">>> Далее";
 const PLAYER_STATE_WASTED = 7;
 const PLAYER_STATE_SPECTATING = 9;
 
@@ -79,14 +79,14 @@ function showList(player: Player, page: number): void {
       player,
       TPINT_DIALOG_ID,
       DIALOG_STYLE_LIST,
-      `Interiery (${safePage + 1}/${pageCount()})`,
+      `Интерьеры (${safePage + 1}/${pageCount()})`,
       lines.join("\n"),
-      "Vybrat'",
-      "Zakryt'"
+      "Выбрать",
+      "Закрыть"
     );
   } catch {
     pageByPlayer.delete(id);
-    player.sendClientMessage(Color.error, "Ne udalos' otkryt' spisok interierov.");
+    player.sendClientMessage(Color.error, "Не удалось открыть список интерьеров.");
   }
 }
 
@@ -148,18 +148,18 @@ function teleportToInterior(player: Player, spot: AdminInterior): boolean {
 
 function goToSpot(player: Player, spot: AdminInterior): void {
   if (!canTeleport(player)) {
-    player.sendClientMessage(Color.error, "Seychas nel'zya teleportirovat'sya.");
+    player.sendClientMessage(Color.error, "Сейчас нельзя телепортироваться.");
     return;
   }
 
   if (!teleportToInterior(player, spot)) {
-    player.sendClientMessage(Color.error, "Ne udalos' teleportirovat'sya.");
+    player.sendClientMessage(Color.error, "Не удалось телепортироваться.");
     return;
   }
 
   player.sendClientMessage(
     Color.info,
-    `Teleport: ${spot.name} (interior ${spot.interior}).`
+    `Телепорт: ${spot.name} (interior ${spot.interior}).`
   );
 }
 
@@ -173,7 +173,7 @@ function clearPage(player: Player): void {
 export function bindAdminTpint(): void {
   registerCommand(
     "tpint",
-    "Teleport v interier",
+    "Телепорт в интерьер",
     (player, args) => {
       if (!hasAdminAccess(player, MIN_LEVEL)) {
         return;
@@ -189,7 +189,7 @@ export function bindAdminTpint(): void {
       if (!Number.isInteger(index) || index < 1 || index > ADMIN_INTERIORS.length) {
         player.sendClientMessage(
           Color.error,
-          `Ispol'zovanie: /tpint [1-${ADMIN_INTERIORS.length}]`
+          `Использование: /tpint [1-${ADMIN_INTERIORS.length}]`
         );
         return;
       }
@@ -198,7 +198,7 @@ export function bindAdminTpint(): void {
       if (!spot) {
         player.sendClientMessage(
           Color.error,
-          `Ispol'zovanie: /tpint [1-${ADMIN_INTERIORS.length}]`
+          `Использование: /tpint [1-${ADMIN_INTERIORS.length}]`
         );
         return;
       }

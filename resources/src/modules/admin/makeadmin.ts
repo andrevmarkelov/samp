@@ -47,7 +47,7 @@ function findTarget(slot: number) {
 export function bindAdminMakeadmin(): void {
   registerCommand(
     "makeadmin",
-    "Vydat' ili snyat' adminku",
+    "Выдать или снять админку",
     (player, args) => {
       if (!hasAdminAccess(player, 7)) {
         return;
@@ -57,20 +57,20 @@ export function bindAdminMakeadmin(): void {
       if (!parsed) {
         player.sendClientMessage(
           Color.error,
-          "Ispol'zovanie: /makeadmin [id] [lvl] (0-7)"
+          "Использование: /makeadmin [id] [lvl] (0-7)"
         );
         return;
       }
 
       const target = findTarget(parsed.slot);
       if (!target) {
-        player.sendClientMessage(Color.error, "Igrok ne nayden.");
+        player.sendClientMessage(Color.error, "Игрок не найден.");
         return;
       }
 
       const account = getAccount(target);
       if (!account) {
-        player.sendClientMessage(Color.error, "Igrok ne nayden.");
+        player.sendClientMessage(Color.error, "Игрок не найден.");
         return;
       }
 
@@ -93,12 +93,12 @@ async function grantAdmin(
   try {
     await saveAdminAccess(account.id, level);
   } catch {
-    admin.sendClientMessage(Color.error, "Ne udalos' sohranit' adminku.");
+    admin.sendClientMessage(Color.error, "Не удалось сохранить админку.");
     return;
   }
 
   if (!isPlayerActive(target) || getAccount(target)?.id !== account.id) {
-    admin.sendClientMessage(Color.error, "Igrok ne nayden.");
+    admin.sendClientMessage(Color.error, "Игрок не найден.");
     return;
   }
 
@@ -110,18 +110,18 @@ async function grantAdmin(
 
   if (level < 1) {
     if (!same) {
-      admin.sendClientMessage(Color.info, `Vy snyali adminku: ${tag}.`);
+      admin.sendClientMessage(Color.info, `Вы сняли админку: ${tag}.`);
     }
-    target.sendClientMessage(Color.info, "Vas snyali s administrirovaniya.");
+    target.sendClientMessage(Color.info, "Вас сняли с администрирования.");
     return;
   }
 
   if (!same) {
-    admin.sendClientMessage(Color.info, `Vy vydali adminku ${tag}: ${level} lvl.`);
+    admin.sendClientMessage(Color.info, `Вы выдали админку ${tag}: ${level} lvl.`);
   }
   target.sendClientMessage(
     Color.info,
-    `Vam vydali administrirovanie. Uroven': ${level}. Pridumayte parol' ot adminki.`
+    `Вам выдали администрирование. Уровень: ${level}. Придумайте пароль от админки.`
   );
   promptAdminPasswordSetup(target);
 }

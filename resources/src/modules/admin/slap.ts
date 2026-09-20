@@ -50,7 +50,7 @@ function slapPlayer(target: Player): boolean {
 export function bindAdminSlap(): void {
   registerCommand(
     "slap",
-    "Podkinut' igroka vverh",
+    "Подкинуть игрока вверх",
     (player, args) => {
       if (!hasAdminAccess(player, MIN_LEVEL)) {
         return;
@@ -58,39 +58,39 @@ export function bindAdminSlap(): void {
 
       const idPart = args.trim();
       if (!idPart) {
-        player.sendClientMessage(Color.error, "Ispol'zovanie: /slap [id]");
+        player.sendClientMessage(Color.error, "Использование: /slap [id]");
         return;
       }
 
       const slot = Number(idPart);
       if (!Number.isInteger(slot) || slot < 0) {
-        player.sendClientMessage(Color.error, "Ispol'zovanie: /slap [id]");
+        player.sendClientMessage(Color.error, "Использование: /slap [id]");
         return;
       }
 
       const target = omp.players.at(slot);
       if (!target || !isPlayerActive(target)) {
-        player.sendClientMessage(Color.error, "Igrok ne nayden.");
+        player.sendClientMessage(Color.error, "Игрок не найден.");
         return;
       }
 
       try {
         if (target.isNPC()) {
-          player.sendClientMessage(Color.error, "Igrok ne nayden.");
+          player.sendClientMessage(Color.error, "Игрок не найден.");
           return;
         }
       } catch {
-        player.sendClientMessage(Color.error, "Igrok ne nayden.");
+        player.sendClientMessage(Color.error, "Игрок не найден.");
         return;
       }
 
       if (!slapPlayer(target)) {
-        player.sendClientMessage(Color.error, "Ne udalos' podkinut' igroka.");
+        player.sendClientMessage(Color.error, "Не удалось подкинуть игрока.");
         return;
       }
 
       broadcastAdmins(
-        `Administrator ${playerChatName(player)} podbrosil ${playerChatName(target)}.`
+        `Администратор ${playerChatName(player)} подбросил ${playerChatName(target)}.`
       );
     },
     true

@@ -22,7 +22,7 @@ function sendAdminChat(text: string): void {
 export function bindAdminChat(): void {
   registerCommand(
     "a",
-    "Chat administracii",
+    "Чат администрации",
     (player, args) => {
       if (!hasAdminAccess(player, 1)) {
         return;
@@ -30,7 +30,7 @@ export function bindAdminChat(): void {
 
       const text = sanitizeChatText(args.trim()).slice(0, CHAT_MAX_LENGTH);
       if (!text) {
-        player.sendClientMessage(Color.error, "Ispol'zovanie: /a [tekst]");
+        player.sendClientMessage(Color.error, "Использование: /a [текст]");
         return;
       }
 

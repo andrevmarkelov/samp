@@ -14,17 +14,17 @@ const TITLE = "{FFCC00}";
 const LABEL = "{FFFFFF}";
 const VALUE = "{33CCFF}";
 
-registerCommand("pass", "Pasport: posmotret' ili pokazat' po id", (player, args) => {
+registerCommand("pass", "Паспорт: посмотреть или показать по id", (player, args) => {
   const account = getAccount(player);
   if (!account) {
-    player.sendClientMessage(Color.error, "Snachala voydi v akkaunt.");
+    player.sendClientMessage(Color.error, "Сначала войди в аккаунт.");
     return;
   }
 
   if (!account.passport) {
     player.sendClientMessage(
       Color.error,
-      "U vas net pasporta. Obratites' v meriyu."
+      "У вас нет паспорта. Обратитесь в мэрию."
     );
     return;
   }
@@ -37,13 +37,13 @@ registerCommand("pass", "Pasport: posmotret' ili pokazat' po id", (player, args)
 
   const slot = Number(rawId);
   if (!Number.isInteger(slot) || slot < 0) {
-    player.sendClientMessage(Color.error, "Ispol'zovanie: /pass [id]");
+    player.sendClientMessage(Color.error, "Использование: /pass [id]");
     return;
   }
 
   const target = omp.players.at(slot);
   if (!target || !isPlayerActive(target)) {
-    player.sendClientMessage(Color.error, "Igrok ne nayden.");
+    player.sendClientMessage(Color.error, "Игрок не найден.");
     return;
   }
 
@@ -53,20 +53,20 @@ registerCommand("pass", "Pasport: posmotret' ili pokazat' po id", (player, args)
   }
 
   if (!isAuthenticatedTarget(target)) {
-    player.sendClientMessage(Color.error, "Igrok ne nayden.");
+    player.sendClientMessage(Color.error, "Игрок не найден.");
     return;
   }
 
   if (!arePlayersNearby(player, target, WHISPER_RADIUS)) {
-    player.sendClientMessage(Color.error, "Igrok slishkom daleko.");
+    player.sendClientMessage(Color.error, "Игрок слишком далеко.");
     return;
   }
 
   showPassport(target, account);
   const shownTo = playerName(target);
-  const verb = byGender(account.gender, "pokazal", "pokazala");
-  player.sendClientMessage(Color.gray, `Vy ${verb} pasport: ${shownTo}.`);
-  target.sendClientMessage(Color.gray, `${account.name} ${verb} vam pasport.`);
+  const verb = byGender(account.gender, "показал", "показала");
+  player.sendClientMessage(Color.gray, `Вы ${verb} паспорт: ${shownTo}.`);
+  target.sendClientMessage(Color.gray, `${account.name} ${verb} вам паспорт.`);
 });
 
 function isAuthenticatedTarget(player: Player): boolean {
@@ -80,13 +80,13 @@ function passRow(label: string, value: string): string {
 function showPassport(viewer: Player, owner: Account): void {
   const membership = getMembership(owner);
   const body = [
-    passRow("Imya", owner.name),
-    passRow("Prozhivanie v strane (let)", String(ageFromBirthDate(owner.birthDate))),
-    passRow("Pol", genderLabel(owner.gender)),
-    passRow("Data rozhdeniya", formatBirthDate(owner.birthDate)),
-    passRow("Organizaciya", membership?.org.name ?? "Net"),
-    passRow("Dolzhnost'", membership?.rank.title ?? "Net"),
-    passRow("Zakonoposlushnost'", String(owner.lawfulness)),
+    passRow("Имя", owner.name),
+    passRow("Проживание в стране (лет)", String(ageFromBirthDate(owner.birthDate))),
+    passRow("Пол", genderLabel(owner.gender)),
+    passRow("Дата рождения", formatBirthDate(owner.birthDate)),
+    passRow("Организация", membership?.org.name ?? "Нет"),
+    passRow("Должность", membership?.rank.title ?? "Нет"),
+    passRow("Законопослушность", String(owner.lawfulness)),
   ].join("\n");
 
   try {
@@ -94,12 +94,12 @@ function showPassport(viewer: Player, owner: Account): void {
       viewer,
       PASSPORT_DIALOG_ID,
       DIALOG_STYLE_MSGBOX,
-      `${TITLE}Pasport ${owner.name}`,
+      `${TITLE}Паспорт ${owner.name}`,
       body,
-      "Zakryt'",
+      "Закрыть",
       ""
     );
   } catch {
-    viewer.sendClientMessage(Color.error, "Ne udalos' otkryt' pasport.");
+    viewer.sendClientMessage(Color.error, "Не удалось открыть паспорт.");
   }
 }

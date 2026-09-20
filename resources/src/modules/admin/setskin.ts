@@ -79,7 +79,7 @@ function applyVisibleSkin(target: Player): void {
 export function bindAdminSetskin(): void {
   registerCommand(
     "setskin",
-    "Ustanovit' skin igroku",
+    "Установить скин игроку",
     (player, args) => {
       if (!hasAdminAccess(player, MIN_LEVEL)) {
         return;
@@ -89,20 +89,20 @@ export function bindAdminSetskin(): void {
       if (!parsed) {
         player.sendClientMessage(
           Color.error,
-          "Ispol'zovanie: /setskin [id] [skin] (1-311)"
+          "Использование: /setskin [id] [skin] (1-311)"
         );
         return;
       }
 
       const target = findTarget(parsed.slot);
       if (!target) {
-        player.sendClientMessage(Color.error, "Igrok ne nayden.");
+        player.sendClientMessage(Color.error, "Игрок не найден.");
         return;
       }
 
       const account = getAccount(target);
       if (!account) {
-        player.sendClientMessage(Color.error, "Igrok ne nayden.");
+        player.sendClientMessage(Color.error, "Игрок не найден.");
         return;
       }
 
@@ -121,12 +121,12 @@ async function applySkin(admin: Player, target: Player, skin: number): Promise<v
   try {
     await saveUserSkin(account.id, skin);
   } catch {
-    admin.sendClientMessage(Color.error, "Ne udalos' sohranit' skin.");
+    admin.sendClientMessage(Color.error, "Не удалось сохранить скин.");
     return;
   }
 
   if (!isPlayerActive(target) || getAccount(target)?.id !== account.id) {
-    admin.sendClientMessage(Color.error, "Igrok ne nayden.");
+    admin.sendClientMessage(Color.error, "Игрок не найден.");
     return;
   }
 
@@ -138,13 +138,13 @@ async function applySkin(admin: Player, target: Player, skin: number): Promise<v
 
   admin.sendClientMessage(
     Color.info,
-    `Vy izmenili vneshnost' igroku ${targetTag} na ${skin} skina.`
+    `Вы изменили внешность игроку ${targetTag} на ${skin} скина.`
   );
 
   if (isPlayerActive(target)) {
     target.sendClientMessage(
       Color.info,
-      `Administrator ${adminTag} izmenil vashu vneshnost' na ${skin} skina.`
+      `Администратор ${adminTag} изменил вашу внешность на ${skin} скина.`
     );
   }
 }

@@ -92,7 +92,7 @@ export const minerModule: GameModule = {
     );
 
     new TextLabel(
-      "Shakhta\nRabota shakhtera",
+      "Шахта\nРабота шахтёра",
       Color.info,
       HIRE_POINT.x,
       HIRE_POINT.y,
@@ -103,7 +103,7 @@ export const minerModule: GameModule = {
     );
 
     new TextLabel(
-      "Shakhta\nInformatsiya",
+      "Шахта\nИнформация",
       Color.info,
       INFO_POINT.x,
       INFO_POINT.y,
@@ -296,21 +296,21 @@ function showInfoDialog(player: Player): void {
       player,
       MINER_INFO_DIALOG_ID,
       DIALOG_STYLE_MSGBOX,
-      "Shakhta",
+      "Шахта",
       [
-        "Rabota shakhtera",
+        "Работа шахтёра",
         "",
-        "Obychnaya ruda: 6-16 kg, $15 za kg",
-        "Osobaya ruda: redkiy shans, 3-8 kg, $90 za kg",
+        "Обычная руда: 6-16 kg, $15 за kg",
+        "Особая руда: редкий шанс, 3-8 kg, $90 за kg",
         "",
-        "Zarplata kopitsya za smenu i vydaetsya",
-        "tol'ko kogda vy zavershaete rabotu.",
+        "Зарплата копится за смену и выдаётся",
+        "только когда вы завершаете работу.",
       ].join("\n"),
-      "Zakryt",
+      "Закрыть",
       ""
     );
   } catch {
-    player.sendClientMessage(Color.error, "Ne udalos' otkryt' dialog.");
+    player.sendClientMessage(Color.error, "Не удалось открыть диалог.");
   }
 }
 
@@ -320,13 +320,13 @@ function showHireDialog(player: Player): void {
       player,
       MINER_HIRE_DIALOG_ID,
       DIALOG_STYLE_MSGBOX,
-      "Shakhta",
-      "Vy khotite ustroit'sya na rabotu shakhtera?",
-      "Da",
-      "Net"
+      "Шахта",
+      "Вы хотите устроиться на работу шахтёра?",
+      "Да",
+      "Нет"
     );
   } catch {
-    player.sendClientMessage(Color.error, "Ne udalos' otkryt' dialog.");
+    player.sendClientMessage(Color.error, "Не удалось открыть диалог.");
   }
 }
 
@@ -336,13 +336,13 @@ function showQuitDialog(player: Player, job: Job): void {
       player,
       MINER_QUIT_DIALOG_ID,
       DIALOG_STYLE_MSGBOX,
-      "Shakhta",
-      `Zavershit' smenu i poluchit' voznagrazhdenie?\nSeychas: ${job.kg} kg, $${job.salary}`,
-      "Da",
-      "Net"
+      "Шахта",
+      `Завершить смену и получить вознаграждение?\nСейчас: ${job.kg} kg, $${job.salary}`,
+      "Да",
+      "Нет"
     );
   } catch {
-    player.sendClientMessage(Color.error, "Ne udalos' otkryt' dialog.");
+    player.sendClientMessage(Color.error, "Не удалось открыть диалог.");
   }
 }
 
@@ -358,12 +358,12 @@ function hire(player: Player): void {
   }
 
   if (account.hospitalized) {
-    player.sendClientMessage(Color.error, "Snachala zakonchite lechenie.");
+    player.sendClientMessage(Color.error, "Сначала закончите лечение.");
     return;
   }
 
   if (!isOnFootAt(player, HIRE_POINT, PICKUP_RADIUS + 0.8)) {
-    player.sendClientMessage(Color.error, "Podoydite k mestu ustroystva.");
+    player.sendClientMessage(Color.error, "Подойдите к месту устройства.");
     return;
   }
 
@@ -391,7 +391,7 @@ function hire(player: Player): void {
 
   givePickaxe(player);
   setMineCheckpoint(player, job);
-  player.sendClientMessage(Color.info, "Vy ustroilis' shakhterom. Idite k otmetke i dobyvaite rudu.");
+  player.sendClientMessage(Color.info, "Вы устроились шахтёром. Идите к отметке и добывайте руду.");
 }
 
 function finishShift(player: Player): void {
@@ -403,7 +403,7 @@ function finishShift(player: Player): void {
   }
 
   if (!isOnFootAt(player, HIRE_POINT, PICKUP_RADIUS + 0.8)) {
-    player.sendClientMessage(Color.error, "Podoydite k mestu ustroystva.");
+    player.sendClientMessage(Color.error, "Подойдите к месту устройства.");
     return;
   }
 
@@ -424,7 +424,7 @@ function finishShift(player: Player): void {
 
   player.sendClientMessage(
     Color.info,
-    `Smena zakonchena. Vy dobyli ${kg} kg rudy i poluchili $${salary}.`
+    `Смена закончена. Вы добыли ${kg} kg руды и получили $${salary}.`
   );
 }
 
@@ -445,7 +445,7 @@ function abortShift(player: Player, notify: boolean): void {
   if (notify && isPlayerActive(player)) {
     player.sendClientMessage(
       Color.error,
-      "Smena sorvana. Ruda i zarplata sgoreli."
+      "Смена сорвана. Руда и зарплата сгорели."
     );
   }
 }
@@ -632,7 +632,7 @@ function finishPickup(player: Player, expectedId: number): void {
     return;
   }
 
-  player.sendClientMessage(Color.info, "Ruda v tachechke. Otvezite ee k skladu.");
+  player.sendClientMessage(Color.info, "Руда в тачке. Отвезите её к складу.");
 }
 
 function deliver(player: Player, job: Job): void {
@@ -655,12 +655,12 @@ function deliver(player: Player, job: Job): void {
   givePickaxe(player);
   setMineCheckpoint(player, job);
 
-  const kind = special ? "osobaya" : "obychnaya";
+  const kind = special ? "особая" : "обычная";
   player.sendClientMessage(
     Color.info,
-    `Sdano: ${kind} ruda, ${kg} kg. +$${pay}`
+    `Сдано: ${kind} руда, ${kg} kg. +$${pay}`
   );
-  player.sendClientMessage(Color.white, `Zarplata za smenu: $${job.salary}`);
+  player.sendClientMessage(Color.white, `Зарплата за смену: $${job.salary}`);
 }
 
 function loseLoad(player: Player): void {
@@ -680,7 +680,7 @@ function loseLoad(player: Player): void {
   setMineCheckpoint(player, job);
   player.sendClientMessage(
     Color.error,
-    "Vy slomali telegu. Ruda poteriana, dobyvaite snova."
+    "Вы сломали телегу. Руда потеряна, добывайте снова."
   );
 }
 

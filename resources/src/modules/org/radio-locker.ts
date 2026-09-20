@@ -14,7 +14,7 @@ const LABEL_HEIGHT = 0.85;
 const LABEL_DRAW_DISTANCE = 12;
 const WEAPON_CAMERA = 43;
 const CAMERA_AMMO = 36;
-const DENY = "Vy ne sostoite v radiocentre.";
+const DENY = "Вы не состоите в радиоцентре.";
 
 const POINT = {
   x: 1411.8359,
@@ -27,7 +27,7 @@ const inside = new Set<number>();
 export function bindRadioLocker(): void {
   new Pickup(PICKUP_MODEL, PICKUP_TYPE, POINT.x, POINT.y, POINT.z, RADIO_WORLD);
   new TextLabel(
-    "Fotoapparat",
+    "Фотоаппарат",
     Color.info,
     POINT.x,
     POINT.y,
@@ -97,7 +97,7 @@ function tryTake(player: Player): void {
   }
 
   if (account.hospitalized) {
-    tell(player, Color.error, "Snachala proydite lechenie v bolnice.");
+    tell(player, Color.error, "Сначала пройдите лечение в больнице.");
     return;
   }
 
@@ -110,11 +110,11 @@ function tryTake(player: Player): void {
   try {
     player.giveWeapon(WEAPON_CAMERA, CAMERA_AMMO);
   } catch {
-    tell(player, Color.error, "Ne udalos' vydat' fotoapparat.");
+    tell(player, Color.error, "Не удалось выдать фотоаппарат.");
     return;
   }
 
-  tell(player, Color.info, "Vy vzyali fotoapparat.");
+  tell(player, Color.info, "Вы взяли фотоаппарат.");
 }
 
 function tell(player: Player, color: number, text: string): void {

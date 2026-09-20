@@ -29,14 +29,14 @@ const DESK = {
 } as const;
 
 const AD_HINT = [
-  `Podacha ob'yavleniya. Stoimost': $${AD_FEE} nalichnymi.`,
+  `Подача объявления. Стоимость: $${AD_FEE} наличными.`,
   "",
-  "Zaprescheno:",
-  "- oskorbleniya, kapslok, offtop",
-  "- reklama storonnih serverov i cheats",
-  "- NRP, ugrozy, obman ot imeni gos. organov",
+  "Запрещено:",
+  "- оскорбления, капслок, оффтоп",
+  "- реклама сторонних серверов и читов",
+  "- NRP, угрозы, обман от имени гос. органов",
   "",
-  "Vvedite tekst ob'yavleniya:",
+  "Введите текст объявления:",
 ].join("\n");
 
 type Ad = {
@@ -60,11 +60,11 @@ const submitting = new Set<number>();
 let lastPublishAt = 0;
 let started = false;
 
-registerCommand("ad", "Podat' ob'yavlenie", (player) => {
+registerCommand("ad", "Подать объявление", (player) => {
   openSubmitDialog(player);
 });
 
-registerCommand("edit", "Proverit' ob'yavlenie radiocentra", (player) => {
+registerCommand("edit", "Проверить объявление радиоцентра", (player) => {
   startEdit(player);
 });
 
@@ -110,12 +110,12 @@ function openSubmitDialog(player: Player, error?: string): void {
   }
 
   if (hasAdInFlight(account.id)) {
-    tell(player, Color.error, "U vas uzhe est' ob'yavlenie v ocheredi.");
+    tell(player, Color.error, "У вас уже есть объявление в очереди.");
     return;
   }
 
   if (account.money < AD_FEE) {
-    tell(player, Color.error, `Ob'yavlenie stoit $${AD_FEE}. Nedostatochno nalichnyh.`);
+    tell(player, Color.error, `Объявление стоит $${AD_FEE}. Недостаточно наличных.`);
     return;
   }
 
@@ -125,13 +125,13 @@ function openSubmitDialog(player: Player, error?: string): void {
       player,
       AD_SUBMIT_DIALOG_ID,
       DIALOG_STYLE_INPUT,
-      "Ob'yavlenie",
+      "Объявление",
       `${prefix}${AD_HINT}`,
-      "Otpravit'",
-      "Otmena"
+      "Отправить",
+      "Отмена"
     );
   } catch {
-    tell(player, Color.error, "Ne udalos' otkryt' ob'yavlenie.");
+    tell(player, Color.error, "Не удалось открыть объявление.");
   }
 }
 
@@ -142,18 +142,18 @@ async function submitAd(player: Player, raw: string): Promise<void> {
   }
 
   if (submitting.has(account.id) || hasAdInFlight(account.id)) {
-    tell(player, Color.error, "U vas uzhe est' ob'yavlenie v ocheredi.");
+    tell(player, Color.error, "У вас уже есть объявление в очереди.");
     return;
   }
 
   const text = sanitizeAd(raw);
   if (!text) {
-    openSubmitDialog(player, "Vvedite tekst ob'yavleniya.");
+    openSubmitDialog(player, "Введите текст объявления.");
     return;
   }
 
   if (account.money < AD_FEE) {
-    tell(player, Color.error, `Ob'yavlenie stoit $${AD_FEE}. Nedostatochno nalichnyh.`);
+    tell(player, Color.error, `Объявление стоит $${AD_FEE}. Недостаточно наличных.`);
     return;
   }
 
@@ -163,7 +163,7 @@ async function submitAd(player: Player, raw: string): Promise<void> {
     await saveUserMoney(account.id, nextCash, account.bank);
   } catch {
     submitting.delete(account.id);
-    tell(player, Color.error, "Ne udalos' spisat' oplatu. Poprobuyte eshchyo raz.");
+    tell(player, Color.error, "Не удалось списать оплату. Попробуйте ещё раз.");
     return;
   }
 
@@ -191,11 +191,11 @@ async function submitAd(player: Player, raw: string): Promise<void> {
   submitting.delete(account.id);
 
   if (isPlayerActive(player) && live?.id === account.id) {
-    tell(player, Color.info, `Ob'yavlenie otpravleno na proverku. Spisano $${AD_FEE}.`);
+    tell(player, Color.info, `Объявление отправлено на проверку. Списано $${AD_FEE}.`);
   }
   notifyRadioStaff(
     Color.info,
-    `Postupilo novoe ob'yavlenie ot ${authorTag}. Vvedite /edit.`
+    `Поступило новое объявление от ${authorTag}. Введите /edit.`
   );
 }
 
@@ -203,7 +203,7 @@ function startEdit(player: Player): void {
   const account = getAccount(player);
   const membership = account ? getMembership(account) : null;
   if (!account || membership?.org.id !== ORG_RADIO_ID) {
-    tell(player, Color.error, "Vy ne sostoite v radiocentre.");
+    tell(player, Color.error, "Вы не состоите в радиоцентре.");
     return;
   }
 
@@ -213,7 +213,7 @@ function startEdit(player: Player): void {
   }
 
   if (editing.has(slot) || rejecting.has(slot)) {
-    tell(player, Color.error, "Snachala zavershite tekuschee ob'yavlenie.");
+    tell(player, Color.error, "Сначала завершите текущее объявление.");
     return;
   }
 
@@ -221,14 +221,14 @@ function startEdit(player: Player): void {
     tell(
       player,
       Color.error,
-      "Proveryat' ob'yavleniya mozhno v ofise ili v transporte radiocentra."
+      "Проверять объявления можно в офисе или в транспорте радиоцентра."
     );
     return;
   }
 
   const ad = pending.shift();
   if (!ad) {
-    tell(player, Color.error, "Ochered' ob'yavleniy pusta.");
+    tell(player, Color.error, "Очередь объявлений пуста.");
     return;
   }
 
@@ -242,14 +242,14 @@ function showEditDialog(player: Player, ad: Ad): void {
       player,
       AD_EDIT_DIALOG_ID,
       DIALOG_STYLE_INPUT,
-      "Proverka ob'yavleniya",
-      `Tekst igroka:\n${ad.text}\n\nIsprav'te tekst nizhe ili ostav'te pole pustym i primite.`,
-      "Prinyat'",
-      "Otklonit'"
+      "Проверка объявления",
+      `Текст игрока:\n${ad.text}\n\nИсправьте текст ниже или оставьте поле пустым и примите.`,
+      "Принять",
+      "Отклонить"
     );
   } catch {
     returnAdFromStaff(player);
-    tell(player, Color.error, "Ne udalos' otkryt' proverku.");
+    tell(player, Color.error, "Не удалось открыть проверку.");
   }
 }
 
@@ -266,7 +266,7 @@ function onEditResponse(player: Player, accepted: boolean, raw: string): void {
 
   if (!isRadioStaff(player)) {
     returnAdFromStaff(player);
-    tell(player, Color.error, "Vy ne sostoite v radiocentre.");
+    tell(player, Color.error, "Вы не состоите в радиоцентре.");
     return;
   }
 
@@ -297,8 +297,8 @@ function onEditResponse(player: Player, accepted: boolean, raw: string): void {
   ad.publishAt = nextPublishAt();
   publishQueue.push(ad);
 
-  tell(player, Color.info, "Ob'yavlenie prinyato i vstanet v ochered' efira.");
-  notifyAuthor(ad.authorId, Color.info, "Vashe ob'yavlenie provereno i otpravleno.");
+  tell(player, Color.info, "Объявление принято и встанет в очередь эфира.");
+  notifyAuthor(ad.authorId, Color.info, "Ваше объявление проверено и отправлено.");
 }
 
 function showRejectDialog(player: Player, error?: string): void {
@@ -308,14 +308,14 @@ function showRejectDialog(player: Player, error?: string): void {
       player,
       AD_REJECT_DIALOG_ID,
       DIALOG_STYLE_INPUT,
-      "Otklonit' ob'yavlenie",
-      `${prefix}Ukazhite prichinu otkloneniya.`,
-      "Otklonit'",
-      "Otmena"
+      "Отклонить объявление",
+      `${prefix}Укажите причину отклонения.`,
+      "Отклонить",
+      "Отмена"
     );
   } catch {
     returnAdFromStaff(player);
-    tell(player, Color.error, "Ne udalos' otkryt' prichinu otkloneniya.");
+    tell(player, Color.error, "Не удалось открыть причину отклонения.");
   }
 }
 
@@ -332,29 +332,29 @@ function onRejectResponse(player: Player, confirmed: boolean, raw: string): void
 
   if (!isRadioStaff(player)) {
     returnAdFromStaff(player);
-    tell(player, Color.error, "Vy ne sostoite v radiocentre.");
+    tell(player, Color.error, "Вы не состоите в радиоцентре.");
     return;
   }
 
   if (!confirmed) {
     rejecting.delete(slot);
     pending.unshift(ad);
-    tell(player, Color.gray, "Otklonenie otmeneno. Ob'yavlenie vernulos' v ochered'.");
+    tell(player, Color.gray, "Отклонение отменено. Объявление вернулось в очередь.");
     return;
   }
 
   const reason = sanitizeAd(raw);
   if (!reason) {
-    showRejectDialog(player, "Ukazhite prichinu otkloneniya.");
+    showRejectDialog(player, "Укажите причину отклонения.");
     return;
   }
 
   rejecting.delete(slot);
   const staff = getAccount(player);
-  const verb = byGender(staff?.gender ?? null, "otklonil", "otklonila");
+  const verb = byGender(staff?.gender ?? null, "отклонил", "отклонила");
   const staffTag = playerChatName(player);
   const line = clipClientMessage(
-    `Sotrudnik radiocentra ${staffTag} ${verb} ob'yavlenie. Prichina: ${reason}`
+    `Сотрудник радиоцентра ${staffTag} ${verb} объявление. Причина: ${reason}`
   );
   notifyAuthor(ad.authorId, Color.error, line);
   notifyRadioStaff(Color.error, line);
@@ -369,14 +369,14 @@ function tickPublish(): void {
   publishQueue.shift();
   lastPublishAt = Date.now();
 
-  const sent = byGender(ad.authorGender, "Otpravil", "Otpravila");
-  const checked = byGender(ad.editorGender, "proveril", "proverila");
+  const sent = byGender(ad.authorGender, "Отправил", "Отправила");
+  const checked = byGender(ad.editorGender, "проверил", "проверила");
   const text = ad.text.endsWith(".") || ad.text.endsWith("!") || ad.text.endsWith("?")
     ? ad.text
     : `${ad.text}.`;
   const first = clipClientMessage(`LS | ${text} | ${sent} ${ad.authorTag}`);
   const second = clipClientMessage(
-    ` Ob'yavlenie ${checked} sotrudnik Radiocentra ${ad.editorTag}`
+    ` Объявление ${checked} сотрудник Радиоцентра ${ad.editorTag}`
   );
 
   broadcast(Color.ad, first);

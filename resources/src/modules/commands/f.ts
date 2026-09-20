@@ -13,7 +13,7 @@ import { registerCommand } from "./registry";
 
 const BUBBLE_MS = 3000;
 
-registerCommand("f", "Chat bandy ili mafii", (player, args) => {
+registerCommand("f", "Чат банды или мафии", (player, args) => {
   const account = getAccount(player);
   const membership = account ? getMembership(account) : null;
   if (!account || !membership || !(membership.org.illegal || membership.org.mafia)) {
@@ -22,7 +22,7 @@ registerCommand("f", "Chat bandy ili mafii", (player, args) => {
 
   const text = sanitizeChatText(args.trim()).slice(0, CHAT_MAX_LENGTH);
   if (!text) {
-    player.sendClientMessage(Color.error, "Ispol'zovanie: /f [tekst]");
+    player.sendClientMessage(Color.error, "Использование: /f [текст]");
     return;
   }
 
@@ -30,7 +30,7 @@ registerCommand("f", "Chat bandy ili mafii", (player, args) => {
     `[F] ${membership.rank.title} ${playerChatName(player)}: ${text}`
   );
   const orgId = membership.org.id;
-  const bubble = membership.org.mafia ? "Soobschenie mafii." : "Soobschenie bande.";
+  const bubble = membership.org.mafia ? "Сообщение мафии." : "Сообщение банде.";
 
   omp.players.forEach((other) => {
     if (!isPlayerActive(other)) {

@@ -18,9 +18,9 @@ const NO_LICENSE = new Set([
 ]);
 
 const DENY: Record<"car" | "moto" | "fly", string> = {
-  car: "U vas net licenzii na avtomobili.",
-  moto: "U vas net licenzii na motocikly.",
-  fly: "U vas net licenzii na polety.",
+  car: "У вас нет лицензии на автомобили.",
+  moto: "У вас нет лицензии на мотоциклы.",
+  fly: "У вас нет лицензии на полёты.",
 };
 
 export type DriveLicense = Extract<LicenseKey, "car" | "moto" | "fly">;
@@ -48,7 +48,7 @@ export function requiredDriveLicense(model: number): DriveLicense | null {
 export function driveLicenseDeny(player: Player, vehicle: Vehicle): string | null {
   const account = getAccount(player);
   if (!account) {
-    return "Snachala voydi v akkaunt.";
+    return "Сначала войди в аккаунт.";
   }
 
   let model = 0;

@@ -59,7 +59,7 @@ function defineMafia(
   };
 
   if (org.ranks.length !== MAX_ORG_RANK) {
-    throw new Error(`${name}: nuzhno 10 rangov`);
+    throw new Error(`${name}: нужно 10 рангов`);
   }
 
   return org;
@@ -107,21 +107,21 @@ export const YAKUZA = defineMafia(
 
 export const RUSSIAN_MAFIA = defineMafia(
   ORG_RUSSIAN_MAFIA_ID,
-  "Russkaya mafiya",
+  "Русская мафия",
   0x1a5c6eff,
   mafiaHqSpawn(RUSSIAN_MAFIA_WORLD),
   169,
   [
-    { title: "Shnyr'", male: 112 },
-    { title: "Bosyak", male: 112 },
-    { title: "Bratok", male: 272 },
-    { title: "Byk", male: 272 },
-    { title: "Avtoritet", male: 126 },
-    { title: "Zam. brigadira", male: 125 },
-    { title: "Brigadir", male: 111 },
-    { title: "Smotryaschiy", male: 98 },
-    { title: "Blatnoy", male: 46 },
-    { title: "Vor v zakone", male: 46 },
+    { title: "Шнырь", male: 112 },
+    { title: "Босяк", male: 112 },
+    { title: "Браток", male: 272 },
+    { title: "Бык", male: 272 },
+    { title: "Авторитет", male: 126 },
+    { title: "Зам. бригадира", male: 125 },
+    { title: "Бригадир", male: 111 },
+    { title: "Смотрящий", male: 98 },
+    { title: "Блатной", male: 46 },
+    { title: "Вор в законе", male: 46 },
   ]
 );
 
@@ -139,7 +139,7 @@ export const LCN_GATES: OrgGateDef[] = [
     ry: 0,
     rz: 90,
     radius: 14,
-    denyMessage: "Vy ne sostoite v La Cosa Nostra.",
+    denyMessage: "Вы не состоите в La Cosa Nostra.",
   },
 ];
 
@@ -149,7 +149,7 @@ const YAKUZA_GATE = {
   rx: 0,
   ry: 0,
   radius: 14,
-  denyMessage: "Vy ne sostoite v Yakuza.",
+  denyMessage: "Вы не состоите в Yakuza.",
 } as const;
 
 export const YAKUZA_GATES: OrgGateDef[] = [
@@ -192,6 +192,6 @@ export const RUSSIAN_MAFIA_GATES: OrgGateDef[] = [
     ryOpen: 0,
     rz: 0.7162,
     radius: 14,
-    denyMessage: "Vy ne sostoite v Russkoy mafii.",
+    denyMessage: "Вы не состоите в русской мафии.",
   },
 ];

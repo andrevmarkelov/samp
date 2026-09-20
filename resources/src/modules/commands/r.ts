@@ -12,13 +12,13 @@ import { getMembership } from "../org";
 import { registerCommand } from "./registry";
 
 const BUBBLE_MS = 3000;
-const BUBBLE_TEXT = "Soobschenie po racii.";
+const BUBBLE_TEXT = "Сообщение по рации.";
 
-registerCommand("r", "Raciya organizacii", (player, args) => {
+registerCommand("r", "Рация организации", (player, args) => {
   const account = getAccount(player);
   const membership = account ? getMembership(account) : null;
   if (!account || !membership) {
-    player.sendClientMessage(Color.error, "Vy ne sostoite v organizacii.");
+    player.sendClientMessage(Color.error, "Вы не состоите в организации.");
     return;
   }
 
@@ -28,7 +28,7 @@ registerCommand("r", "Raciya organizacii", (player, args) => {
 
   const text = sanitizeChatText(args.trim()).slice(0, CHAT_MAX_LENGTH);
   if (!text) {
-    player.sendClientMessage(Color.error, "Ispol'zovanie: /r [tekst]");
+    player.sendClientMessage(Color.error, "Использование: /r [текст]");
     return;
   }
 

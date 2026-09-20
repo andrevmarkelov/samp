@@ -3,10 +3,10 @@ import { CHAT_MAX_LENGTH, CHAT_RADIUS, sanitizeChatText, sendNearby } from "../.
 import { playerName } from "../../shared/player";
 import { registerCommand } from "./registry";
 
-registerCommand("me", "Deystvie ili emotsiya ot tret'ego litsa", (player, args) => {
+registerCommand("me", "Действие или эмоция от третьего лица", (player, args) => {
   const text = sanitizeChatText(args.trim()).slice(0, CHAT_MAX_LENGTH);
   if (!text) {
-    player.sendClientMessage(Color.error, "Ispol'zovanie: /me [deystvie]");
+    player.sendClientMessage(Color.error, "Использование: /me [действие]");
     return;
   }
 

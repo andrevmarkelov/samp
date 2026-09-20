@@ -24,7 +24,7 @@ export const LSPD = defineGovOrg(
 );
 
 export const LAW_ORG_IDS = [ORG_LSPD_ID, ORG_POLICE_ID, ORG_FBI_ID] as const;
-const LAW_GATE_DENY = "Otkryt' mogut sotrudniki LSPD, oblastnoy policii i FBI.";
+const LAW_GATE_DENY = "Открыть могут сотрудники LSPD, областной полиции и FBI.";
 
 export const LSPD_GATES: OrgGateDef[] = [
   {

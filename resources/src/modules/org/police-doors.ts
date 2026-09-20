@@ -17,7 +17,7 @@ const PICKUP_RADIUS = 1.5;
 const TICK_MS = 200;
 const LABEL_HEIGHT = 0.85;
 const LABEL_DRAW_DISTANCE = 12;
-const DENY = "Otkryt' mogut sotrudniki LSPD, oblastnoy policii i FBI.";
+const DENY = "Открыть могут сотрудники LSPD, областной полиции и FBI.";
 
 type PoliceDoor = {
   pickup: { x: number; y: number; z: number; interior: number };
@@ -37,7 +37,7 @@ const DOORS: readonly PoliceDoor[] = [
       interior: POLICE_INTERIOR,
       world: STREET_WORLD,
     },
-    label: "Oblastnaya policiya\nVkhod",
+    label: "Областная полиция\nВход",
     staffOnly: false,
   },
   {
@@ -50,7 +50,7 @@ const DOORS: readonly PoliceDoor[] = [
       interior: 0,
       world: STREET_WORLD,
     },
-    label: "Vykhod na ulicu",
+    label: "Выход на улицу",
     staffOnly: false,
   },
   {
@@ -63,7 +63,7 @@ const DOORS: readonly PoliceDoor[] = [
       interior: POLICE_INTERIOR,
       world: STREET_WORLD,
     },
-    label: "Parkovka\nSluzhebnyy vkhod",
+    label: "Парковка\nСлужебный вход",
     staffOnly: true,
   },
   {
@@ -76,7 +76,7 @@ const DOORS: readonly PoliceDoor[] = [
       interior: 0,
       world: STREET_WORLD,
     },
-    label: "Parkovka\nSluzhebnyy vykhod",
+    label: "Парковка\nСлужебный выход",
     staffOnly: true,
   },
   {
@@ -89,7 +89,7 @@ const DOORS: readonly PoliceDoor[] = [
       interior: POLICE_INTERIOR,
       world: STREET_WORLD,
     },
-    label: "Krysha\nSluzhebnyy vkhod",
+    label: "Крыша\nСлужебный вход",
     staffOnly: true,
   },
   {
@@ -102,7 +102,7 @@ const DOORS: readonly PoliceDoor[] = [
       interior: 0,
       world: STREET_WORLD,
     },
-    label: "Krysha\nSluzhebnyy vykhod",
+    label: "Крыша\nСлужебный выход",
     staffOnly: true,
   },
 ];
@@ -179,7 +179,7 @@ function tryUse(player: Player, door: PoliceDoor): void {
   if (door.staffOnly) {
     const account = getAccount(player);
     if (account?.hospitalized) {
-      deny(player, "Vam nuzhno lechenie. Zanimite koyku: /hospital.");
+      deny(player, "Вам нужно лечение. Займите койку: /hospital.");
       return;
     }
 

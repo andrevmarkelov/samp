@@ -11,7 +11,7 @@ type OnlineLeader = {
   slot: number;
 };
 
-registerCommand("leaders", "Spisok liderov online", (player) => {
+registerCommand("leaders", "Список лидеров online", (player) => {
   const list: OnlineLeader[] = [];
 
   omp.players.forEach((other) => {
@@ -46,9 +46,9 @@ registerCommand("leaders", "Spisok liderov online", (player) => {
 
   list.sort((a, b) => a.orgName.localeCompare(b.orgName) || a.slot - b.slot);
 
-  player.sendClientMessage(Color.info, "Lidery online:");
+  player.sendClientMessage(Color.info, "Лидеры online:");
   if (list.length === 0) {
-    player.sendClientMessage(Color.white, "Seychas net liderov v igre.");
+    player.sendClientMessage(Color.white, "Сейчас нет лидеров в игре.");
     return;
   }
 

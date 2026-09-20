@@ -69,7 +69,7 @@ function broadcastAll(color: number, text: string): void {
 export function bindAdminMute(): void {
   registerCommand(
     "mute",
-    "Zaglushit' igroka",
+    "Заглушить игрока",
     (player, args) => {
       if (!hasAdminAccess(player, MIN_LEVEL)) {
         return;
@@ -79,25 +79,25 @@ export function bindAdminMute(): void {
       if (!parsed) {
         player.sendClientMessage(
           Color.error,
-          "Ispol'zovanie: /mute [id] [minuty] [prichina (ne obyazatel'no)]"
+          "Использование: /mute [id] [минуты] [причина (не обязательно)]"
         );
         return;
       }
 
       const target = findTarget(parsed.slot);
       if (!target) {
-        player.sendClientMessage(Color.error, "Igrok ne nayden.");
+        player.sendClientMessage(Color.error, "Игрок не найден.");
         return;
       }
 
       const account = getAccount(target);
       if (!account) {
-        player.sendClientMessage(Color.error, "Igrok ne nayden.");
+        player.sendClientMessage(Color.error, "Игрок не найден.");
         return;
       }
 
       if (account.adminLevel >= 1) {
-        player.sendClientMessage(Color.error, "Nel'zya postavit' mut administratoru.");
+        player.sendClientMessage(Color.error, "Нельзя поставить мут администратору.");
         return;
       }
 
@@ -131,14 +131,14 @@ async function applyMute(
       patchAccount(target, { mutedUntil: previous });
       watchMute(target);
     }
-    admin.sendClientMessage(Color.error, "Ne udalos' sohranit' mut.");
+    admin.sendClientMessage(Color.error, "Не удалось сохранить мут.");
     return;
   }
 
   const adminTag = playerChatName(admin);
   const targetTag = playerChatName(target);
   const line = reason
-    ? `Administrator ${adminTag} zaglushil igroka ${targetTag}. Prichina: ${reason}.`
-    : `Administrator ${adminTag} zaglushil igroka ${targetTag}.`;
+    ? `Администратор ${adminTag} заглушил игрока ${targetTag}. Причина: ${reason}.`
+    : `Администратор ${adminTag} заглушил игрока ${targetTag}.`;
   broadcastAll(Color.error, line);
 }

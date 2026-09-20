@@ -23,7 +23,7 @@ const PICKUP_RADIUS = 1.5;
 const TICK_MS = 200;
 const LABEL_HEIGHT = 0.85;
 const LABEL_DRAW_DISTANCE = 12;
-const DENY_ROOF = "Na kryshu mogut tol'ko sotrudniki radiocentra.";
+const DENY_ROOF = "На крышу могут только сотрудники радиоцентра.";
 
 type DoorKind = "street" | "interior" | "roof";
 
@@ -86,10 +86,10 @@ const DOORS: readonly RadioDoor[] = [
       interior: 0,
       world: STREET_WORLD,
     },
-    label: "Radiocentr\nVkhod",
+    label: "Радиоцентр\nВход",
     options: [
-      { key: "office", label: "Ofis" },
-      { key: "roof", label: "Krysha" },
+      { key: "office", label: "Офис" },
+      { key: "roof", label: "Крыша" },
     ],
   },
   {
@@ -101,10 +101,10 @@ const DOORS: readonly RadioDoor[] = [
       interior: RADIO_INTERIOR,
       world: RADIO_WORLD,
     },
-    label: "Radiocentr\nVykhod",
+    label: "Радиоцентр\nВыход",
     options: [
-      { key: "street", label: "Ulica" },
-      { key: "roof", label: "Krysha" },
+      { key: "street", label: "Улица" },
+      { key: "roof", label: "Крыша" },
     ],
   },
   {
@@ -116,10 +116,10 @@ const DOORS: readonly RadioDoor[] = [
       interior: 0,
       world: STREET_WORLD,
     },
-    label: "Radiocentr\nKrysha",
+    label: "Радиоцентр\nКрыша",
     options: [
-      { key: "street", label: "Ulica" },
-      { key: "office", label: "Ofis" },
+      { key: "street", label: "Улица" },
+      { key: "office", label: "Офис" },
     ],
   },
 ];
@@ -238,7 +238,7 @@ function tickRadioDoors(): void {
 function openMenu(player: Player, door: RadioDoor): void {
   const account = getAccount(player);
   if (account?.hospitalized) {
-    deny(player, "Vam nuzhno lechenie. Zanimite koyku: /hospital.");
+    deny(player, "Вам нужно лечение. Займите койку: /hospital.");
     return;
   }
 
@@ -253,21 +253,21 @@ function openMenu(player: Player, door: RadioDoor): void {
       player,
       RADIO_DOOR_DIALOG_ID,
       DIALOG_STYLE_LIST,
-      "Radiocentr",
+      "Радиоцентр",
       door.options.map((option) => option.label).join("\n"),
-      "Vybrat'",
-      "Otmena"
+      "Выбрать",
+      "Отмена"
     );
   } catch {
     pending.delete(id);
-    deny(player, "Ne udalos' otkryt' menu.");
+    deny(player, "Не удалось открыть меню.");
   }
 }
 
 function tryUse(player: Player, destKey: "office" | "street" | "roof"): void {
   const account = getAccount(player);
   if (account?.hospitalized) {
-    deny(player, "Vam nuzhno lechenie. Zanimite koyku: /hospital.");
+    deny(player, "Вам нужно лечение. Займите койку: /hospital.");
     return;
   }
 

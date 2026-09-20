@@ -154,7 +154,7 @@ function sendToSides(current: CaptureState, color: number, text: string): void {
 }
 
 function scoreLine(orgId: number, kills: number): string {
-  const name = getOrganization(orgId)?.name ?? "Banda";
+  const name = getOrganization(orgId)?.name ?? "Банда";
   return `${name}: ~r~${kills}`;
 }
 
@@ -287,8 +287,8 @@ async function finishCapture(current: CaptureState): Promise<void> {
   clearInterval(current.timer);
 
   const turf = getTurf(current.zoneId);
-  const attackerName = getOrganization(current.attackerId)?.name ?? "Banda";
-  const defenderName = getOrganization(current.defenderId)?.name ?? "Banda";
+  const attackerName = getOrganization(current.attackerId)?.name ?? "Банда";
+  const defenderName = getOrganization(current.defenderId)?.name ?? "Банда";
   let transferred = false;
 
   try {
@@ -308,18 +308,18 @@ async function finishCapture(current: CaptureState): Promise<void> {
       sendToSides(
         current,
         NEWS_COLOR,
-        `${attackerName} zahvatili territoriyu u bandy ${defenderName} v rayone ${current.district}`
+        `${attackerName} захватили территорию у банды ${defenderName} в районе ${current.district}`
       );
     } else {
       sendToSides(
         current,
         NEWS_COLOR,
-        `Popytka ${attackerName} zahvatit' territoriyu u ${defenderName} provalilas'`
+        `Попытка ${attackerName} захватить территорию у ${defenderName} провалилась`
       );
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    omp.log(`[${SERVER_TAG}] kapt: ${message}`);
+    omp.log(`[${SERVER_TAG}] капт: ${message}`);
     if (!transferred && turf) {
       restoreTurf(turf);
     }
@@ -354,8 +354,8 @@ function beginCapture(
 ): void {
   const gen = ++generation;
   const district = districtNameAt((turf.minX + turf.maxX) / 2, (turf.minY + turf.maxY) / 2);
-  const attackerName = getOrganization(attackerId)?.name ?? "Banda";
-  const defenderName = getOrganization(defenderId)?.name ?? "Banda";
+  const attackerName = getOrganization(attackerId)?.name ?? "Банда";
+  const defenderName = getOrganization(defenderId)?.name ?? "Банда";
 
   const current: CaptureState = {
     gen,
@@ -380,13 +380,13 @@ function beginCapture(
   sendToSides(
     current,
     NEWS_COLOR,
-    `${attackerName} nachali zahvat territorii bandy ${defenderName} v rayone ${district}`
+    `${attackerName} начали захват территории банды ${defenderName} в районе ${district}`
   );
-  sendToGang(attackerId, GANG_HINT_COLOR, `${rankTitle} ${playerChatName(player)} iniciiroval zahvat`);
+  sendToGang(attackerId, GANG_HINT_COLOR, `${rankTitle} ${playerChatName(player)} инициировал захват`);
   sendToSides(
     current,
     GPS_HINT_COLOR,
-    "Mesto otmecheno na GPS. Otpravlyaytes' tuda i podderzhite svoyu bandu"
+    "Место отмечено на GPS. Отправляйтесь туда и поддержите свою банду"
   );
 }
 
@@ -402,12 +402,12 @@ export function tryStartCapture(player: Player): void {
   }
 
   if (membership.rank.id < CAPTURE_MIN_RANK) {
-    tell(player, 0xb4b5b7ff, "Zahvat dostupen s 8 ranga.");
+    tell(player, 0xb4b5b7ff, "Захват доступен с 8 ранга.");
     return;
   }
 
   if (ending) {
-    tell(player, 0xb4b5b7ff, "Uzhe idet zahvat odnoy iz zon. Dozhdites' okonchaniya!");
+    tell(player, 0xb4b5b7ff, "Уже идёт захват одной из зон. Дождитесь окончания!");
     return;
   }
 
@@ -416,28 +416,28 @@ export function tryStartCapture(player: Player): void {
     tell(
       player,
       0xb4b5b7ff,
-      "Vy dolzhny nakhodit'sya na territorii bandy, kotoruyu khotite zahvatit'."
+      "Вы должны находиться на территории банды, которую хотите захватить."
     );
     return;
   }
 
   if (turf.orgId === membership.org.id) {
-    tell(player, 0xb4b5b7ff, "Eta territoriya prinadlezhit vashey bande.");
+    tell(player, 0xb4b5b7ff, "Эта территория принадлежит вашей банде.");
     return;
   }
 
   if (state) {
-    tell(player, 0xb4b5b7ff, "Uzhe idet zahvat odnoy iz zon. Dozhdites' okonchaniya!");
+    tell(player, 0xb4b5b7ff, "Уже идёт захват одной из зон. Дождитесь окончания!");
     return;
   }
 
   if (turf.spawnProtected) {
-    tell(player, 0xb4b5b7ff, "Nel'zya nachat' zahvat territorii spawna bandy!");
+    tell(player, 0xb4b5b7ff, "Нельзя начать захват территории спавна банды!");
     return;
   }
 
   if (!isGangOrgId(turf.orgId)) {
-    tell(player, 0xb4b5b7ff, "Eta territoriya ne prinadlezhit bande.");
+    tell(player, 0xb4b5b7ff, "Эта территория не принадлежит банде.");
     return;
   }
 
@@ -445,7 +445,7 @@ export function tryStartCapture(player: Player): void {
     tell(
       player,
       0xb4b5b7ff,
-      "V seti net chlenov bandy, kotoraya vladeet etoy territoriey."
+      "В сети нет членов банды, которая владеет этой территорией."
     );
     return;
   }
@@ -492,7 +492,7 @@ function scoreCaptureKill(victim: Player, killer: Player): void {
 
 export function startCapture(): void {
   if (!startCaptureHud()) {
-    omp.log(`[${SERVER_TAG}] textdraw kaptov ne sozdan`);
+    omp.log(`[${SERVER_TAG}] текстрау каптов не создан`);
   }
 
   omp.on("playerDeath", (player, killer) => {

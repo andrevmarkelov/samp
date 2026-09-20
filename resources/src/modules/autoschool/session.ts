@@ -77,6 +77,6 @@ export function autoschoolExamVehicleDeny(player: Player, vehicle: Vehicle): str
   }
 
   return exam.kind === "car"
-    ? "Dlya ekzamena nuzhen avtomobil'."
-    : "Dlya ekzamena nuzhen motocikl.";
+    ? "Для экзамена нужен автомобиль."
+    : "Для экзамена нужен мотоцикл.";
 }

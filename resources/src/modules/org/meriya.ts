@@ -9,16 +9,16 @@ export const CITY_HALL_INTERIOR = 3;
 
 function meriyaRanks(): OrgRankDef[] {
   const rows: Array<{ title: string; male: number; female: number; pay: number }> = [
-    { title: "Ohrannik", male: 164, female: 141, pay: 2500 },
-    { title: "Sekretar'", male: 185, female: 141, pay: 3300 },
-    { title: "Starshiy sekretar'", male: 59, female: 141, pay: 4200 },
-    { title: "Nachal'nik ohrany", male: 165, female: 141, pay: 5300 },
-    { title: "Advokat", male: 57, female: 141, pay: 6600 },
-    { title: "Pomoschnik deputata", male: 98, female: 76, pay: 8100 },
-    { title: "Sovetnik", male: 227, female: 76, pay: 9800 },
-    { title: "Deputat", male: 187, female: 76, pay: 11800 },
-    { title: "Zam. Mera", male: 17, female: 76, pay: 14200 },
-    { title: "Mer", male: 147, female: 150, pay: 17000 },
+    { title: "Охранник", male: 164, female: 141, pay: 2500 },
+    { title: "Секретарь", male: 185, female: 141, pay: 3300 },
+    { title: "Старший секретарь", male: 59, female: 141, pay: 4200 },
+    { title: "Начальник охраны", male: 165, female: 141, pay: 5300 },
+    { title: "Адвокат", male: 57, female: 141, pay: 6600 },
+    { title: "Помощник депутата", male: 98, female: 76, pay: 8100 },
+    { title: "Советник", male: 227, female: 76, pay: 9800 },
+    { title: "Депутат", male: 187, female: 76, pay: 11800 },
+    { title: "Зам. Мэра", male: 17, female: 76, pay: 14200 },
+    { title: "Мэр", male: 147, female: 150, pay: 17000 },
   ];
 
   return rows.map((row, index) => ({
@@ -31,7 +31,7 @@ function meriyaRanks(): OrgRankDef[] {
 
 export const MERIYA: OrganizationDef = {
   id: ORG_MERIYA_ID,
-  name: "Meriya",
+  name: "Мэрия",
   color: MERIYA_COLOR,
   gov: true,
   illegal: false,
@@ -47,5 +47,5 @@ export const MERIYA: OrganizationDef = {
 };
 
 if (MERIYA.ranks.length !== MAX_ORG_RANK) {
-  throw new Error("Meriya: nuzhno 10 rangov");
+  throw new Error("Мэрия: нужно 10 рангов");
 }

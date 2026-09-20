@@ -30,7 +30,7 @@ function kickSoon(player: Player): void {
 export function bindAdminKick(): void {
   registerCommand(
     "kick",
-    "Kiknut' igroka",
+    "Кикнуть игрока",
     (player, args) => {
       if (!canUseKick(player)) {
         return;
@@ -47,7 +47,7 @@ export function bindAdminKick(): void {
       if (!idPart) {
         player.sendClientMessage(
           Color.error,
-          "Ispol'zovanie: /kick [id] [prichina (ne obyazatel'no)]"
+          "Использование: /kick [id] [причина (не обязательно)]"
         );
         return;
       }
@@ -56,32 +56,32 @@ export function bindAdminKick(): void {
       if (!Number.isInteger(slot) || slot < 0) {
         player.sendClientMessage(
           Color.error,
-          "Ispol'zovanie: /kick [id] [prichina (ne obyazatel'no)]"
+          "Использование: /kick [id] [причина (не обязательно)]"
         );
         return;
       }
 
       const target = omp.players.at(slot);
       if (!target || !isPlayerActive(target)) {
-        player.sendClientMessage(Color.error, "Igrok ne nayden.");
+        player.sendClientMessage(Color.error, "Игрок не найден.");
         return;
       }
 
       try {
         if (target.isNPC()) {
-          player.sendClientMessage(Color.error, "Igrok ne nayden.");
+          player.sendClientMessage(Color.error, "Игрок не найден.");
           return;
         }
       } catch {
-        player.sendClientMessage(Color.error, "Igrok ne nayden.");
+        player.sendClientMessage(Color.error, "Игрок не найден.");
         return;
       }
 
       const adminTag = playerChatName(player);
       const targetTag = playerChatName(target);
       const line = reason
-        ? `Administrator ${adminTag} kiknul igroka ${targetTag}. Prichina: ${reason}.`
-        : `Administrator ${adminTag} kiknul igroka ${targetTag}.`;
+        ? `Администратор ${adminTag} кикнул игрока ${targetTag}. Причина: ${reason}.`
+        : `Администратор ${adminTag} кикнул игрока ${targetTag}.`;
       broadcastAll(Color.error, line);
       kickSoon(target);
     },

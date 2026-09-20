@@ -17,7 +17,7 @@ const MAX_ARMOR = 100;
 const WEAPON_NIGHTSTICK = 3;
 const WEAPON_DEAGLE = 24;
 const DEAGLE_AMMO = 50;
-const DENY = "Vy ne sostoite v merii.";
+const DENY = "Вы не состоите в мэрии.";
 
 const POINT = {
   x: 357.6911,
@@ -30,7 +30,7 @@ const inside = new Set<number>();
 export function bindMeriyaLocker(): void {
   new Pickup(PICKUP_MODEL, PICKUP_TYPE, POINT.x, POINT.y, POINT.z, STREET_WORLD);
   new TextLabel(
-    "Sklad merii\nBronya, dubinka, Deagle",
+    "Склад мэрии\nБроня, дубинка, Deagle",
     Color.info,
     POINT.x,
     POINT.y,
@@ -100,7 +100,7 @@ function tryTake(player: Player): void {
   }
 
   if (account.hospitalized) {
-    tell(player, Color.error, "Snachala proydite lechenie v bolnice.");
+    tell(player, Color.error, "Сначала пройдите лечение в больнице.");
     return;
   }
 
@@ -115,11 +115,11 @@ function tryTake(player: Player): void {
     player.giveWeapon(WEAPON_NIGHTSTICK, 1);
     player.giveWeapon(WEAPON_DEAGLE, DEAGLE_AMMO);
   } catch {
-    tell(player, Color.error, "Ne udalos' vydat' snaryazhenie.");
+    tell(player, Color.error, "Не удалось выдать снаряжение.");
     return;
   }
 
-  tell(player, Color.info, "Vy vzyali bronzhilet, dubinku i Desert Eagle.");
+  tell(player, Color.info, "Вы взяли бронежилет, дубинку и Desert Eagle.");
 }
 
 function tell(player: Player, color: number, text: string): void {

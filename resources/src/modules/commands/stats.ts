@@ -13,14 +13,14 @@ const TITLE = "{FFCC00}";
 const LABEL = "{FFFFFF}";
 const VALUE = "{33CCFF}";
 
-registerCommand("stats", "Statistika personazha", (player) => {
+registerCommand("stats", "Статистика персонажа", (player) => {
   showStatsDialog(player);
 });
 
 export function showStatsDialog(player: Player): void {
   const account = getAccount(player);
   if (!account) {
-    player.sendClientMessage(Color.error, "Snachala voydi v akkaunt.");
+    player.sendClientMessage(Color.error, "Сначала войди в аккаунт.");
     return;
   }
 
@@ -37,22 +37,22 @@ export function showStatsDialog(player: Player): void {
   const membership = getMembership(account);
   const rank = membership
     ? `${membership.rank.title} (${membership.rank.id})`
-    : "Net";
+    : "Нет";
   const body = [
-    statsRow("Imya", account.name),
-    statsRow("Pol", genderLabel(account.gender)),
-    statsRow("Uroven'", String(account.level)),
-    statsRow("Opyt", `${account.exp}/${expForNextLevel(account.level)}`),
-    statsRow("Zakonoposlushnost'", String(account.lawfulness)),
-    statsRow("Skin", String(resolvePlayerSkin(account))),
-    statsRow("Data rozhdeniya", formatBirthDate(account.birthDate)),
-    statsRow("Pochta", account.email),
-    statsRow("Den'gi", `$${account.money}`),
-    statsRow("Bank", `$${account.bank}`),
-    statsRow("Donat-schet", String(account.donate)),
-    statsRow("Zdorov'e", String(health)),
-    statsRow("Organizaciya", membership?.org.name ?? "Net"),
-    statsRow("Dolzhnost'", rank),
+    statsRow("Имя", account.name),
+    statsRow("Пол", genderLabel(account.gender)),
+    statsRow("Уровень", String(account.level)),
+    statsRow("Опыт", `${account.exp}/${expForNextLevel(account.level)}`),
+    statsRow("Законопослушность", String(account.lawfulness)),
+    statsRow("Скин", String(resolvePlayerSkin(account))),
+    statsRow("Дата рождения", formatBirthDate(account.birthDate)),
+    statsRow("Почта", account.email),
+    statsRow("Деньги", `$${account.money}`),
+    statsRow("Банк", `$${account.bank}`),
+    statsRow("Донат-счёт", String(account.donate)),
+    statsRow("Здоровье", String(health)),
+    statsRow("Организация", membership?.org.name ?? "Нет"),
+    statsRow("Должность", rank),
   ].join("\n");
 
   try {
@@ -60,13 +60,13 @@ export function showStatsDialog(player: Player): void {
       player,
       STATS_DIALOG_ID,
       DIALOG_STYLE_MSGBOX,
-      `${TITLE}Statistika ${account.name}`,
+      `${TITLE}Статистика ${account.name}`,
       body,
-      "Zakryt'",
+      "Закрыть",
       ""
     );
   } catch {
-    player.sendClientMessage(Color.error, "Ne udalos' otkryt' statistiku.");
+    player.sendClientMessage(Color.error, "Не удалось открыть статистику.");
   }
 }
 

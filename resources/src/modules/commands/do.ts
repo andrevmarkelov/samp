@@ -3,10 +3,10 @@ import { CHAT_MAX_LENGTH, CHAT_RADIUS, sanitizeChatText, sendNearby } from "../.
 import { playerName } from "../../shared/player";
 import { registerCommand } from "./registry";
 
-registerCommand("do", "Obstanovka ili sobytie ryadom", (player, args) => {
+registerCommand("do", "Обстановка или событие рядом", (player, args) => {
   const text = sanitizeChatText(args.trim()).slice(0, CHAT_MAX_LENGTH);
   if (!text) {
-    player.sendClientMessage(Color.error, "Ispol'zovanie: /do [opisanie]");
+    player.sendClientMessage(Color.error, "Использование: /do [описание]");
     return;
   }
 

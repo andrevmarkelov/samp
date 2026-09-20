@@ -70,7 +70,7 @@ function payPlayer(player: Player, clock: string): void {
   const need = expForNextLevel(next.level);
   playPaydaySound(player);
   tell(player, Color.info, clock);
-  tell(player, Color.white, `Ochki opyta ${next.exp}/${need}`);
+  tell(player, Color.white, `Очки опыта ${next.exp}/${need}`);
 
   const salary = orgPaydayPay(account);
   if (salary) {
@@ -85,8 +85,8 @@ function payPlayer(player: Player, clock: string): void {
       player,
       Color.tryOk,
       credited > 0
-        ? `Zarplata ${salary.orgName} (${salary.rankTitle}): $${credited} na bankovskiy schet.`
-        : `Zarplata ne nachislena: bankovskiy schet zapolnen.`
+        ? `Зарплата ${salary.orgName} (${salary.rankTitle}): $${credited} на банковский счёт.`
+        : `Зарплата не начислена: банковский счёт заполнен.`
     );
   }
 
@@ -94,7 +94,7 @@ function payPlayer(player: Player, clock: string): void {
     tell(
       player,
       Color.tryOk,
-      `Pozdravlyaem, vash igrovoy uroven' byl povyshen do ${next.level}.`
+      `Поздравляем, ваш игровой уровень был повышен до ${next.level}.`
     );
   }
 }

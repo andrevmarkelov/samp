@@ -9,16 +9,16 @@ const FEMALE_SKIN = 170;
 
 function hospitalRanks(): OrgRankDef[] {
   const rows: Array<{ title: string; male: number; pay: number }> = [
-    { title: "Intern", male: 274, pay: 1800 },
-    { title: "Mladshiy med. rabotnik", male: 274, pay: 2300 },
-    { title: "Starshiy med. rabotnik", male: 70, pay: 2900 },
-    { title: "Vrach-uchastkovyy", male: 71, pay: 3600 },
-    { title: "Terapevt", male: 71, pay: 4400 },
-    { title: "Hirurg", male: 276, pay: 5400 },
-    { title: "Zaveduyuschiy otdeleniem", male: 275, pay: 6500 },
-    { title: "Starshiy ordinator", male: 275, pay: 7700 },
-    { title: "Zamestitel' glavnogo vracha", male: 70, pay: 9000 },
-    { title: "Glavnyy vrach", male: 70, pay: 10800 },
+    { title: "Интерн", male: 274, pay: 1800 },
+    { title: "Младший мед. работник", male: 274, pay: 2300 },
+    { title: "Старший мед. работник", male: 70, pay: 2900 },
+    { title: "Врач-участковый", male: 71, pay: 3600 },
+    { title: "Терапевт", male: 71, pay: 4400 },
+    { title: "Хирург", male: 276, pay: 5400 },
+    { title: "Заведующий отделением", male: 275, pay: 6500 },
+    { title: "Старший ординатор", male: 275, pay: 7700 },
+    { title: "Заместитель главного врача", male: 70, pay: 9000 },
+    { title: "Главный врач", male: 70, pay: 10800 },
   ];
 
   return rows.map((row, index) => ({
@@ -31,7 +31,7 @@ function hospitalRanks(): OrgRankDef[] {
 
 export const HOSPITAL: OrganizationDef = {
   id: ORG_HOSPITAL_ID,
-  name: "Bol'nica",
+  name: "Больница",
   color: HOSPITAL_COLOR,
   gov: true,
   illegal: false,
@@ -47,7 +47,7 @@ export const HOSPITAL: OrganizationDef = {
 };
 
 if (HOSPITAL.ranks.length !== MAX_ORG_RANK) {
-  throw new Error("Bol'nica: nuzhno 10 rangov");
+  throw new Error("Больница: нужно 10 рангов");
 }
 
 export const HOSPITAL_GATES: OrgGateDef[] = [
@@ -62,6 +62,6 @@ export const HOSPITAL_GATES: OrgGateDef[] = [
     ry: 0,
     rz: 0,
     radius: 14,
-    denyMessage: "Vy ne sostoite v bol'nice.",
+    denyMessage: "Вы не состоите в больнице.",
   },
 ];

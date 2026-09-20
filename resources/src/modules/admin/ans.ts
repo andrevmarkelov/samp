@@ -70,7 +70,7 @@ function playAnswerSound(player: Player): void {
 export function bindAdminAns(): void {
   registerCommand(
     "ans",
-    "Otvetit' igroku",
+    "Ответить игроку",
     (player, args) => {
       if (!hasAdminAccess(player, 1)) {
         return;
@@ -85,25 +85,25 @@ export function bindAdminAns(): void {
       );
 
       if (!idPart || !text) {
-        player.sendClientMessage(Color.error, "Ispol'zovanie: /ans [id] [tekst]");
+        player.sendClientMessage(Color.error, "Использование: /ans [id] [текст]");
         return;
       }
 
       const slot = Number(idPart);
       if (!Number.isInteger(slot) || slot < 0) {
-        player.sendClientMessage(Color.error, "Ispol'zovanie: /ans [id] [tekst]");
+        player.sendClientMessage(Color.error, "Использование: /ans [id] [текст]");
         return;
       }
 
       const target = findTarget(slot);
       if (!target) {
-        player.sendClientMessage(Color.error, "Igrok ne nayden.");
+        player.sendClientMessage(Color.error, "Игрок не найден.");
         return;
       }
 
-      const verb = byGender(getGender(player), "otvetil", "otvetila");
+      const verb = byGender(getGender(player), "ответил", "ответила");
       const line = clipClientMessage(
-        `[A] Administrator ${playerChatName(player)} ${verb} igroku ${playerChatName(target)}: ${text}`
+        `[A] Администратор ${playerChatName(player)} ${verb} игроку ${playerChatName(target)}: ${text}`
       );
       sendAnswer(line, target);
     },

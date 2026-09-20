@@ -21,13 +21,13 @@ const DIALOG_STYLE_LIST = 2;
 type MenuKey = "stats" | "rules" | "report" | "invite";
 
 const MENU_ITEMS: Record<MenuKey, string> = {
-  stats: "Statistika",
-  rules: "Pravila servera",
-  report: "Svyaz' s administraciey",
-  invite: "Kto priglasil",
+  stats: "Статистика",
+  rules: "Правила сервера",
+  report: "Связь с администрацией",
+  invite: "Кто пригласил",
 };
 
-registerCommand("mn", "Menyu: statistika, pravila i svyaz' s administraciey", (player) => {
+registerCommand("mn", "Меню: статистика, правила и связь с администрацией", (player) => {
   showMenu(player);
 });
 
@@ -94,13 +94,13 @@ function showMenu(player: Player): void {
       player,
       MENU_DIALOG_ID,
       DIALOG_STYLE_LIST,
-      "Menyu",
+      "Меню",
       body,
-      "Vybrat'",
-      "Zakryt'"
+      "Выбрать",
+      "Закрыть"
     );
   } catch {
-    player.sendClientMessage(Color.error, "Ne udalos' otkryt' menyu.");
+    player.sendClientMessage(Color.error, "Не удалось открыть меню.");
   }
 }
 
@@ -112,11 +112,11 @@ function showRulesDialog(player: Player): void {
       DIALOG_STYLE_MSGBOX,
       RULES_TITLE,
       SERVER_RULES,
-      "Zakryt'",
+      "Закрыть",
       ""
     );
   } catch {
-    player.sendClientMessage(Color.error, "Ne udalos' otkryt' pravila.");
+    player.sendClientMessage(Color.error, "Не удалось открыть правила.");
   }
 }
 
@@ -132,13 +132,13 @@ function showInviteDialog(player: Player, error?: string): void {
       player,
       INVITE_DIALOG_ID,
       DIALOG_STYLE_INPUT,
-      "Kto priglasil",
-      `${prefix}Vvedi nik igroka, kotoryy tebya priglasil.\nFormat: Name_Surname`,
-      "Sokhranit'",
-      "Otmena"
+      "Кто пригласил",
+      `${prefix}Введи ник игрока, который тебя пригласил.\nФормат: Name_Surname`,
+      "Сохранить",
+      "Отмена"
     );
   } catch {
-    player.sendClientMessage(Color.error, "Ne udalos' otkryt' formu.");
+    player.sendClientMessage(Color.error, "Не удалось открыть форму.");
   }
 }
 
@@ -162,23 +162,23 @@ async function submitInvite(player: Player, raw: string): Promise<void> {
   }
 
   if (account.invitedBy) {
-    player.sendClientMessage(Color.gray, "Priglasivshiy uzhe ukazan.");
+    player.sendClientMessage(Color.gray, "Пригласивший уже указан.");
     return;
   }
 
   const nick = raw.trim();
   if (!nick) {
-    showInviteDialog(player, "Vvedi nik.");
+    showInviteDialog(player, "Введи ник.");
     return;
   }
 
   if (!isRoleplayName(nick)) {
-    showInviteDialog(player, "Nik v formate Name_Surname.");
+    showInviteDialog(player, "Ник в формате Name_Surname.");
     return;
   }
 
   if (nick.toLowerCase() === account.name.toLowerCase()) {
-    showInviteDialog(player, "Nel'zya ukazat' sebya.");
+    showInviteDialog(player, "Нельзя указать себя.");
     return;
   }
 
@@ -194,7 +194,7 @@ async function submitInvite(player: Player, raw: string): Promise<void> {
     }
 
     if (!row) {
-      showInviteDialog(player, "Takoy nik ne zaregistrirovan.");
+      showInviteDialog(player, "Такой ник не зарегистрирован.");
       return;
     }
 
@@ -204,22 +204,22 @@ async function submitInvite(player: Player, raw: string): Promise<void> {
     }
 
     if (!saved) {
-      player.sendClientMessage(Color.gray, "Priglasivshiy uzhe ukazan.");
+      player.sendClientMessage(Color.gray, "Пригласивший уже указан.");
       return;
     }
 
     patchAccount(player, { invitedBy: row.name });
     player.sendClientMessage(
       Color.info,
-      `Priglasivshiy sokhranen: ${row.name}.`
+      `Пригласивший сохранён: ${row.name}.`
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    omp.log(`[${SERVER_TAG}] oshibka referalki ${account.name}: ${message}`);
+    omp.log(`[${SERVER_TAG}] ошибка рефералки ${account.name}: ${message}`);
     if (isPlayerActive(player)) {
       player.sendClientMessage(
         Color.error,
-        "Ne udalos' sokhranit'. Poprobuy pozhe."
+        "Не удалось сохранить. Попробуй позже."
       );
     }
   }

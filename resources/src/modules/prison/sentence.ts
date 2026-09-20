@@ -23,7 +23,7 @@ import {
 
 const SAVE_EVERY_MS = 30_000;
 const TICK_MS = 1000;
-const INMATE_DENY = "Vy otbyvaete srok. Etot vykhod zakryt.";
+const INMATE_DENY = "Вы отбываете срок. Этот выход закрыт.";
 
 const CELLS: readonly SpawnPoint[] = [
   { x: -86.0985, y: 2444.3215, z: 1179.3195, angle: 179.9293, interior: 0, world: PRISON_WORLD },
@@ -137,7 +137,7 @@ export async function applyJail(player: Player, minutes: number): Promise<boolea
 
   placeInJail(player);
   applyOrgVisuals(player);
-  tell(player, Color.error, `Vas posadili v tyur'mu. Srok: ${minutes} min.`);
+  tell(player, Color.error, `Вас посадили в тюрьму. Срок: ${minutes} мин.`);
   return true;
 }
 
@@ -164,7 +164,7 @@ export async function applyUnjail(player: Player): Promise<boolean> {
 
   placeAtSpawn(player, resolveOrgSpawn(account) ?? DEFAULT_SPAWN);
   applyOrgVisuals(player);
-  tell(player, Color.info, "Vas vypustili iz tyur'my.");
+  tell(player, Color.info, "Вас выпустили из тюрьмы.");
   return true;
 }
 
@@ -240,7 +240,7 @@ async function releaseFromJail(player: Player): Promise<void> {
 
   placeAtSpawn(player, FREEDOM);
   applyOrgVisuals(player);
-  tell(player, Color.info, "Vy otsideli srok i vyshli na svobodu.");
+  tell(player, Color.info, "Вы отсидели срок и вышли на свободу.");
 }
 
 function confineInmate(player: Player): void {

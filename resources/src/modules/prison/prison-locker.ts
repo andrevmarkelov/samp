@@ -17,7 +17,7 @@ const TICK_MS = 200;
 const LABEL_HEIGHT = 0.85;
 const LABEL_DRAW_DISTANCE = 12;
 const MAX_ARMOR = 100;
-const DENY = "Otkryt' mogut sotrudniki LSPD, oblastnoy policii i FBI.";
+const DENY = "Открыть могут сотрудники LSPD, областной полиции и FBI.";
 
 const POINT = {
   x: -100.0232,
@@ -33,8 +33,8 @@ type LockerItem = {
 };
 
 const ITEMS: readonly LockerItem[] = [
-  { label: "Bronzhilet", kind: "armor", id: 0 },
-  { label: "Dubinka", kind: "weapon", id: 3, ammo: 1 },
+  { label: "Бронежилет", kind: "armor", id: 0 },
+  { label: "Дубинка", kind: "weapon", id: 3, ammo: 1 },
 ];
 
 const inside = new Set<number>();
@@ -42,7 +42,7 @@ const inside = new Set<number>();
 export function bindPrisonLocker(): void {
   new Pickup(PICKUP_MODEL, PICKUP_TYPE, POINT.x, POINT.y, POINT.z, PRISON_WORLD);
   new TextLabel(
-    "Oruzheynaya\nSklad tyur'my",
+    "Оружейная\nСклад тюрьмы",
     Color.info,
     POINT.x,
     POINT.y,
@@ -136,7 +136,7 @@ function canUseLocker(player: Player, tellDeny = false): boolean {
 
   if (account.hospitalized) {
     if (tellDeny) {
-      tell(player, Color.error, "Snachala proydite lechenie v bolnice.");
+      tell(player, Color.error, "Сначала пройдите лечение в больнице.");
     }
     return false;
   }
@@ -159,13 +159,13 @@ function showLocker(player: Player): void {
       player,
       PRISON_LOCKER_DIALOG_ID,
       DIALOG_STYLE_LIST,
-      "Oruzheynaya",
+      "Оружейная",
       ITEMS.map((item, index) => `${index + 1}. ${item.label}`).join("\n"),
-      "Vzyat'",
-      "Zakryt'"
+      "Взять",
+      "Закрыть"
     );
   } catch {
-    tell(player, Color.error, "Ne udalos' otkryt' sklad.");
+    tell(player, Color.error, "Не удалось открыть склад.");
   }
 }
 
@@ -183,14 +183,14 @@ function giveItem(player: Player, item: LockerItem): void {
   try {
     if (item.kind === "armor") {
       player.setArmor(MAX_ARMOR);
-      tell(player, Color.info, "Vy nadel bronzhilet.");
+      tell(player, Color.info, "Вы надели бронежилет.");
       return;
     }
 
     player.giveWeapon(item.id, item.ammo ?? 1);
-    tell(player, Color.info, `Vy vzyali: ${item.label}.`);
+    tell(player, Color.info, `Вы взяли: ${item.label}.`);
   } catch {
-    tell(player, Color.error, "Ne udalos' vydat' snaryazhenie.");
+    tell(player, Color.error, "Не удалось выдать снаряжение.");
   }
 }
 

@@ -20,7 +20,7 @@ const PICKUP_RADIUS = 1.5;
 const TICK_MS = 200;
 const LABEL_HEIGHT = 0.85;
 const LABEL_DRAW_DISTANCE = 12;
-const DENY = "Otkryt' mogut sotrudniki LSPD, oblastnoy policii i FBI.";
+const DENY = "Открыть могут сотрудники LSPD, областной полиции и FBI.";
 
 const POINT = {
   x: 1810.8636,
@@ -52,7 +52,7 @@ const DOORS: readonly PrisonDoor[] = [
       interior: 0,
       world: PRISON_WORLD,
     },
-    label: "Tyurma",
+    label: "Тюрьма",
     staffOnly: true,
   },
   {
@@ -65,7 +65,7 @@ const DOORS: readonly PrisonDoor[] = [
       interior: 0,
       world: STREET_WORLD,
     },
-    label: "Vykhod na ulicu",
+    label: "Выход на улицу",
     staffOnly: true,
   },
   {
@@ -78,7 +78,7 @@ const DOORS: readonly PrisonDoor[] = [
       interior: 0,
       world: PRISON_WORLD,
     },
-    label: "Tyuremnye kamery",
+    label: "Тюремные камеры",
     staffOnly: false,
   },
   {
@@ -91,7 +91,7 @@ const DOORS: readonly PrisonDoor[] = [
       interior: 0,
       world: PRISON_WORLD,
     },
-    label: "Vykhod\nKukhnya\nKomnata dezhurnogo\nKomnata ohrany",
+    label: "Выход\nКухня\nКомната дежурного\nКомната охраны",
     staffOnly: false,
   },
   {
@@ -104,7 +104,7 @@ const DOORS: readonly PrisonDoor[] = [
       interior: 0,
       world: PRISON_YARD_WORLD,
     },
-    label: "Tyuremnyy dvor",
+    label: "Тюремный двор",
     staffOnly: false,
     liveLabel: true,
   },
@@ -118,7 +118,7 @@ const DOORS: readonly PrisonDoor[] = [
       interior: 0,
       world: PRISON_WORLD,
     },
-    label: "Tyuremnye kamery",
+    label: "Тюремные камеры",
     staffOnly: false,
   },
   {
@@ -131,7 +131,7 @@ const DOORS: readonly PrisonDoor[] = [
       interior: 0,
       world: PRISON_WORLD,
     },
-    label: "Sportzal",
+    label: "Спортзал",
     staffOnly: false,
   },
   {
@@ -144,7 +144,7 @@ const DOORS: readonly PrisonDoor[] = [
       interior: 0,
       world: PRISON_WORLD,
     },
-    label: "Tyuremnye kamery",
+    label: "Тюремные камеры",
     staffOnly: false,
   },
   {
@@ -157,7 +157,7 @@ const DOORS: readonly PrisonDoor[] = [
       interior: 0,
       world: PRISON_WORLD,
     },
-    label: "Kukhnya",
+    label: "Кухня",
     staffOnly: false,
   },
   {
@@ -170,7 +170,7 @@ const DOORS: readonly PrisonDoor[] = [
       interior: 0,
       world: PRISON_WORLD,
     },
-    label: "Komnata dezhurnogo",
+    label: "Комната дежурного",
     staffOnly: false,
   },
   {
@@ -183,7 +183,7 @@ const DOORS: readonly PrisonDoor[] = [
       interior: 0,
       world: PRISON_WORLD,
     },
-    label: "Komnata ohrany",
+    label: "Комната охраны",
     staffOnly: true,
   },
   {
@@ -196,7 +196,7 @@ const DOORS: readonly PrisonDoor[] = [
       interior: 0,
       world: PRISON_WORLD,
     },
-    label: "Komnata dezhurnogo",
+    label: "Комната дежурного",
     staffOnly: true,
   },
 ];
@@ -311,7 +311,7 @@ function tryUse(player: Player, door: PrisonDoor): void {
   if (door.staffOnly) {
     const account = getAccount(player);
     if (account?.hospitalized) {
-      deny(player, "Vam nuzhno lechenie. Zanimite koyku: /hospital.");
+      deny(player, "Вам нужно лечение. Займите койку: /hospital.");
       return;
     }
 
@@ -324,7 +324,7 @@ function tryUse(player: Player, door: PrisonDoor): void {
   }
 
   if (door.dest.world === PRISON_YARD_WORLD && !isPrisonYardOpen()) {
-    deny(player, "Dvor zakryt.");
+    deny(player, "Двор закрыт.");
     return;
   }
 

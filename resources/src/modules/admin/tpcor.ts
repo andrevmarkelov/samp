@@ -87,7 +87,7 @@ function teleportToCoords(player: Player, x: number, y: number, z: number): bool
 export function bindAdminTpcor(): void {
   registerCommand(
     "tpcor",
-    "Teleport po koordinatam XYZ",
+    "Телепорт по координатам XYZ",
     (player, args) => {
       if (!hasAdminAccess(player, MIN_LEVEL)) {
         return;
@@ -97,24 +97,24 @@ export function bindAdminTpcor(): void {
       if (!parsed) {
         player.sendClientMessage(
           Color.error,
-          "Ispol'zovanie: /tpcor [x] [y] [z]"
+          "Использование: /tpcor [x] [y] [z]"
         );
         return;
       }
 
       if (!canTeleport(player)) {
-        player.sendClientMessage(Color.error, "Seychas nel'zya teleportirovat'sya.");
+        player.sendClientMessage(Color.error, "Сейчас нельзя телепортироваться.");
         return;
       }
 
       if (!teleportToCoords(player, parsed.x, parsed.y, parsed.z)) {
-        player.sendClientMessage(Color.error, "Ne udalos' teleportirovat'sya.");
+        player.sendClientMessage(Color.error, "Не удалось телепортироваться.");
         return;
       }
 
       player.sendClientMessage(
         Color.info,
-        `Vy teleportirovalis': ${formatCoord(parsed.x)}, ${formatCoord(parsed.y)}, ${formatCoord(parsed.z)}.`
+        `Вы телепортировались: ${formatCoord(parsed.x)}, ${formatCoord(parsed.y)}, ${formatCoord(parsed.z)}.`
       );
     },
     true

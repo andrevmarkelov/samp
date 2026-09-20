@@ -4,10 +4,10 @@ import { playerChatName } from "../../shared/player";
 import { playLocalSpeech } from "../chat/talk";
 import { registerCommand } from "./registry";
 
-registerCommand("w", "Shepnut' tem, kto stoit ryadom", (player, args) => {
+registerCommand("w", "Шепнуть тем, кто стоит рядом", (player, args) => {
   const text = sanitizeChatText(args.trim()).slice(0, CHAT_MAX_LENGTH);
   if (!text) {
-    player.sendClientMessage(Color.error, "Ispol'zovanie: /w [tekst]");
+    player.sendClientMessage(Color.error, "Использование: /w [текст]");
     return;
   }
 

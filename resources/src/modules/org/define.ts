@@ -40,7 +40,7 @@ export function defineGovOrg(
   };
 
   if (org.ranks.length !== MAX_ORG_RANK) {
-    throw new Error(`${name}: nuzhno 10 rangov`);
+    throw new Error(`${name}: нужно 10 рангов`);
   }
 
   return org;

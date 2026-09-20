@@ -14,7 +14,7 @@ const COOLDOWN_MS = 30_000;
 
 const lastReportAt = new Map<number, number>();
 
-registerCommand("report", "Svyaz' s administraciey", (player) => {
+registerCommand("report", "Связь с администрацией", (player) => {
   showReportDialog(player);
 });
 
@@ -45,7 +45,7 @@ export function showReportDialog(player: Player, error?: string): void {
   if (wait > 0 && !error) {
     player.sendClientMessage(
       Color.error,
-      `Report mozhno otpravit' cherez ${formatWait(wait)}.`
+      `Репорт можно отправить через ${formatWait(wait)}.`
     );
     return;
   }
@@ -56,13 +56,13 @@ export function showReportDialog(player: Player, error?: string): void {
       player,
       REPORT_DIALOG_ID,
       DIALOG_STYLE_INPUT,
-      "Svyaz' s administraciey",
-      `${prefix}Opishite vopros ili zhalobu.`,
-      "Otpravit'",
-      "Otmena"
+      "Связь с администрацией",
+      `${prefix}Опишите вопрос или жалобу.`,
+      "Отправить",
+      "Отмена"
     );
   } catch {
-    player.sendClientMessage(Color.error, "Ne udalos' otkryt' report.");
+    player.sendClientMessage(Color.error, "Не удалось открыть репорт.");
   }
 }
 
@@ -76,21 +76,21 @@ function sendReport(player: Player, raw: string): void {
   if (wait > 0) {
     player.sendClientMessage(
       Color.error,
-      `Report mozhno otpravit' cherez ${formatWait(wait)}.`
+      `Репорт можно отправить через ${formatWait(wait)}.`
     );
     return;
   }
 
   const text = sanitizeChatText(raw.trim()).slice(0, CHAT_MAX_LENGTH);
   if (!text) {
-    showReportDialog(player, "Vvedite tekst.");
+    showReportDialog(player, "Введите текст.");
     return;
   }
 
-  const verb = byGender(account.gender, "napisal", "napisala");
+  const verb = byGender(account.gender, "написал", "написала");
   const authorId = playerId(player);
   const authorLine = clipClientMessage(`${playerChatName(player)}: ${text}`);
-  const adminLine = clipClientMessage(`Igrok ${playerChatName(player)} ${verb}: ${text}`);
+  const adminLine = clipClientMessage(`Игрок ${playerChatName(player)} ${verb}: ${text}`);
 
   try {
     player.sendClientMessage(Color.info, authorLine);
@@ -129,5 +129,5 @@ function reportWaitMs(player: Player): number {
 
 function formatWait(ms: number): string {
   const seconds = Math.max(1, Math.ceil(ms / 1000));
-  return `${seconds} sek.`;
+  return `${seconds} сек.`;
 }

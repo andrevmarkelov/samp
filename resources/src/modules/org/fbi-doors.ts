@@ -16,7 +16,7 @@ const PICKUP_RADIUS = 1.5;
 const TICK_MS = 200;
 const LABEL_HEIGHT = 0.85;
 const LABEL_DRAW_DISTANCE = 12;
-const DENY = "Vy ne sostoite v FBI.";
+const DENY = "Вы не состоите в FBI.";
 
 type FbiDoor = {
   pickup: { x: number; y: number; z: number; interior: number };
@@ -36,7 +36,7 @@ const DOORS: readonly FbiDoor[] = [
       interior: FBI_INTERIOR,
       world: STREET_WORLD,
     },
-    label: "FBI\nSluzhebnyy vkhod",
+    label: "FBI\nСлужебный вход",
     staffOnly: true,
   },
   {
@@ -49,7 +49,7 @@ const DOORS: readonly FbiDoor[] = [
       interior: 0,
       world: STREET_WORLD,
     },
-    label: "Vykhod na ulicu",
+    label: "Выход на улицу",
     staffOnly: true,
   },
 ];
@@ -126,7 +126,7 @@ function tryUse(player: Player, door: FbiDoor): void {
   if (door.staffOnly) {
     const account = getAccount(player);
     if (account?.hospitalized) {
-      deny(player, "Vam nuzhno lechenie. Zanimite koyku: /hospital.");
+      deny(player, "Вам нужно лечение. Займите койку: /hospital.");
       return;
     }
 

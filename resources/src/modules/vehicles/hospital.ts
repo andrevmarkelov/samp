@@ -4,7 +4,7 @@ import { registerOrgVehicle } from "./access";
 import { createServerVehicle } from "./spawn";
 
 const RESPAWN_SEC = 100;
-const DENY = "Vy ne sostoite v bol'nice.";
+const DENY = "Вы не состоите в больнице.";
 
 const HOSPITAL_VEHICLES: ReadonlyArray<{
   model: number;

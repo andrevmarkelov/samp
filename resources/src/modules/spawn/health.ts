@@ -32,7 +32,7 @@ export function startSpawnHealthPickup(): void {
   try {
     new Pickup(HEART_PICKUP, PICKUP_TYPE, POINT.x, POINT.y, POINT.z, STREET_WORLD);
     new TextLabel(
-      "Zdorov'e",
+      "Здоровье",
       Color.info,
       POINT.x,
       POINT.y,
@@ -89,12 +89,12 @@ function tryHeal(player: Player): void {
   }
 
   if (account.hospitalized) {
-    tell(player, Color.error, "Snachala proydite lechenie v bolnice.");
+    tell(player, Color.error, "Сначала пройдите лечение в больнице.");
     return;
   }
 
   if (account.level > MAX_FREE_LEVEL) {
-    tell(player, Color.error, "Etot punkt pomoschi dostupen do 5 urovnya.");
+    tell(player, Color.error, "Этот пункт помощи доступен до 5 уровня.");
     return;
   }
 
@@ -114,7 +114,7 @@ function tryHeal(player: Player): void {
 
   applyHealth(player, MAX_HEALTH);
   patchAccount(player, { health: MAX_HEALTH });
-  tell(player, Color.info, "Zdorov'e vosstanovleno.");
+  tell(player, Color.info, "Здоровье восстановлено.");
 }
 
 function tell(player: Player, color: number, text: string): void {

@@ -10,7 +10,7 @@ const MIN_ADMIN_LEVEL = 5;
 
 function usageLines(): string[] {
   return [
-    "Ispol'zovanie: /gzcolor [id]",
+    "Использование: /gzcolor [id]",
     ...GANGS.map((gang) => `${gang.id} — ${gang.name}`),
   ];
 }
@@ -32,7 +32,7 @@ function parseGangId(args: string): number | null {
 export function bindAdminGzcolor(): void {
   registerCommand(
     "gzcolor",
-    "Smenit' vladel'ca gangzony",
+    "Сменить владельца гангзоны",
     (player, args) => {
       if (!hasAdminAccess(player, MIN_ADMIN_LEVEL)) {
         return;
@@ -50,18 +50,18 @@ export function bindAdminGzcolor(): void {
       if (!turf) {
         player.sendClientMessage(
           Color.error,
-          "Vstan'te na gangzonu, kotoruyu khotite izmenit'."
+          "Встаньте на гангзону, которую хотите изменить."
         );
         return;
       }
 
       if (turf.orgId === orgId) {
-        player.sendClientMessage(Color.error, "Eta territoriya uzhe prinadlezhit etoy bande.");
+        player.sendClientMessage(Color.error, "Эта территория уже принадлежит этой банде.");
         return;
       }
 
       if (isZoneUnderCapture(turf.id)) {
-        player.sendClientMessage(Color.error, "Nel'zya smenit' vladel'ca vo vremya kapta.");
+        player.sendClientMessage(Color.error, "Нельзя сменить владельца во время капта.");
         return;
       }
 
@@ -79,11 +79,11 @@ async function applyOwner(
 ): Promise<void> {
   const saved = await setGangZoneOwner(zoneId, orgId);
   if (!saved) {
-    admin.sendClientMessage(Color.error, "Ne udalos' sohranit' vladel'ca zony.");
+    admin.sendClientMessage(Color.error, "Не удалось сохранить владельца зоны.");
     return;
   }
 
-  const nextName = getOrganization(orgId)?.name ?? "bande";
-  const prevName = getOrganization(previousOrgId)?.name ?? "nikomu";
-  admin.sendClientMessage(Color.info, `Zona #${zoneId}: ${prevName} → ${nextName}.`);
+  const nextName = getOrganization(orgId)?.name ?? "банде";
+  const prevName = getOrganization(previousOrgId)?.name ?? "никому";
+  admin.sendClientMessage(Color.info, `Зона #${zoneId}: ${prevName} → ${nextName}.`);
 }

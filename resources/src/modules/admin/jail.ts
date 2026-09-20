@@ -68,7 +68,7 @@ function broadcastAll(color: number, text: string): void {
 export function bindAdminJail(): void {
   registerCommand(
     "jail",
-    "Posadit' igroka v tyur'mu",
+    "Посадить игрока в тюрьму",
     (player, args) => {
       if (!hasAdminAccess(player, MIN_LEVEL)) {
         return;
@@ -78,30 +78,30 @@ export function bindAdminJail(): void {
       if (!parsed) {
         player.sendClientMessage(
           Color.error,
-          "Ispol'zovanie: /jail [id] [minuty] [prichina (ne obyazatel'no)]"
+          "Использование: /jail [id] [минуты] [причина (не обязательно)]"
         );
         return;
       }
 
       const target = findTarget(parsed.slot);
       if (!target) {
-        player.sendClientMessage(Color.error, "Igrok ne nayden.");
+        player.sendClientMessage(Color.error, "Игрок не найден.");
         return;
       }
 
       const account = getAccount(target);
       if (!account) {
-        player.sendClientMessage(Color.error, "Igrok ne nayden.");
+        player.sendClientMessage(Color.error, "Игрок не найден.");
         return;
       }
 
       if (isJailed(target)) {
-        player.sendClientMessage(Color.error, "Igrok uzhe v tyur'me.");
+        player.sendClientMessage(Color.error, "Игрок уже в тюрьме.");
         return;
       }
 
       if (account.adminLevel >= 1) {
-        player.sendClientMessage(Color.error, "Nel'zya posadit' administratora.");
+        player.sendClientMessage(Color.error, "Нельзя посадить администратора.");
         return;
       }
 
@@ -112,7 +112,7 @@ export function bindAdminJail(): void {
 
   registerCommand(
     "unjail",
-    "Vypustit' igroka iz tyur'my",
+    "Выпустить игрока из тюрьмы",
     (player, args) => {
       if (!hasAdminAccess(player, MIN_LEVEL)) {
         return;
@@ -121,24 +121,24 @@ export function bindAdminJail(): void {
       const raw = args.trim();
       const slot = Number(raw);
       if (!raw || !Number.isInteger(slot) || slot < 0) {
-        player.sendClientMessage(Color.error, "Ispol'zovanie: /unjail [id]");
+        player.sendClientMessage(Color.error, "Использование: /unjail [id]");
         return;
       }
 
       const target = findTarget(slot);
       if (!target) {
-        player.sendClientMessage(Color.error, "Igrok ne nayden.");
+        player.sendClientMessage(Color.error, "Игрок не найден.");
         return;
       }
 
       const account = getAccount(target);
       if (!account) {
-        player.sendClientMessage(Color.error, "Igrok ne nayden.");
+        player.sendClientMessage(Color.error, "Игрок не найден.");
         return;
       }
 
       if (!isJailed(target)) {
-        player.sendClientMessage(Color.error, "Igrok ne v tyur'me.");
+        player.sendClientMessage(Color.error, "Игрок не в тюрьме.");
         return;
       }
 
@@ -156,22 +156,22 @@ async function applyAndAnnounce(
 ): Promise<void> {
   const ok = await applyJail(target, minutes);
   if (!ok) {
-    admin.sendClientMessage(Color.error, "Ne udalos' posadit' igroka.");
+    admin.sendClientMessage(Color.error, "Не удалось посадить игрока.");
     return;
   }
 
   const adminTag = playerChatName(admin);
   const targetTag = playerChatName(target);
   const line = reason
-    ? `Administrator ${adminTag} posadil igroka ${targetTag} v tyur'mu na ${minutes} min. Prichina: ${reason}.`
-    : `Administrator ${adminTag} posadil igroka ${targetTag} v tyur'mu na ${minutes} min.`;
+    ? `Администратор ${adminTag} посадил игрока ${targetTag} в тюрьму на ${minutes} мин. Причина: ${reason}.`
+    : `Администратор ${adminTag} посадил игрока ${targetTag} в тюрьму на ${minutes} мин.`;
   broadcastAll(Color.error, line);
 }
 
 async function applyUnjailAndAnnounce(admin: Player, target: Player): Promise<void> {
   const ok = await applyUnjail(target);
   if (!ok) {
-    admin.sendClientMessage(Color.error, "Ne udalos' vypustit' igroka.");
+    admin.sendClientMessage(Color.error, "Не удалось выпустить игрока.");
     return;
   }
 
@@ -179,6 +179,6 @@ async function applyUnjailAndAnnounce(admin: Player, target: Player): Promise<vo
   const targetTag = playerChatName(target);
   broadcastAll(
     Color.error,
-    `Administrator ${adminTag} vypustil igroka ${targetTag} iz tyur'my.`
+    `Администратор ${adminTag} выпустил игрока ${targetTag} из тюрьмы.`
   );
 }

@@ -18,20 +18,20 @@ type WatchLabel = {
 
 const labels = new Map<number, WatchLabel>();
 
-registerCommand("time", "Posmotret' vremya, mut i srok", (player) => {
+registerCommand("time", "Посмотреть время, мут и срок", (player) => {
   const account = getAccount(player);
   if (!account) {
-    player.sendClientMessage(Color.error, "Snachala voydi v akkaunt.");
+    player.sendClientMessage(Color.error, "Сначала войди в аккаунт.");
     return;
   }
 
-  player.sendClientMessage(Color.info, `Vremya: ${formatClock()}.`);
+  player.sendClientMessage(Color.info, `Время: ${formatClock()}.`);
 
   const muteLeft = remainingMuteMs(player);
   if (muteLeft !== null) {
     player.sendClientMessage(
       Color.error,
-      `U vas mut. Ostalos': ${formatMuteLeft(muteLeft)}.`
+      `У вас мут. Осталось: ${formatMuteLeft(muteLeft)}.`
     );
   }
 
@@ -39,12 +39,12 @@ registerCommand("time", "Posmotret' vremya, mut i srok", (player) => {
     const left = getAccount(player)?.jailSeconds ?? 0;
     player.sendClientMessage(
       Color.error,
-      `Vy v tyur'me. Ostalos': ${formatMuteLeft(left * 1000)}.`
+      `Вы в тюрьме. Осталось: ${formatMuteLeft(left * 1000)}.`
     );
   }
 
-  const verb = byGender(account.gender, "Posmotrel", "Posmotrela");
-  showWatchLabel(player, `${verb} na chasy.`);
+  const verb = byGender(account.gender, "Посмотрел", "Посмотрела");
+  showWatchLabel(player, `${verb} на часы.`);
 });
 
 export function bindTimeLabels(): void {

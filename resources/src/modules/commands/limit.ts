@@ -11,22 +11,22 @@ import {
 
 const PLAYER_STATE_DRIVER = 2;
 
-registerCommand("limit", "Ogranichitel' skorosti mashiny", (player, args) => {
+registerCommand("limit", "Ограничитель скорости машины", (player, args) => {
   let vehicle;
   try {
     if (player.getState() !== PLAYER_STATE_DRIVER) {
-      player.sendClientMessage(Color.error, "Vy dolzhny byt' za rulem.");
+      player.sendClientMessage(Color.error, "Вы должны быть за рулём.");
       return;
     }
 
     vehicle = omp.vehicles.at(player.getVehicleID());
   } catch {
-    player.sendClientMessage(Color.error, "Vy dolzhny byt' za rulem.");
+    player.sendClientMessage(Color.error, "Вы должны быть за рулём.");
     return;
   }
 
   if (!vehicle) {
-    player.sendClientMessage(Color.error, "Vy dolzhny byt' za rulem.");
+    player.sendClientMessage(Color.error, "Вы должны быть за рулём.");
     return;
   }
 
@@ -36,8 +36,8 @@ registerCommand("limit", "Ogranichitel' skorosti mashiny", (player, args) => {
     player.sendClientMessage(
       Color.info,
       current
-        ? `Limit etoy mashiny: ${current} km/h.`
-        : `Ispol'zovanie: /limit [kmh] (${MIN_SPEED_LIMIT}-${MAX_SPEED_LIMIT}, 0 - vyklyuchit')`
+        ? `Лимит этой машины: ${current} km/h.`
+        : `Использование: /limit [kmh] (${MIN_SPEED_LIMIT}-${MAX_SPEED_LIMIT}, 0 - выключить)`
     );
     return;
   }
@@ -46,30 +46,30 @@ registerCommand("limit", "Ogranichitel' skorosti mashiny", (player, args) => {
   if (!Number.isInteger(kmh) || kmh < 0) {
     player.sendClientMessage(
       Color.error,
-      `Ispol'zovanie: /limit [kmh] (${MIN_SPEED_LIMIT}-${MAX_SPEED_LIMIT}, 0 - vyklyuchit')`
+      `Использование: /limit [kmh] (${MIN_SPEED_LIMIT}-${MAX_SPEED_LIMIT}, 0 - выключить)`
     );
     return;
   }
 
   if (kmh === 0) {
     clearVehicleLimit(vehicle);
-    player.sendClientMessage(Color.info, "Limit skorosti snyat.");
+    player.sendClientMessage(Color.info, "Лимит скорости снят.");
     return;
   }
 
   if (kmh < MIN_SPEED_LIMIT || kmh > MAX_SPEED_LIMIT) {
     player.sendClientMessage(
       Color.error,
-      `Ispol'zovanie: /limit [kmh] (${MIN_SPEED_LIMIT}-${MAX_SPEED_LIMIT}, 0 - vyklyuchit')`
+      `Использование: /limit [kmh] (${MIN_SPEED_LIMIT}-${MAX_SPEED_LIMIT}, 0 - выключить)`
     );
     return;
   }
 
   const applied = setVehicleLimit(vehicle, kmh);
   if (applied === null) {
-    player.sendClientMessage(Color.error, "Ne udalos' postavit' limit.");
+    player.sendClientMessage(Color.error, "Не удалось поставить лимит.");
     return;
   }
 
-  player.sendClientMessage(Color.info, `Limit skorosti: ${applied} km/h.`);
+  player.sendClientMessage(Color.info, `Лимит скорости: ${applied} km/h.`);
 });

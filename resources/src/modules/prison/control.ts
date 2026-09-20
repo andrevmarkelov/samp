@@ -16,7 +16,7 @@ const LABEL_HEIGHT = 0.25;
 const PICKUP_LABEL_HEIGHT = 0.85;
 const LABEL_DRAW_DISTANCE = 12;
 const CMD_RADIUS = 2.5;
-const DENY = "Otkryt' mogut sotrudniki LSPD, oblastnoy policii i FBI.";
+const DENY = "Открыть могут сотрудники LSPD, областной полиции и FBI.";
 
 const POINT = {
   x: -96.0945,
@@ -38,7 +38,7 @@ export function isPrisonYardOpen(): boolean {
 }
 
 function yardLabelText(): string {
-  return yardOpen ? "Tyuremnyy dvor\nOtkryt" : "Tyuremnyy dvor\nZakryt";
+  return yardOpen ? "Тюремный двор\nОткрыт" : "Тюремный двор\nЗакрыт";
 }
 
 function yardLabelColor(): number {
@@ -59,7 +59,7 @@ function refreshYardLabel(): void {
 
 export function bindPrisonControl(): void {
   new TextLabel(
-    "Dlya upravleniya vvedite /pult.",
+    "Для управления введите /pult.",
     Color.info,
     POINT.x,
     POINT.y,
@@ -108,7 +108,7 @@ export function bindPrisonControl(): void {
 
 registerCommand(
   "pult",
-  "Upravlenie tyur'moy",
+  "Управление тюрьмой",
   (player) => {
     if (!isAuthenticated(player)) {
       return;
@@ -119,13 +119,13 @@ registerCommand(
     }
 
     if (isJailed(player)) {
-      tell(player, Color.error, "Vy otbyvaete srok.");
+      tell(player, Color.error, "Вы отбываете срок.");
       return;
     }
 
     try {
       if (player.getState() !== PLAYER_STATE_ONFOOT) {
-        tell(player, Color.error, "Upravlenie dostupno tol'ko peshkom.");
+        tell(player, Color.error, "Управление доступно только пешком.");
         return;
       }
     } catch {
@@ -133,7 +133,7 @@ registerCommand(
     }
 
     if (!atPanel(player)) {
-      tell(player, Color.error, "Upravlenie dostupno tol'ko u pulta.");
+      tell(player, Color.error, "Управление доступно только у пульта.");
       return;
     }
 
@@ -143,40 +143,40 @@ registerCommand(
 );
 
 function handleCmdMenu(player: Player, listItem: number, inputText: string): void {
-  const choice = pickChoice(listItem, inputText, ["dvor", "kamery"]);
+  const choice = pickChoice(listItem, inputText, ["двор", "камеры"]);
   if (choice === 0) {
     showYardMenu(player);
     return;
   }
 
   if (choice === 1) {
-    tell(player, Color.info, "Kamery poka v razrabotke.");
+    tell(player, Color.info, "Камеры пока в разработке.");
   }
 }
 
 function handleYardMenu(player: Player, listItem: number, inputText: string): void {
-  const choice = pickChoice(listItem, inputText, ["otkryt'", "zakryt'"]);
+  const choice = pickChoice(listItem, inputText, ["открыть", "закрыть"]);
   if (choice === 0) {
     if (yardOpen) {
-      tell(player, Color.info, "Dvor uzhe otkryt.");
+      tell(player, Color.info, "Двор уже открыт.");
       return;
     }
 
     yardOpen = true;
     refreshYardLabel();
-    tell(player, Color.info, "Dvor otkryt.");
+    tell(player, Color.info, "Двор открыт.");
     return;
   }
 
   if (choice === 1) {
     if (!yardOpen) {
-      tell(player, Color.info, "Dvor uzhe zakryt.");
+      tell(player, Color.info, "Двор уже закрыт.");
       return;
     }
 
     yardOpen = false;
     refreshYardLabel();
-    tell(player, Color.info, "Dvor zakryt.");
+    tell(player, Color.info, "Двор закрыт.");
   }
 }
 
@@ -186,13 +186,13 @@ function showCmdMenu(player: Player): void {
       player,
       PRISON_CMD_DIALOG_ID,
       DIALOG_STYLE_LIST,
-      "Upravlenie",
-      "1. Dvor\n2. Kamery",
-      "Vybrat'",
-      "Zakryt'"
+      "Управление",
+      "1. Двор\n2. Камеры",
+      "Выбрать",
+      "Закрыть"
     );
   } catch {
-    tell(player, Color.error, "Ne udalos' otkryt' menyu.");
+    tell(player, Color.error, "Не удалось открыть меню.");
   }
 }
 
@@ -202,13 +202,13 @@ function showYardMenu(player: Player): void {
       player,
       PRISON_YARD_DIALOG_ID,
       DIALOG_STYLE_LIST,
-      "Dvor",
-      "1. Otkryt'\n2. Zakryt'",
-      "Vybrat'",
-      "Nazad"
+      "Двор",
+      "1. Открыть\n2. Закрыть",
+      "Выбрать",
+      "Назад"
     );
   } catch {
-    tell(player, Color.error, "Ne udalos' otkryt' menyu.");
+    tell(player, Color.error, "Не удалось открыть меню.");
   }
 }
 
@@ -224,7 +224,7 @@ function isLawStaff(player: Player, tellDeny: boolean): boolean {
 
   if (account.hospitalized) {
     if (tellDeny) {
-      tell(player, Color.error, "Snachala proydite lechenie v bolnice.");
+      tell(player, Color.error, "Сначала пройдите лечение в больнице.");
     }
     return false;
   }

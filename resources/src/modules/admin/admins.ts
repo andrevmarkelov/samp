@@ -14,7 +14,7 @@ type OnlineAdmin = {
 export function bindAdminsList(): void {
   registerCommand(
     "admins",
-    "Spisok administratorov v igre",
+    "Список администраторов в игре",
     (player) => {
       if (!hasAdminAccess(player, 1)) {
         return;
@@ -41,7 +41,7 @@ export function bindAdminsList(): void {
         }
 
         const slot = playerId(other) ?? 0;
-        const logged = isAdminLoggedIn(other) ? "da" : "net";
+        const logged = isAdminLoggedIn(other) ? "да" : "нет";
         list.push({
           level: account.adminLevel,
           slot,
@@ -51,9 +51,9 @@ export function bindAdminsList(): void {
 
       list.sort((a, b) => b.level - a.level || a.slot - b.slot);
 
-      player.sendClientMessage(Color.info, "Administratory v igre:");
+      player.sendClientMessage(Color.info, "Администраторы в игре:");
       if (list.length === 0) {
-        player.sendClientMessage(Color.white, "Nikogo net.");
+        player.sendClientMessage(Color.white, "Никого нет.");
         return;
       }
 
