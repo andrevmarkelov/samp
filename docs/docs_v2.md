@@ -55,7 +55,7 @@ resources/src/modules/
   org/          армия, больница, банды 9–13
 ```
 
-GPS v2: метки **ZHD LS**, **Tyurma**, **Bank**, **Oblastnaya policiya**, **LSPD**, **FBI**, **Avtoshkola**, **LCN**, **Yakuza**, **Russkaya mafiya**.
+GPS v2: метки **ZHD LS**, **Tyurma**, **Bank**, **Oblastnaya policiya**, **LSPD**, **FBI**, **Avtoshkola**, **LCN**, **Yakuza**, **Russkaya mafiya**, **Grove Street**, **Ballas**, **Vagos**, **Rifa**, **Aztecas**.
 
 `/mn`: пункт **Svyaz' s administraciey** → диалог репорта.
 
@@ -72,6 +72,8 @@ GPS v2: метки **ZHD LS**, **Tyurma**, **Bank**, **Oblastnaya policiya**, **
 | `muted_until` | INT UNSIGNED NULL, unix **секунды**; NULL = нет мута |
 | `jail_seconds` | INT UNSIGNED, оставшийся срок; 0 = не в тюрьме. Тикает **только онлайн** |
 | `license_car` `license_moto` `license_fly` `license_boat` `license_gun` | TINYINT, 0 = нет лицензии |
+| `banned_until` | DATETIME NULL, дата и время **конца** бана; NULL = не забанен. Вручную: `2026-09-27 18:00:00`, не «7 дней» |
+| `ban_reason` | VARCHAR(128) NULL, причина бана |
 
 В памяти: `Account.bank`, `Account.lawfulness`, `Account.mutedUntil` (мс), `Account.jailSeconds`, `Account.licenses`.
 
@@ -250,6 +252,7 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 | Ур. | Команда | Поведение |
 |---|---|---|
 | 1 | `/ans [id] [tekst]` | ответ на репорт, см. выше |
+| 1 | `/slap [id]` | подкинуть вверх (из машины выкидывает); себя и админов можно; серый лог только админам |
 | 2 | `/mute [id] [min] [prichina]` | мут чата |
 | 3 | `/veh` `/delveh` | создать / удалить админ-машину |
 | 3 | `/jail [id] [min] [prichina]` | посадка в тюрьму, см. выше |
@@ -257,6 +260,9 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 | 3 | `/tpcor [x] [y] [z]` | телепорт, VW/interior не сбрасываются; за рулём едет машина |
 | 4 | `/respcar` | через 30 с респавн **пустых** машин; таймер доигрывает, даже если админ вышел |
 | 4 | `/setskin [id] [1–311]` | гражданский скин в БД; скин органа пока в органе |
+| 4 | `/ban [id] [dni] [prichina]` | 1–3650 дней; кик + диалог цели; объявление всем; вход закрыт до `banned_until` |
+| 4 | `/unban [Nick_Name]` | снять бан оффлайн; серый лог только админам |
+| 4 | `/tpint [id]` | телепорт в интерьер по номеру из списка; без id — диалог со страницами |
 | 5 | `/makeleader [id]` | список органов или снять; нужен паспорт; ранг 10 |
 | 5 | `/gzcolor [id]` | владелец гангзоны под ногами; только банды 9–13; во время капта этой клетки нельзя |
 | 6 | `/givemoney [id] [0-1] [summa]` | 0 — нал, 1 — банк; себе можно |
@@ -307,7 +313,7 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 
 Склад в интерьере (пикап **19134**, `357.6911, 150.9142, 1025.7891`): броня 100, дубинка 3, Desert Eagle 24 (50 патр.). Только члены мэрии. `org/meriya-locker.ts`.
 
-Служебный вход (пикап **19132**): парковка `1413.03, -1790.49, 15.44` ↔ интерьер `368.42, 194.10, 1008.38`. Только члены мэрии. `org/meriya-doors.ts`.
+Служебный вход (пикап **19132**): парковка `1413.03, -1790.49, 15.44` ↔ интерьер `368.42, 194.10, 1008.38`. Крыша: интерьер `350.13, 178.06, 1014.19` ↔ крыша `1445.25, -1803.03, 33.43`. Только члены мэрии. `org/meriya-doors.ts`.
 
 ---
 
@@ -385,17 +391,27 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 
 ## Банды
 
-Пять illegal-органов. Ник и гангзоны — цветом органа. `/f` — общий `Color.radio`. Спавн на улице у HQ.
+Пять illegal-органов. Ник и гангзоны — цветом органа. `/f` — общий `Color.radio`. Спавн **в доме** HQ.
 
 | id | Имя | Цвет | HQ |
 |---|---|---|---|
-| 9 | Grove Street | `0x009900aa` | Ganton |
-| 10 | The Ballas | `0xcc00ffaa` | Glen Park |
-| 11 | Los Santos Vagos | `0xffcd00aa` | Las Colinas |
-| 12 | The Rifa | `0x6666ffaa` | Playa del Seville |
-| 13 | Varios Los Aztecas | `0x00b4e1aa` | El Corona |
+| 9 | Grove Street | `0x009900aa` | interior 2 VW 9 `2449.47, -1690.28, 1013.51` |
+| 10 | The Ballas | `0xcc00ffaa` | interior 4 VW 10 `224.96, 1158.23, 1082.61` |
+| 11 | Los Santos Vagos | `0xffcd00aa` | interior 5 VW 11 `323.83, 1127.13, 1083.88` |
+| 12 | The Rifa | `0x6666ffaa` | interior 6 VW 12 `-60.69, 1364.61, 1080.22` |
+| 13 | Varios Los Aztecas | `0x00b4e1aa` | interior 2 VW 13 `231.23, 1246.63, 1082.14` |
 
 10 рангов у каждой. Каталог: `org/gangs.ts`.
+
+Входы HQ (пикап **19132**, любой). Свои VW. `org/gang-doors.ts`.
+
+| Банда | Улица ↔ дом |
+|---|---|
+| Grove | `2514.07, -1691.37` ↔ int 2 VW 9 `2468.77, -1698.32` |
+| Ballas | `2022.87, -1120.26` ↔ int 4 VW 10 `221.87, 1140.55` |
+| Vagos | `2756.28, -1182.81` ↔ int 5 VW 11 `318.62, 1114.64` |
+| Rifa | `2787.07, -1926.13` ↔ int 6 VW 12 `-68.84, 1351.37` |
+| Aztecas | `2185.82, -1815.23` ↔ int 2 VW 13 `226.46, 1240.00` |
 
 ### Кадры
 
@@ -540,6 +556,8 @@ GPS: **LCN** `1288.81, -2056.62, 58.63`, **Yakuza** `664.94, -1315.21, 13.45`, *
 | 37 | `/ad` текст объявления |
 | 38 | `/edit` правка объявления |
 | 39 | `/edit` причина отклонения |
+| 40 | уведомление о бане |
+| 41 | `/tpint` список интерьеров |
 
 ---
 
@@ -578,6 +596,8 @@ GPS: **LCN** `1288.81, -2056.62, 58.63`, **Yakuza** `664.94, -1315.21, 13.45`, *
 | Машины Avtoshkola | `vehicles/autoschool.ts` |
 | Машины Radiocentr | `vehicles/radio.ts` |
 | Объявления `/ad` `/edit` | `commands/ads.ts` |
+| Бан `/ban` `/unban` | `admin/ban.ts`, `auth/ban.ts` |
+| `/tpint` интерьеры | `admin/tpint.ts`, `admin/interiors.ts` |
 | Машины у тюрьмы | `vehicles/prison.ts` |
 | Иконка FBI | `org/fbi-map.ts` |
 | Вход FBI | `org/fbi-doors.ts` |
@@ -596,6 +616,7 @@ GPS: **LCN** `1288.81, -2056.62, 58.63`, **Yakuza** `664.94, -1315.21, 13.45`, *
 | Ворота Yakuza | `org/mafias.ts`, `org/gates.ts` |
 | Шлагбаум русской мафии | `org/mafias.ts`, `org/gates.ts` |
 | Входы мафий | `org/mafia-doors.ts` |
+| Входы банд | `org/gang-doors.ts` |
 | Инвайт / ранг | `commands/org-staff.ts` |
 | Гангзоны | `zones/turf.ts`, `zones/repository.ts`, `sql/schema.sql` |
 | Капт | `zones/capture.ts`, `zones/capture-hud.ts`, `commands/capture.ts` |

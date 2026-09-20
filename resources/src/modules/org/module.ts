@@ -14,6 +14,7 @@ import { bindLspdMapIcon } from "./lspd-map";
 import { bindAutoschoolDoors } from "./autoschool-doors";
 import { bindAutoschoolMapIcon } from "./autoschool-map";
 import { bindMafiaDoors } from "./mafia-doors";
+import { bindGangDoors } from "./gang-doors";
 import { bindPoliceMapIcon } from "./police-map";
 import { bindRadioDoors } from "./radio-doors";
 import { bindRadioLocker } from "./radio-locker";
@@ -35,6 +36,7 @@ export const orgModule: GameModule = {
     bindFbiDoors();
     bindFbiMapIcon();
     bindMafiaDoors();
+    bindGangDoors();
     bindAutoschoolDoors();
     bindAutoschoolMapIcon();
     bindRadioDoors();

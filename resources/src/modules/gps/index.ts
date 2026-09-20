@@ -111,6 +111,41 @@ const TARGETS: readonly GpsTarget[] = [
     y: -946.551,
     z: 40.2929,
   },
+  {
+    key: "grove",
+    label: "Grove Street",
+    x: 2506.6667,
+    y: -1684.4637,
+    z: 13.5469,
+  },
+  {
+    key: "ballas",
+    label: "Ballas",
+    x: 2023.1401,
+    y: -1129.0132,
+    z: 24.8482,
+  },
+  {
+    key: "vagos",
+    label: "Vagos",
+    x: 2745.1252,
+    y: -1177.5881,
+    z: 69.4024,
+  },
+  {
+    key: "rifa",
+    label: "Rifa",
+    x: 2776.4692,
+    y: -1924.9092,
+    z: 13.5394,
+  },
+  {
+    key: "aztecas",
+    label: "Aztecas",
+    x: 2185.4087,
+    y: -1807.8779,
+    z: 13.3734,
+  },
 ];
 
 const activeByPlayer = new Map<number, GpsTarget>();

@@ -41,6 +41,8 @@ type UserRow = RowDataPacket & {
   license_fly: number | boolean;
   license_boat: number | boolean;
   license_gun: number | boolean;
+  banned_until: Date | string | number | null;
+  ban_reason: string | null;
 };
 
 const CREATE_USERS_SQL = `
@@ -74,6 +76,8 @@ CREATE TABLE IF NOT EXISTS users (
   license_fly TINYINT(1) NOT NULL DEFAULT 0,
   license_boat TINYINT(1) NOT NULL DEFAULT 0,
   license_gun TINYINT(1) NOT NULL DEFAULT 0,
+  banned_until DATETIME NULL DEFAULT NULL,
+  ban_reason VARCHAR(128) NULL DEFAULT NULL,
   birth_date DATE NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
@@ -175,6 +179,14 @@ const COLUMN_MIGRATIONS = [
     name: "license_gun",
     sql: "license_gun TINYINT(1) NOT NULL DEFAULT 0 AFTER license_boat",
   },
+  {
+    name: "banned_until",
+    sql: "banned_until DATETIME NULL DEFAULT NULL AFTER license_gun",
+  },
+  {
+    name: "ban_reason",
+    sql: "ban_reason VARCHAR(128) NULL DEFAULT NULL AFTER banned_until",
+  },
 ] as const;
 
 export async function ensureUsersTable(): Promise<void> {
@@ -187,6 +199,8 @@ export async function ensureUsersTable(): Promise<void> {
 
     await getPool().query(`ALTER TABLE users ADD COLUMN ${column.sql}`);
   }
+
+  await migrateBannedUntilDatetime();
 }
 
 async function columnExists(column: string): Promise<boolean> {
@@ -202,9 +216,48 @@ async function columnExists(column: string): Promise<boolean> {
   return rows.length > 0;
 }
 
+async function columnDataType(column: string): Promise<string | null> {
+  const rows = await query<RowDataPacket>(
+    `SELECT DATA_TYPE AS data_type
+     FROM information_schema.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE()
+       AND TABLE_NAME = 'users'
+       AND COLUMN_NAME = ?
+     LIMIT 1`,
+    [column]
+  );
+  const raw = rows[0]?.data_type ?? rows[0]?.DATA_TYPE;
+  return raw ? String(raw).toLowerCase() : null;
+}
+
+async function migrateBannedUntilDatetime(): Promise<void> {
+  const type = await columnDataType("banned_until");
+  if (type === null || type === "datetime" || type === "timestamp") {
+    return;
+  }
+
+  await getPool().query(
+    "ALTER TABLE users ADD COLUMN banned_until_dt DATETIME NULL DEFAULT NULL AFTER banned_until"
+  );
+  await getPool().query(
+    `UPDATE users
+     SET banned_until_dt = FROM_UNIXTIME(banned_until)
+     WHERE banned_until >= 1000000000`
+  );
+  await getPool().query(
+    `UPDATE users
+     SET banned_until_dt = DATE_ADD(NOW(), INTERVAL banned_until DAY)
+     WHERE banned_until BETWEEN 1 AND 3650`
+  );
+  await getPool().query("ALTER TABLE users DROP COLUMN banned_until");
+  await getPool().query(
+    "ALTER TABLE users CHANGE banned_until_dt banned_until DATETIME NULL DEFAULT NULL"
+  );
+}
+
 export async function findUserByName(name: string): Promise<UserRow | null> {
   const rows = await query<UserRow>(
-    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, bank, donate, lawfulness, health, passport, hospitalized, invited_by, birth_date, admin_level, org_id, org_rank, muted_until, jail_seconds, license_car, license_moto, license_fly, license_boat, license_gun FROM users WHERE name = ? LIMIT 1",
+    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, bank, donate, lawfulness, health, passport, hospitalized, invited_by, birth_date, admin_level, org_id, org_rank, muted_until, jail_seconds, license_car, license_moto, license_fly, license_boat, license_gun, banned_until, ban_reason FROM users WHERE name = ? LIMIT 1",
     [name]
   );
   return rows[0] ?? null;
@@ -489,6 +542,28 @@ export async function saveUserMutedUntil(
   untilUnix: number | null
 ): Promise<void> {
   await execute("UPDATE users SET muted_until = ? WHERE id = ?", [untilUnix, userId]);
+}
+
+export async function saveUserBan(
+  userId: number,
+  untilUnix: number,
+  reason: string
+): Promise<void> {
+  await execute("UPDATE users SET banned_until = FROM_UNIXTIME(?), ban_reason = ? WHERE id = ?", [
+    untilUnix,
+    reason,
+    userId,
+  ]);
+}
+
+export async function clearUserBan(userId: number): Promise<void> {
+  await execute("UPDATE users SET banned_until = NULL, ban_reason = NULL WHERE id = ?", [
+    userId,
+  ]);
+}
+
+export function parseBanReason(value: unknown): string {
+  return String(value ?? "").trim();
 }
 
 export async function saveUserJailedSeconds(userId: number, seconds: number): Promise<void> {

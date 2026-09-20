@@ -24,12 +24,16 @@ import {
   showSkinDialog,
 } from "./dialogs";
 import { hashPassword, verifyPassword } from "./password";
+import { isBanActive, kickBannedPlayer, resolveBanUntil } from "./ban";
 import {
   accountFromRow,
+  clearUserBan,
   createUser,
   emailTaken,
   findUserByName,
   isDuplicateKey,
+  parseBanReason,
+  saveUserBan,
   saveUserLastIp,
 } from "./repository";
 import { clearAccount, getAccount, isAuthenticated, setAccount, applyWallet, applyScore } from "./session";
@@ -476,6 +480,30 @@ async function finishLogin(player: Player, name: string, password: string): Prom
 
   if (!isSamePlayer(player, id, name)) {
     return;
+  }
+
+  const resolved = resolveBanUntil(row.banned_until);
+  const banReason = parseBanReason(row.ban_reason);
+  if (isBanActive(resolved.untilUnix)) {
+    if (resolved.persist) {
+      try {
+        await saveUserBan(row.id, resolved.untilUnix, banReason);
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        omp.log(`[${SERVER_TAG}] не удалось сохранить бан ${name}: ${message}`);
+      }
+    }
+
+    clearPending(player);
+    kickBannedPlayer(player, resolved.untilUnix, banReason);
+    return;
+  }
+
+  if (resolved.untilUnix != null) {
+    void clearUserBan(row.id).catch((error: unknown) => {
+      const message = error instanceof Error ? error.message : String(error);
+      omp.log(`[${SERVER_TAG}] не удалось очистить истёкший бан ${name}: ${message}`);
+    });
   }
 
   const account = accountFromRow(row);

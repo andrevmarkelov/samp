@@ -1,4 +1,4 @@
-import { STREET_WORLD, type SpawnPoint } from "../spawn/point";
+import type { SpawnPoint } from "../spawn/point";
 import type { OrganizationDef, OrgRankDef } from "./types";
 import { MAX_ORG_RANK } from "./types";
 
@@ -8,6 +8,13 @@ export const ORG_VAGOS_ID = 11;
 export const ORG_RIFA_ID = 12;
 export const ORG_AZTECAS_ID = 13;
 
+/** Дома банд — ванильные интерьеры, у каждой свой VW (= org id). */
+export const GROVE_WORLD = 9;
+export const BALLAS_WORLD = 10;
+export const VAGOS_WORLD = 11;
+export const RIFA_WORLD = 12;
+export const AZTECAS_WORLD = 13;
+
 const GANG_PAY = [800, 1100, 1500, 2000, 2600, 3300, 4100, 5000, 6000, 7200];
 
 type GangRankRow = {
@@ -15,13 +22,15 @@ type GangRankRow = {
   male: number;
 };
 
-function streetSpawn(
+function hqSpawn(
   x: number,
   y: number,
   z: number,
-  angle: number
+  angle: number,
+  interior: number,
+  world: number
 ): SpawnPoint {
-  return { x, y, z, angle, interior: 0, world: STREET_WORLD };
+  return { x, y, z, angle, interior, world };
 }
 
 function gangRanks(female: number, rows: GangRankRow[]): OrgRankDef[] {
@@ -62,7 +71,7 @@ export const GROVE = defineGang(
   ORG_GROVE_ID,
   "Grove Street",
   0x009900aa,
-  streetSpawn(2512.2371, -1686.0691, 13.5614, 44.2188),
+  hqSpawn(2449.4707, -1690.2758, 1013.5078, 179.8317, 2, GROVE_WORLD),
   195,
   [
     { title: "Newman", male: 105 },
@@ -82,7 +91,7 @@ export const BALLAS = defineGang(
   ORG_BALLAS_ID,
   "The Ballas",
   0xcc00ffaa,
-  streetSpawn(2028.5479, -1121.1851, 26.4164, 91.1957),
+  hqSpawn(224.9616, 1158.2284, 1082.6094, 89.0343, 4, BALLAS_WORLD),
   195,
   [
     { title: "Baby", male: 103 },
@@ -102,7 +111,7 @@ export const VAGOS = defineGang(
   ORG_VAGOS_ID,
   "Los Santos Vagos",
   0xffcd00aa,
-  streetSpawn(2755.4487, -1175.7596, 69.4076, 89.3391),
+  hqSpawn(323.8303, 1127.1255, 1083.8828, 178.9385, 5, VAGOS_WORLD),
   190,
   [
     { title: "Novato", male: 108 },
@@ -122,7 +131,7 @@ export const RIFA = defineGang(
   ORG_RIFA_ID,
   "The Rifa",
   0x6666ffaa,
-  streetSpawn(2781.7666, -1928.8019, 13.5469, 1.6284),
+  hqSpawn(-60.6872, 1364.6147, 1080.2185, 90.2645, 6, RIFA_WORLD),
   226,
   [
     { title: "Amigo", male: 175 },
@@ -142,7 +151,7 @@ export const AZTECAS = defineGang(
   ORG_AZTECAS_ID,
   "Varios Los Aztecas",
   0x00b4e1aa,
-  streetSpawn(2180.5889, -1811.9956, 13.5469, 270.181),
+  hqSpawn(231.2349, 1246.6328, 1082.1406, 136.928, 2, AZTECAS_WORLD),
   193,
   [
     { title: "Novato", male: 114 },

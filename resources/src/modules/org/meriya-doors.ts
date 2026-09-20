@@ -61,6 +61,42 @@ const DOORS: readonly StaffDoor[] = [
     },
     label: "Parkovka\nSluzhebnyy vykhod",
   },
+  {
+    pickup: {
+      x: 350.1312,
+      y: 178.0575,
+      z: 1014.1875,
+      interior: CITY_HALL_INTERIOR,
+      world: STREET_WORLD,
+    },
+    dest: {
+      x: 1445.2192,
+      y: -1804.9155,
+      z: 33.4297,
+      angle: 182.0736,
+      interior: 0,
+      world: STREET_WORLD,
+    },
+    label: "Meriya\nKrysha",
+  },
+  {
+    pickup: {
+      x: 1445.2548,
+      y: -1803.027,
+      z: 33.4297,
+      interior: 0,
+      world: STREET_WORLD,
+    },
+    dest: {
+      x: 350.1312,
+      y: 179.9575,
+      z: 1014.1875,
+      angle: 1.3958,
+      interior: CITY_HALL_INTERIOR,
+      world: STREET_WORLD,
+    },
+    label: "Meriya\nS kryshi",
+  },
 ];
 
 const lastTeleportAt = new Map<number, number>();
