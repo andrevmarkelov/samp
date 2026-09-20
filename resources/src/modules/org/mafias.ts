@@ -127,6 +127,22 @@ export const RUSSIAN_MAFIA = defineMafia(
 
 export const MAFIAS: readonly OrganizationDef[] = [LCN, YAKUZA, RUSSIAN_MAFIA];
 
+export const LCN_GATES: OrgGateDef[] = [
+  {
+    orgId: ORG_LCN_ID,
+    model: 19912,
+    x: 1282.35217,
+    y: -2050.71509,
+    zClosed: 60.6006,
+    zOpen: 55.0073,
+    rx: 0,
+    ry: 0,
+    rz: 90,
+    radius: 14,
+    denyMessage: "Vy ne sostoite v La Cosa Nostra.",
+  },
+];
+
 const YAKUZA_GATE = {
   orgId: ORG_YAKUZA_ID,
   model: 19912,
@@ -160,5 +176,22 @@ export const YAKUZA_GATES: OrgGateDef[] = [
     zClosed: 25.3149,
     zOpen: 19.8112,
     rz: -90,
+  },
+];
+
+export const RUSSIAN_MAFIA_GATES: OrgGateDef[] = [
+  {
+    orgId: ORG_RUSSIAN_MAFIA_ID,
+    model: 968,
+    x: 965.55011,
+    y: -942.06873,
+    zClosed: 40.1682,
+    zOpen: 40.1682,
+    rx: 0,
+    ry: -90,
+    ryOpen: 0,
+    rz: 0.7162,
+    radius: 14,
+    denyMessage: "Vy ne sostoite v Russkoy mafii.",
   },
 ];

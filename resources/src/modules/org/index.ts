@@ -21,6 +21,7 @@ export {
 } from "./gangs";
 export {
   LCN,
+  LCN_GATES,
   LCN_WORLD,
   MAFIA_INTERIOR,
   MAFIAS,
@@ -28,6 +29,7 @@ export {
   ORG_RUSSIAN_MAFIA_ID,
   ORG_YAKUZA_ID,
   RUSSIAN_MAFIA,
+  RUSSIAN_MAFIA_GATES,
   RUSSIAN_MAFIA_WORLD,
   YAKUZA,
   YAKUZA_GATES,

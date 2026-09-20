@@ -3,7 +3,7 @@ import { AUTOSCHOOL } from "./autoschool";
 import { FBI } from "./fbi";
 import { GANGS } from "./gangs";
 import { HOSPITAL, HOSPITAL_GATES } from "./hospital";
-import { MAFIAS, YAKUZA_GATES } from "./mafias";
+import { LCN_GATES, MAFIAS, RUSSIAN_MAFIA_GATES, YAKUZA_GATES } from "./mafias";
 import { MERIYA } from "./meriya";
 import { LSPD, LSPD_GATES } from "./lspd";
 import { POLICE } from "./police";
@@ -26,7 +26,9 @@ const ORG_GATES: readonly OrgGateDef[] = [
   ...ARMY_GATES,
   ...HOSPITAL_GATES,
   ...LSPD_GATES,
+  ...LCN_GATES,
   ...YAKUZA_GATES,
+  ...RUSSIAN_MAFIA_GATES,
 ];
 
 const byId = new Map(ORGANIZATIONS.map((org) => [org.id, org]));

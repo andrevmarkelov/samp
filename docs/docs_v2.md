@@ -424,7 +424,17 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 
 Женский скин на все ранги: LCN **263**, Yakuza **56**, русская **169**.
 
+Ворота LCN (модель **19912**, вниз `60.60`→`55.01`) у `1282.35, -2050.72`. Crouch. Только `org_id = 14`. `org/mafias.ts` + `org/gates.ts`.
+
 У Yakuza три ворот 19912, открываются вниз (crouch). Только члены семьи. `org/mafias.ts` + `org/gates.ts`.
+
+Шлагбаум русской мафии (модель **968**, `ry` −90→0) у `965.55, -942.07, 40.17`. Crouch. Только `org_id = 16`. Стойка 966 уже в `maps/rmMap.txt`. `org/mafias.ts` + `org/gates.ts`.
+
+Транспорт Yakuza у HQ (Stretch 409, Maverick 487, Huntley 579 ×2, Sultan 560 ×4, FCR-900 521 ×4) — цвет **6**, только `org_id = 15`. Чужому: двери закрыты. `vehicles/mafias.ts`.
+
+Транспорт LCN у HQ (Maverick 487, Huntley 579 ×4, Sultan 560 ×4, Stretch 409, FCR-900 521 ×5) — цвет **145**, только `org_id = 14`. Чужому: двери закрыты. `vehicles/mafias.ts`.
+
+Транспорт русской мафии у HQ (FCR-900 521 ×6, Sultan 560 ×4, Maverick 487, Huntley 579 ×5, Stretch 409) — цвет **0**, только `org_id = 16`. Чужому: двери закрыты. `vehicles/mafias.ts`.
 
 GPS: **LCN** `1288.81, -2056.62, 58.63`, **Yakuza** `664.94, -1315.21, 13.45`, **Russkaya mafiya** `962.19, -946.55, 40.29`.
 
@@ -557,7 +567,10 @@ GPS: **LCN** `1288.81, -2056.62, 58.63`, **Yakuza** `664.94, -1315.21, 13.45`, *
 | Оружейка LSPD | `org/lspd-locker.ts` |
 | Банды | `org/gangs.ts`, `vehicles/gangs.ts` |
 | Мафии | `org/mafias.ts` |
+| Машины мафий | `vehicles/mafias.ts` |
+| Ворота LCN | `org/mafias.ts`, `org/gates.ts` |
 | Ворота Yakuza | `org/mafias.ts`, `org/gates.ts` |
+| Шлагбаум русской мафии | `org/mafias.ts`, `org/gates.ts` |
 | Входы мафий | `org/mafia-doors.ts` |
 | Инвайт / ранг | `commands/org-staff.ts` |
 | Гангзоны | `zones/turf.ts`, `zones/repository.ts`, `sql/schema.sql` |

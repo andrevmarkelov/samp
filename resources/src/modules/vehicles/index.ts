@@ -5,6 +5,7 @@ import { spawnArmyVehicles } from "./army";
 import { spawnAutoschoolVehicles } from "./autoschool";
 import { spawnFbiVehicles } from "./fbi";
 import { spawnGangVehicles } from "./gangs";
+import { spawnMafiaVehicles } from "./mafias";
 import { spawnHospitalVehicles } from "./hospital";
 import { spawnMeriyaVehicles } from "./meriya";
 import { spawnLspdVehicles } from "./lspd";
@@ -50,6 +51,7 @@ export const vehiclesModule: GameModule = {
     spawnAutoschoolVehicles();
     spawnPrisonVehicles();
     spawnGangVehicles();
+    spawnMafiaVehicles();
 
     for (const spot of STATION_SCOOTERS) {
       createServerVehicle({
