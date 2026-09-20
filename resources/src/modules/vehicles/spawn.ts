@@ -34,13 +34,11 @@ export function startEngineControl(): void {
   }
 
   for (const vehicle of omp.vehicles.all()) {
-    setEngine(vehicle, false);
-    setLights(vehicle, false);
+    setEngine(vehicle, false, false);
   }
 
   omp.on("vehicleSpawn", (vehicle) => {
-    setEngine(vehicle, false);
-    setLights(vehicle, false);
+    setEngine(vehicle, false, false);
   });
 
   omp.on("playerKeyStateChange", (player, newKeys, oldKeys) => {
@@ -76,8 +74,7 @@ export function createServerVehicle(def: ServerVehicleDef): Vehicle | null {
 
   try {
     vehicle.setVirtualWorld(def.world ?? STREET_WORLD);
-    setEngine(vehicle, false);
-    setLights(vehicle, false);
+    setEngine(vehicle, false, false);
   } catch {
     // Машина уже в мире — параметры догонятся на vehicleSpawn.
   }
@@ -85,12 +82,12 @@ export function createServerVehicle(def: ServerVehicleDef): Vehicle | null {
   return vehicle;
 }
 
-function setEngine(vehicle: Vehicle, on: boolean): void {
+function setEngine(vehicle: Vehicle, on: boolean, lights?: boolean): void {
   try {
     const params = vehicle.getParamsEx();
     vehicle.setParamsEx(
       on ? PARAM_ON : PARAM_OFF,
-      asParam(params.lights),
+      lights === undefined ? asParam(params.lights) : lights ? PARAM_ON : PARAM_OFF,
       asParam(params.alarm),
       asParam(params.doors),
       asParam(params.bonnet),
@@ -142,7 +139,7 @@ function toggleEngine(player: Player): void {
   }
 
   const running = isEngineOn(vehicle);
-  setEngine(vehicle, !running);
+  setEngine(vehicle, !running, !running);
   try {
     player.sendClientMessage(
       Color.info,

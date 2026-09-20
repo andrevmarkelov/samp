@@ -45,7 +45,6 @@ export { allOrganizations, allOrgGates, getOrganization, getOrgRank } from "./ca
 export {
   getMembership,
   orgPaydayPay,
-  orgStatsLines,
   parseOrgId,
   parseOrgRank,
   resolveOrgSpawn,

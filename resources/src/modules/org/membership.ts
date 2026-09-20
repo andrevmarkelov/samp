@@ -68,16 +68,3 @@ export function orgPaydayPay(
   };
 }
 
-export function orgStatsLines(
-  account: Pick<Account, "orgId" | "orgRank">
-): string[] {
-  const membership = getMembership(account);
-  if (!membership) {
-    return ["Organizaciya: Net"];
-  }
-
-  return [
-    `Organizaciya: ${membership.org.name}`,
-    `Dolzhnost': ${membership.rank.title} (${membership.rank.id})`,
-  ];
-}
