@@ -23,6 +23,7 @@ const SAFE_ZONES: readonly Rect[] = [
   { minX: 1393, minY: -1763.5, maxX: 1565, maxY: -1721.5 },
   { minX: 1151, minY: -1388.5, maxX: 1251, maxY: -1288.5 },
   { minX: 1003, minY: -458.5, maxX: 1127, maxY: -283.5 },
+  { minX: 655.8, minY: -1447.9, maxX: 784.8, maxY: -1401.9 },
 ];
 
 type Vitals = {

@@ -2,7 +2,12 @@ import { INVALID_VEHICLE_ID, omp, type Player, type Vehicle } from "@omp-node/co
 import { Color } from "../../shared/colors";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { getAccount } from "../auth/session";
-import { getMembership } from "../org";
+import { getMembership, ORG_AUTOSCHOOL_ID } from "../org";
+import {
+  autoschoolExamVehicleDeny,
+  canEnterAutoschoolExamVehicle,
+} from "../autoschool/session";
+import { driveLicenseDeny } from "./drive-license";
 
 const PLAYER_STATE_ONFOOT = 1;
 const PLAYER_STATE_DRIVER = 2;
@@ -61,8 +66,8 @@ export function bindOrgVehicleAccess(): void {
     applyDoorLock(vehicle, player);
   });
 
-  omp.on("playerEnterVehicle", (player, vehicle) => {
-    refuseIfForbidden(player, vehicle, true);
+  omp.on("playerEnterVehicle", (player, vehicle, passenger) => {
+    refuseIfForbidden(player, vehicle, true, Boolean(passenger));
   });
 
   omp.on("playerKeyStateChange", (player, newKeys, oldKeys) => {
@@ -85,7 +90,12 @@ export function bindOrgVehicleAccess(): void {
         return;
       }
 
-      refuseIfForbidden(player, vehicle, false);
+      refuseIfForbidden(
+        player,
+        vehicle,
+        false,
+        newState === PLAYER_STATE_PASSENGER
+      );
     } catch {
       // Слот пустой.
     }
@@ -115,7 +125,12 @@ function ejectFromForbiddenOrgVehicle(player: Player): void {
       return;
     }
 
-    refuseIfForbidden(player, vehicle, false);
+    refuseIfForbidden(
+      player,
+      vehicle,
+      false,
+      player.getState() === PLAYER_STATE_PASSENGER
+    );
   } catch {
     // Слот пустой.
   }
@@ -140,11 +155,19 @@ function denyNearbyIfForbidden(player: Player): void {
   }
 
   const access = accessFor(vehicle);
-  if (!access || canUseOrgVehicle(player, access.orgIds)) {
+  if (access && !canUseOrgVehicle(player, access.orgIds, vehicle)) {
+    deny(player, denyMessage(player, vehicle, access));
     return;
   }
 
-  deny(player, access.denyMessage);
+  if (skipsDriveLicense(player, vehicle, access)) {
+    return;
+  }
+
+  const licenseMsg = driveLicenseDeny(player, vehicle);
+  if (licenseMsg) {
+    deny(player, licenseMsg);
+  }
 }
 
 function nearestVehicle(player: Player, range: number): Vehicle | null {
@@ -177,13 +200,32 @@ function nearestVehicle(player: Player, range: number): Vehicle | null {
   return best;
 }
 
-function refuseIfForbidden(player: Player, vehicle: Vehicle, entering: boolean): boolean {
+function refuseIfForbidden(
+  player: Player,
+  vehicle: Vehicle,
+  entering: boolean,
+  passenger: boolean
+): boolean {
   const access = accessFor(vehicle);
-  if (!access || canUseOrgVehicle(player, access.orgIds)) {
-    return false;
+  if (access && !canUseOrgVehicle(player, access.orgIds, vehicle)) {
+    deny(player, denyMessage(player, vehicle, access));
+    eject(player, entering);
+    return true;
   }
 
-  deny(player, access.denyMessage);
+  if (!passenger && !skipsDriveLicense(player, vehicle, access)) {
+    const licenseMsg = driveLicenseDeny(player, vehicle);
+    if (licenseMsg) {
+      deny(player, licenseMsg);
+      eject(player, entering);
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function eject(player: Player, entering: boolean): void {
   try {
     if (entering) {
       player.clearAnimations(ANIM_SYNC_ALL);
@@ -192,7 +234,6 @@ function refuseIfForbidden(player: Player, vehicle: Vehicle, entering: boolean):
   } catch {
     // Уже не в транспорте.
   }
-  return true;
 }
 
 function applyDoorLock(vehicle: Vehicle, player: Player): void {
@@ -202,14 +243,32 @@ function applyDoorLock(vehicle: Vehicle, player: Player): void {
   }
 
   try {
-    const locked = canUseOrgVehicle(player, access.orgIds) ? DOORS_UNLOCKED : DOORS_LOCKED;
+    const locked = canUseOrgVehicle(player, access.orgIds, vehicle)
+      ? DOORS_UNLOCKED
+      : DOORS_LOCKED;
     vehicle.setParamsForPlayer(player, 0, locked);
   } catch {
     // Слот или транспорт уже не в мире.
   }
 }
 
-function canUseOrgVehicle(player: Player, orgIds: readonly number[]): boolean {
+function skipsDriveLicense(
+  player: Player,
+  vehicle: Vehicle,
+  access: OrgVehicleAccess | null
+): boolean {
+  return (
+    !!access &&
+    access.orgIds.includes(ORG_AUTOSCHOOL_ID) &&
+    canEnterAutoschoolExamVehicle(player, vehicle)
+  );
+}
+
+function canUseOrgVehicle(
+  player: Player,
+  orgIds: readonly number[],
+  vehicle: Vehicle
+): boolean {
   if (!isPlayerActive(player)) {
     return false;
   }
@@ -220,7 +279,25 @@ function canUseOrgVehicle(player: Player, orgIds: readonly number[]): boolean {
   }
 
   const orgId = getMembership(account)?.org.id;
-  return orgId !== undefined && orgIds.includes(orgId);
+  if (orgId !== undefined && orgIds.includes(orgId)) {
+    return true;
+  }
+
+  return (
+    orgIds.includes(ORG_AUTOSCHOOL_ID) && canEnterAutoschoolExamVehicle(player, vehicle)
+  );
+}
+
+function denyMessage(
+  player: Player,
+  vehicle: Vehicle,
+  access: OrgVehicleAccess
+): string {
+  if (access.orgIds.includes(ORG_AUTOSCHOOL_ID)) {
+    return autoschoolExamVehicleDeny(player, vehicle) ?? access.denyMessage;
+  }
+
+  return access.denyMessage;
 }
 
 function accessFor(vehicle: Vehicle): OrgVehicleAccess | null {

@@ -42,7 +42,7 @@
 1. `database`, `persist`, `auth`, `spawn`, `mapping`
 2. `hospital`, `cityhall`, `bank`, `miner`, `gps`, `prison`, `afk`, `payday`, `worldtime`, `zones`
 3. `hud`, `session`, `chat`, `commands`
-4. `admin`, `org`
+4. `admin`, `org`, `autoschool`
 5. **`vehicles` последним** — машины после органов и ворот
 
 ```
@@ -55,7 +55,7 @@ resources/src/modules/
   org/          армия, больница, банды 9–13
 ```
 
-GPS v2: метки **ZHD LS**, **Tyurma**, **Bank**, **Oblastnaya policiya**, **LSPD**, **FBI**, **LCN**, **Yakuza**, **Russkaya mafiya**.
+GPS v2: метки **ZHD LS**, **Tyurma**, **Bank**, **Oblastnaya policiya**, **LSPD**, **FBI**, **Avtoshkola**, **LCN**, **Yakuza**, **Russkaya mafiya**.
 
 `/mn`: пункт **Svyaz' s administraciey** → диалог репорта.
 
@@ -71,8 +71,9 @@ GPS v2: метки **ZHD LS**, **Tyurma**, **Bank**, **Oblastnaya policiya**, **
 | `lawfulness` | SMALLINT, −100…100, новый персонаж **100** |
 | `muted_until` | INT UNSIGNED NULL, unix **секунды**; NULL = нет мута |
 | `jail_seconds` | INT UNSIGNED, оставшийся срок; 0 = не в тюрьме. Тикает **только онлайн** |
+| `license_car` `license_moto` `license_fly` `license_boat` `license_gun` | TINYINT, 0 = нет лицензии |
 
-В памяти: `Account.bank`, `Account.lawfulness`, `Account.mutedUntil` (мс), `Account.jailSeconds`.
+В памяти: `Account.bank`, `Account.lawfulness`, `Account.mutedUntil` (мс), `Account.jailSeconds`, `Account.licenses`.
 
 Таблица **`gang_zones`**: клетка карты банд. Seed в том же `schema.sql` (104 строки). Координаты и стартовый владелец из seed; **`org_id` при повторном seed не перезаписывается** (капты).
 
@@ -100,7 +101,9 @@ GPS v2: метки **ZHD LS**, **Tyurma**, **Bank**, **Oblastnaya policiya**, **
 
 ### Скутера у ЖД
 
-11 × **Faggio (462)**, цвет **191**, угол −90, респавн 100 с. Координата X `1775.908`, Y от `-1933.96` до `-1917.94`.
+11 × **Faggio (462)**, цвет **191**, угол −90, респавн 100 с. Координата X `1775.908`, Y от `-1933.96` до `-1917.94`. Права не нужны.
+
+За рулём без лицензии нельзя: авто — `license_car`, мото (кроме Faggio/Pizzaboy и великов) — `license_moto`, вертолёт/самолёт — `license_fly`. Пассажиру лицензия не нужна. На экзамене автошколы ученик может вести Premier/Wayfarer. `vehicles/drive-license.ts`.
 
 ### Двигатель
 
@@ -186,7 +189,7 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 
 Невидимые (без GangZone и текста). Пешком нельзя нанести урон; HP/броня откатываются.
 
-Районы: ЖД, мэрия, больница, шахта. Только VW улицы, interior 0.
+Районы: ЖД, мэрия, больница, шахта, автошкола. Только VW улицы, interior 0.
 
 ---
 
@@ -320,6 +323,12 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 | 7 | Avtoshkola | `0xfff3b0ff` | `org/autoschool.ts` |
 | 8 | Radiocentr | `0xff8c00ff` | `org/radio.ts` |
 
+Вход Avtoshkola (пикап **19132**, любой): улица `739.04, -1418.46, 13.52` → interior **3** `-2028.73, -105.08, 1035.17`. Выход: `-2026.92, -103.71, 1035.17` → улица `739.00, -1415.03, 13.52`. Парковка: `739.07, -1428.91, 13.90` ↔ `-2029.75, -117.98, 1035.17`. GPS: **Avtoshkola** `738.83, -1412.74, 13.53`. Иконка (слот 10, тип **55**) в радиусе ~300 м: `741.35, -1417.58, 14.20`. Спавн сотрудников: interior **3** `-2024.38, -114.57, 1035.17`. `org/autoschool-doors.ts`, `org/autoschool-map.ts`.
+
+`/selllic [id]` — любой ранг Avtoshkola, пешком у стойки `-2031.86, -116.98, 1035.17` (interior **3**, радиус 8 м). Покупатель рядом (10 м, тот же VW/interior). Список только тех лицензий, которых нет; цена наличными в диапазоне: авто $5000–50000, мото $3000–30000, полёты $20000–150000, вода $10000–80000, оружие $15000–100000. Покупатель видит `Sotrudnik Name_Surname predlagaet vam kupit' licenziyu … za $N` и **Soglasit'sya** / **Otkazat'sya**. TTL 60 с. `commands/selllic.ts`.
+
+Экзамен на авто/мото: красный чекпоинт в interior **3** `-2026.75, -114.34, 1035.17`. Выбор транспорта → краткие ПДД → тест 5 вопросов за **$500** наличными (нужны все верные, иначе `N/5`). После теории — 10 минут, выйти на парковку и сесть в Premier (426) или Wayfarer (586) **автошколы**. Маршрут 29 race-checkpoint со стрелкой; на финише высадка, респавн машины, лицензия в БД. `modules/autoschool/`.
+
 Ранги полиции (4 и 5) общие: `org/police-ranks.ts`.
 
 Транспорт областной полиции у участка Dillimore (Police LS 596 ×7, Ranger 599 ×2, Cheetah 415, Maverick 497, HPV1000 523 ×5) — цвета из спавна, только `org_id = 4`. LSPD сесть не может. `vehicles/police.ts`.
@@ -327,6 +336,8 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 Транспорт LSPD у участка LS (596 ×11, SWAT 601 ×2, Ranger 599 ×3, Enforcer 427 ×2, Cheetah 415 ×2, HPV1000 523 ×6, Maverick 497) — те же цвета, только `org_id = 5`. Областная полиция сесть не может. `vehicles/lspd.ts`.
 
 Транспорт FBI (FBI Rancher 490 ×7, Cheetah 415 ×2, Sultan 560 ×2, Maverick 487) — цвет 0/0, только `org_id = 6`. `vehicles/fbi.ts`.
+
+Транспорт Avtoshkola у здания (Premier 426 ×5, Wayfarer 586 ×5) — цвет **124**, только `org_id = 7`. После сдачи теории экзамена ученик тоже может сесть в нужный тип. Чужому: двери закрыты. `vehicles/autoschool.ts`.
 
 Иконка FBI (слот 9, тип 30) в радиусе ~300 м: `606.91, -1462.48, 14.44`. GPS: **FBI** `617.45, -1458.59, 14.43`. `org/fbi-map.ts`.
 
@@ -470,8 +481,10 @@ GPS: **LCN** `1288.81, -2056.62, 58.63`, **Yakuza** `664.94, -1315.21, 13.45`, *
 | `/r` `/f` `/d` `/gov` | рации, см. Банды / Мафии |
 | `/capture` | захват гангзоны, ранг банды 8+ |
 | `/time` | часы; если есть мут или срок — оставшееся время; label `Posmotrel(a) na chasy.` |
+| `/lic` | свои лицензии; `/lic [id]` — показать рядом (5 м) |
+| `/selllic [id]` | сотрудник Avtoshkola продаёт лицензию у стойки |
 
-`/stats` и `/pass`: банк, законопослушность, орган.
+`/stats` и `/pass`: банк, законопослушность, орган. `/lic`: авто, мото, полёты, вода, оружие (по умолчанию нет).
 
 ---
 
@@ -491,6 +504,14 @@ GPS: **LCN** `1288.81, -2056.62, 58.63`, **Yakuza** `664.94, -1315.21, 13.45`, *
 | 25 | оружейка тюрьмы |
 | 26 | пульт тюрьмы `/pult` |
 | 27 | двор тюрьмы открыть/закрыть |
+| 28 | лицензии `/lic` |
+| 29 | `/selllic` список лицензий |
+| 30 | `/selllic` цена |
+| 31 | `/selllic` подтверждение покупателя |
+| 32 | экзамен: авто/мото |
+| 33 | экзамен: правила ПДД |
+| 34 | экзамен: вопрос |
+| 35 | экзамен: результат теста |
 
 ---
 
@@ -512,13 +533,17 @@ GPS: **LCN** `1288.81, -2056.62, 58.63`, **Yakuza** `664.94, -1315.21, 13.45`, *
 | Задача | Файл |
 |---|---|
 | Скутера / общий спавн машин | `vehicles/index.ts`, `vehicles/spawn.ts` |
+| Лицензии на транспорт | `vehicles/drive-license.ts`, `vehicles/access.ts` |
 | Армейский транспорт | `vehicles/army.ts`, `vehicles/access.ts` |
 | Больница орган / машины | `org/hospital.ts`, `vehicles/hospital.ts` |
 | Мэрия | `org/meriya.ts`, `vehicles/meriya.ts`, `org/meriya-locker.ts`, `org/meriya-doors.ts` |
 | Полиция / LSPD / FBI / автошкола / радио | `org/police.ts`, `org/lspd.ts`, `org/fbi.ts`, `org/autoschool.ts`, `org/radio.ts` |
+| Вход Avtoshkola | `org/autoschool-doors.ts` |
+| Иконка Avtoshkola | `org/autoschool-map.ts` |
 | Машины областной полиции | `vehicles/police.ts` |
 | Машины LSPD | `vehicles/lspd.ts` |
 | Машины FBI | `vehicles/fbi.ts` |
+| Машины Avtoshkola | `vehicles/autoschool.ts` |
 | Машины у тюрьмы | `vehicles/prison.ts` |
 | Иконка FBI | `org/fbi-map.ts` |
 | Вход FBI | `org/fbi-doors.ts` |
@@ -554,3 +579,6 @@ GPS: **LCN** `1288.81, -2056.62, 58.63`, **Yakuza** `664.94, -1315.21, 13.45`, *
 | Оружейка тюрьмы | `prison/prison-locker.ts` |
 | Пульт тюрьмы `/pult` | `prison/control.ts` |
 | Схема БД | `sql/schema.sql` + `auth/repository.ts` |
+| Лицензии `/lic` | `auth/licenses.ts`, `commands/lic.ts` |
+| Продажа лицензий `/selllic` | `commands/selllic.ts` |
+| Экзамен авто/мото | `modules/autoschool/` |

@@ -11,6 +11,8 @@ import "./w";
 import "./stats";
 import "./time";
 import "./pass";
+import "./lic";
+import "./selllic";
 import "./hospital";
 import "./gps";
 import "./leaders";
@@ -25,6 +27,7 @@ import { bindMenuDialogs } from "./mn";
 import { bindGpsDialogs } from "../gps";
 import { bindReportDialogs } from "./report";
 import { bindOrgStaff } from "./org-staff";
+import { bindSellLic } from "./selllic";
 import { bindTimeLabels } from "./time";
 
 export const commandsModule: GameModule = {
@@ -35,6 +38,7 @@ export const commandsModule: GameModule = {
     bindGpsDialogs();
     bindReportDialogs();
     bindOrgStaff();
+    bindSellLic();
     bindTimeLabels();
   },
 };

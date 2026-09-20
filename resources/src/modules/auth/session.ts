@@ -1,6 +1,7 @@
 import type { Player } from "@omp-node/core";
 import { playerId } from "../../shared/player";
 import type { Gender } from "./gender";
+import type { Licenses } from "./licenses";
 
 export const MAX_HEALTH = 100;
 export const MIN_HEALTH = 20;
@@ -53,6 +54,7 @@ export type Account = {
   orgRank: number;
   mutedUntil: number | null;
   jailSeconds: number;
+  licenses: Licenses;
 };
 
 const accounts = new Map<number, Account>();
@@ -140,6 +142,7 @@ export function patchAccount(
       | "skin"
       | "mutedUntil"
       | "jailSeconds"
+      | "licenses"
     >
   >
 ): void {

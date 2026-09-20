@@ -3,6 +3,7 @@ import { Color } from "../../shared/colors";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { isAuthenticated } from "../auth/session";
 import { isMinerOnShift } from "../miner";
+import { isAutoschoolExamOnRoute } from "../autoschool/session";
 import type { GameModule } from "../types";
 
 export const GPS_DIALOG_ID = 7;
@@ -74,6 +75,13 @@ const TARGETS: readonly GpsTarget[] = [
     x: 617.4481,
     y: -1458.5858,
     z: 14.4322,
+  },
+  {
+    key: "autoschool",
+    label: "Avtoshkola",
+    x: 738.8304,
+    y: -1412.7374,
+    z: 13.5284,
   },
   {
     key: "bank",
@@ -193,7 +201,7 @@ function setRoute(player: Player, target: GpsTarget): void {
       GPS_ICON_COLOR,
       MAPICON_GLOBAL
     );
-    if (!isMinerOnShift(player)) {
+    if (!isMinerOnShift(player) && !isAutoschoolExamOnRoute(player)) {
       Checkpoint.set(player, target.x, target.y, target.z, CHECKPOINT_RADIUS);
     }
   } catch {
@@ -232,7 +240,11 @@ function tickGps(): void {
         return;
       }
 
-      if (!isMinerOnShift(player) && !Checkpoint.isActive(player)) {
+      if (
+        !isMinerOnShift(player) &&
+        !isAutoschoolExamOnRoute(player) &&
+        !Checkpoint.isActive(player)
+      ) {
         Checkpoint.set(player, target.x, target.y, target.z, CHECKPOINT_RADIUS);
       }
     } catch {
@@ -263,7 +275,7 @@ function clearRoute(player: Player, id: number): void {
   activeByPlayer.delete(id);
   try {
     player.removeMapIcon(GPS_ICON_SLOT);
-    if (!isMinerOnShift(player)) {
+    if (!isMinerOnShift(player) && !isAutoschoolExamOnRoute(player)) {
       Checkpoint.disable(player);
     }
   } catch {

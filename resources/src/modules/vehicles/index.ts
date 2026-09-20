@@ -2,6 +2,7 @@ import { STREET_WORLD } from "../spawn/point";
 import type { GameModule } from "../types";
 import { bindOrgVehicleAccess } from "./access";
 import { spawnArmyVehicles } from "./army";
+import { spawnAutoschoolVehicles } from "./autoschool";
 import { spawnFbiVehicles } from "./fbi";
 import { spawnGangVehicles } from "./gangs";
 import { spawnHospitalVehicles } from "./hospital";
@@ -46,6 +47,7 @@ export const vehiclesModule: GameModule = {
     spawnPoliceVehicles();
     spawnLspdVehicles();
     spawnFbiVehicles();
+    spawnAutoschoolVehicles();
     spawnPrisonVehicles();
     spawnGangVehicles();
 

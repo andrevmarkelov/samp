@@ -9,6 +9,7 @@ import {
   type Account,
 } from "./session";
 import { parseOrgId, parseOrgRank } from "../org/membership";
+import { EMPTY_LICENSES, licenseFlag, type Licenses } from "./licenses";
 
 export const STARTING_MONEY = 500;
 
@@ -35,6 +36,11 @@ type UserRow = RowDataPacket & {
   org_rank: number;
   muted_until: number | null;
   jail_seconds: number;
+  license_car: number | boolean;
+  license_moto: number | boolean;
+  license_fly: number | boolean;
+  license_boat: number | boolean;
+  license_gun: number | boolean;
 };
 
 const CREATE_USERS_SQL = `
@@ -63,6 +69,11 @@ CREATE TABLE IF NOT EXISTS users (
   org_rank TINYINT UNSIGNED NOT NULL DEFAULT 0,
   muted_until INT UNSIGNED NULL DEFAULT NULL,
   jail_seconds INT UNSIGNED NOT NULL DEFAULT 0,
+  license_car TINYINT(1) NOT NULL DEFAULT 0,
+  license_moto TINYINT(1) NOT NULL DEFAULT 0,
+  license_fly TINYINT(1) NOT NULL DEFAULT 0,
+  license_boat TINYINT(1) NOT NULL DEFAULT 0,
+  license_gun TINYINT(1) NOT NULL DEFAULT 0,
   birth_date DATE NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
@@ -144,6 +155,26 @@ const COLUMN_MIGRATIONS = [
     name: "jail_seconds",
     sql: "jail_seconds INT UNSIGNED NOT NULL DEFAULT 0 AFTER muted_until",
   },
+  {
+    name: "license_car",
+    sql: "license_car TINYINT(1) NOT NULL DEFAULT 0 AFTER jail_seconds",
+  },
+  {
+    name: "license_moto",
+    sql: "license_moto TINYINT(1) NOT NULL DEFAULT 0 AFTER license_car",
+  },
+  {
+    name: "license_fly",
+    sql: "license_fly TINYINT(1) NOT NULL DEFAULT 0 AFTER license_moto",
+  },
+  {
+    name: "license_boat",
+    sql: "license_boat TINYINT(1) NOT NULL DEFAULT 0 AFTER license_fly",
+  },
+  {
+    name: "license_gun",
+    sql: "license_gun TINYINT(1) NOT NULL DEFAULT 0 AFTER license_boat",
+  },
 ] as const;
 
 export async function ensureUsersTable(): Promise<void> {
@@ -173,7 +204,7 @@ async function columnExists(column: string): Promise<boolean> {
 
 export async function findUserByName(name: string): Promise<UserRow | null> {
   const rows = await query<UserRow>(
-    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, bank, donate, lawfulness, health, passport, hospitalized, invited_by, birth_date, admin_level, org_id, org_rank, muted_until, jail_seconds FROM users WHERE name = ? LIMIT 1",
+    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, bank, donate, lawfulness, health, passport, hospitalized, invited_by, birth_date, admin_level, org_id, org_rank, muted_until, jail_seconds, license_car, license_moto, license_fly, license_boat, license_gun FROM users WHERE name = ? LIMIT 1",
     [name]
   );
   return rows[0] ?? null;
@@ -235,6 +266,7 @@ export async function createUser(input: {
     orgRank: 0,
     mutedUntil: null,
     jailSeconds: 0,
+    licenses: { ...EMPTY_LICENSES },
   };
 }
 
@@ -266,6 +298,63 @@ export async function saveUserMoney(
     bank,
     userId,
   ]);
+}
+
+export async function saveLicenseSale(input: {
+  sellerId: number;
+  sellerCash: number;
+  sellerBank: number;
+  buyerId: number;
+  buyerCash: number;
+  buyerBank: number;
+  buyerLicenses: Licenses;
+}): Promise<void> {
+  const conn = await getPool().getConnection();
+  try {
+    await conn.beginTransaction();
+    await conn.query("UPDATE users SET money = ?, bank = ? WHERE id = ?", [
+      input.sellerCash,
+      input.sellerBank,
+      input.sellerId,
+    ]);
+    await conn.query(
+      `UPDATE users
+       SET money = ?, bank = ?, license_car = ?, license_moto = ?, license_fly = ?, license_boat = ?, license_gun = ?
+       WHERE id = ?`,
+      [
+        input.buyerCash,
+        input.buyerBank,
+        input.buyerLicenses.car ? 1 : 0,
+        input.buyerLicenses.moto ? 1 : 0,
+        input.buyerLicenses.fly ? 1 : 0,
+        input.buyerLicenses.boat ? 1 : 0,
+        input.buyerLicenses.gun ? 1 : 0,
+        input.buyerId,
+      ]
+    );
+    await conn.commit();
+  } catch (error) {
+    await conn.rollback();
+    throw error;
+  } finally {
+    conn.release();
+  }
+}
+
+export async function saveUserLicenses(userId: number, licenses: Licenses): Promise<void> {
+  await execute(
+    `UPDATE users
+     SET license_car = ?, license_moto = ?, license_fly = ?, license_boat = ?, license_gun = ?
+     WHERE id = ?`,
+    [
+      licenses.car ? 1 : 0,
+      licenses.moto ? 1 : 0,
+      licenses.fly ? 1 : 0,
+      licenses.boat ? 1 : 0,
+      licenses.gun ? 1 : 0,
+      userId,
+    ]
+  );
 }
 
 export async function saveUserBankTransfer(
@@ -441,6 +530,17 @@ export function accountFromRow(row: UserRow): Account {
     orgRank: parseOrgRank(row.org_rank),
     mutedUntil: parseMutedUntil(row.muted_until),
     jailSeconds: parseJailSeconds(row.jail_seconds),
+    licenses: licensesFromRow(row),
+  };
+}
+
+function licensesFromRow(row: UserRow): Licenses {
+  return {
+    car: licenseFlag(row.license_car),
+    moto: licenseFlag(row.license_moto),
+    fly: licenseFlag(row.license_fly),
+    boat: licenseFlag(row.license_boat),
+    gun: licenseFlag(row.license_gun),
   };
 }
 

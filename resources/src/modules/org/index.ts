@@ -4,7 +4,7 @@ export { MERIYA, ORG_MERIYA_ID } from "./meriya";
 export { ORG_POLICE_ID, POLICE } from "./police";
 export { LSPD, LSPD_GATES, LSPD_INTERIOR, ORG_LSPD_ID } from "./lspd";
 export { FBI, FBI_INTERIOR, ORG_FBI_ID } from "./fbi";
-export { AUTOSCHOOL, ORG_AUTOSCHOOL_ID } from "./autoschool";
+export { AUTOSCHOOL, AUTOSCHOOL_INTERIOR, ORG_AUTOSCHOOL_ID } from "./autoschool";
 export { ORG_RADIO_ID, RADIOCENTR } from "./radio";
 export {
   AZTECAS,
