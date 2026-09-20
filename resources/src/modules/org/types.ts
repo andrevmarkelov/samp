@@ -22,6 +22,8 @@ export type OrganizationDef = {
   color: number;
   gov: boolean;
   illegal: boolean;
+  /** Семья: /f, без /r /d /gov и без капта. */
+  mafia?: boolean;
   spawn: SpawnPoint;
   ranks: readonly OrgRankDef[];
 };

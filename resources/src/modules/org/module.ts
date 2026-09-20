@@ -11,6 +11,7 @@ import { bindFbiMapIcon } from "./fbi-map";
 import { bindLspdDoors } from "./lspd-doors";
 import { bindLspdLocker } from "./lspd-locker";
 import { bindLspdMapIcon } from "./lspd-map";
+import { bindMafiaDoors } from "./mafia-doors";
 import { bindPoliceMapIcon } from "./police-map";
 
 export const orgModule: GameModule = {
@@ -29,5 +30,6 @@ export const orgModule: GameModule = {
     bindLspdMapIcon();
     bindFbiDoors();
     bindFbiMapIcon();
+    bindMafiaDoors();
   },
 };

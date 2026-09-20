@@ -25,6 +25,8 @@ export const PRISON_WORLD = 3;
 /** Двор тюрьмы на координатах участка: игроки не пересекаются с улицей. */
 export const PRISON_YARD_WORLD = 4;
 
+/** Мафии (интерьер 5): LCN VW 14, Yakuza 15, Russkaya 16 — `org/mafias.ts`. */
+
 /** Обычный спавн, пока игрок не в организации. */
 export const DEFAULT_SPAWN: SpawnPoint = {
   x: 1760.2538,

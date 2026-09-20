@@ -1,6 +1,11 @@
 import { Dialog, omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
-import { CHAT_MAX_LENGTH, clipClientMessage, sanitizeChatText } from "../../shared/nearby";
+import {
+  CHAT_MAX_LENGTH,
+  arePlayersNearby,
+  clipClientMessage,
+  sanitizeChatText,
+} from "../../shared/nearby";
 import { isPlayerActive, playerChatName, playerId } from "../../shared/player";
 import { saveUserOrg } from "../auth/repository";
 import { byGender } from "../auth/gender";
@@ -23,6 +28,7 @@ const DIALOG_STYLE_MSGBOX = 0;
 const STAFF_MIN_RANK = 9;
 const MANAGE_MAX_RANK = 9;
 const INVITE_TTL_MS = 60_000;
+const INVITE_RADIUS = 10;
 
 type PendingInvite = {
   inviterSlot: number;
@@ -234,6 +240,11 @@ registerCommand("invite", "Priglasit' v organizaciyu", (player, args) => {
 
   if (targetAccount.orgId !== ORG_NONE || getMembership(targetAccount)) {
     tell(player, Color.error, "Igrok uzhe sostoit v organizacii.");
+    return;
+  }
+
+  if (!arePlayersNearby(player, target, INVITE_RADIUS)) {
+    tell(player, Color.error, "Igrok slishkom daleko.");
     return;
   }
 
@@ -538,7 +549,24 @@ export function bindOrgStaff(): void {
       return;
     }
 
+    if (!inviterOk || !inviter) {
+      tell(player, Color.error, "Priglashenie uzhe neaktual'no.");
+      return;
+    }
+
+    if (!arePlayersNearby(player, inviter, INVITE_RADIUS)) {
+      tell(player, Color.error, "Vy slishkom daleko ot togo, kto priglasil.");
+      tell(inviter, Color.error, `${targetTag} ne smog prinyat': slishkom daleko.`);
+      return;
+    }
+
     void (async () => {
+      if (!arePlayersNearby(player, inviter, INVITE_RADIUS)) {
+        tell(player, Color.error, "Vy slishkom daleko ot togo, kto priglasil.");
+        tell(inviter, Color.error, `${targetTag} ne smog prinyat': slishkom daleko.`);
+        return;
+      }
+
       const ok = await setOrg(player, pending.orgId, pending.orgRank);
       if (!ok) {
         tell(player, Color.error, "Ne udalos' sohranit' v bazu.");

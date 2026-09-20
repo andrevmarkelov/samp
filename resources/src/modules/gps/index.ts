@@ -82,6 +82,27 @@ const TARGETS: readonly GpsTarget[] = [
     y: -1024.3342,
     z: 23.8281,
   },
+  {
+    key: "lcn",
+    label: "LCN",
+    x: 1288.8087,
+    y: -2056.6206,
+    z: 58.6303,
+  },
+  {
+    key: "yakuza",
+    label: "Yakuza",
+    x: 664.9431,
+    y: -1315.2083,
+    z: 13.4496,
+  },
+  {
+    key: "russian_mafia",
+    label: "Russkaya mafiya",
+    x: 962.1949,
+    y: -946.551,
+    z: 40.2929,
+  },
 ];
 
 const activeByPlayer = new Map<number, GpsTarget>();

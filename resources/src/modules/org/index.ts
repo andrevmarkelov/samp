@@ -20,6 +20,20 @@ export {
   VAGOS,
 } from "./gangs";
 export {
+  LCN,
+  LCN_WORLD,
+  MAFIA_INTERIOR,
+  MAFIAS,
+  ORG_LCN_ID,
+  ORG_RUSSIAN_MAFIA_ID,
+  ORG_YAKUZA_ID,
+  RUSSIAN_MAFIA,
+  RUSSIAN_MAFIA_WORLD,
+  YAKUZA,
+  YAKUZA_GATES,
+  YAKUZA_WORLD,
+} from "./mafias";
+export {
   applyOrgVisuals,
   resolveChatColor,
   resolveNametagColor,

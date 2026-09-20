@@ -22,7 +22,7 @@ registerCommand("r", "Raciya organizacii", (player, args) => {
     return;
   }
 
-  if (membership.org.illegal) {
+  if (membership.org.illegal || membership.org.mafia) {
     return;
   }
 

@@ -16,6 +16,23 @@ export function clipClientMessage(text: string): string {
   return text.slice(0, CLIENT_MESSAGE_MAX);
 }
 
+export function arePlayersNearby(source: Player, other: Player, radius: number): boolean {
+  try {
+    if (source.getVirtualWorld() !== other.getVirtualWorld()) {
+      return false;
+    }
+
+    if (source.getInterior() !== other.getInterior()) {
+      return false;
+    }
+
+    const pos = source.getPos();
+    return other.getDistanceFromPoint(pos.x, pos.y, pos.z) <= radius;
+  } catch {
+    return false;
+  }
+}
+
 export function sendNearby(
   source: Player,
   radius: number,

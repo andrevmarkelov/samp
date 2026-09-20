@@ -12,12 +12,11 @@ import { getMembership } from "../org";
 import { registerCommand } from "./registry";
 
 const BUBBLE_MS = 3000;
-const BUBBLE_TEXT = "Soobschenie bande.";
 
-registerCommand("f", "Chat bandy", (player, args) => {
+registerCommand("f", "Chat bandy ili mafii", (player, args) => {
   const account = getAccount(player);
   const membership = account ? getMembership(account) : null;
-  if (!account || !membership?.org.illegal) {
+  if (!account || !membership || !(membership.org.illegal || membership.org.mafia)) {
     return;
   }
 
@@ -27,11 +26,11 @@ registerCommand("f", "Chat bandy", (player, args) => {
     return;
   }
 
-  const color = membership.org.color;
   const line = clipClientMessage(
     `[F] ${membership.rank.title} ${playerChatName(player)}: ${text}`
   );
   const orgId = membership.org.id;
+  const bubble = membership.org.mafia ? "Soobschenie mafii." : "Soobschenie bande.";
 
   omp.players.forEach((other) => {
     if (!isPlayerActive(other)) {
@@ -53,14 +52,14 @@ registerCommand("f", "Chat bandy", (player, args) => {
     }
 
     try {
-      other.sendClientMessage(color, line);
+      other.sendClientMessage(Color.radio, line);
     } catch {
       // Слот пустой.
     }
   });
 
   try {
-    player.setChatBubble(BUBBLE_TEXT, color, CHAT_RADIUS, BUBBLE_MS);
+    player.setChatBubble(bubble, Color.radio, CHAT_RADIUS, BUBBLE_MS);
   } catch {
     // Пузырь не обязателен.
   }

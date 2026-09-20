@@ -1,6 +1,6 @@
 import { Dialog, omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
-import { WHISPER_RADIUS } from "../../shared/nearby";
+import { WHISPER_RADIUS, arePlayersNearby } from "../../shared/nearby";
 import { isPlayerActive, playerId, playerName } from "../../shared/player";
 import { byGender, genderLabel } from "../auth/gender";
 import { getAccount, type Account } from "../auth/session";
@@ -57,7 +57,7 @@ registerCommand("pass", "Pasport: posmotret' ili pokazat' po id", (player, args)
     return;
   }
 
-  if (!samePlaceNearby(player, target)) {
+  if (!arePlayersNearby(player, target, WHISPER_RADIUS)) {
     player.sendClientMessage(Color.error, "Igrok slishkom daleko.");
     return;
   }
@@ -71,23 +71,6 @@ registerCommand("pass", "Pasport: posmotret' ili pokazat' po id", (player, args)
 
 function isAuthenticatedTarget(player: Player): boolean {
   return getAccount(player) !== null;
-}
-
-function samePlaceNearby(source: Player, other: Player): boolean {
-  try {
-    if (source.getVirtualWorld() !== other.getVirtualWorld()) {
-      return false;
-    }
-
-    if (source.getInterior() !== other.getInterior()) {
-      return false;
-    }
-
-    const pos = source.getPos();
-    return other.getDistanceFromPoint(pos.x, pos.y, pos.z) <= WHISPER_RADIUS;
-  } catch {
-    return false;
-  }
 }
 
 function passRow(label: string, value: string): string {

@@ -397,7 +397,7 @@ export function tryStartCapture(player: Player): void {
 
   const account = getAccount(player);
   const membership = account ? getMembership(account) : null;
-  if (!account || !membership?.org.illegal) {
+  if (!account || !membership || !isGangOrgId(membership.org.id)) {
     return;
   }
 
