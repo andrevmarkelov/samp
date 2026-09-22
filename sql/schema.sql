@@ -47,6 +47,30 @@ CREATE TABLE IF NOT EXISTS gang_zones (
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS houses (
+  id SMALLINT UNSIGNED NOT NULL,
+  owner_id INT UNSIGNED NULL DEFAULT NULL,
+  entrance_x FLOAT NOT NULL,
+  entrance_y FLOAT NOT NULL,
+  entrance_z FLOAT NOT NULL,
+  interior_x FLOAT NOT NULL,
+  interior_y FLOAT NOT NULL,
+  interior_z FLOAT NOT NULL,
+  vehicle_x FLOAT NOT NULL,
+  vehicle_y FLOAT NOT NULL,
+  vehicle_z FLOAT NOT NULL,
+  vehicle_angle FLOAT NOT NULL,
+  price INT UNSIGNED NOT NULL,
+  interior_id SMALLINT UNSIGNED NOT NULL,
+  has_medkit TINYINT(1) NOT NULL DEFAULT 0,
+  is_locked TINYINT(1) NOT NULL DEFAULT 1,
+  class_id TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  rent_paid_until DATE NULL DEFAULT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_houses_owner_id (owner_id),
+  CONSTRAINT fk_houses_owner FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 INSERT INTO gang_zones (id, min_x, min_y, max_x, max_y, org_id) VALUES
 (0, 1849.377441, -1054.259277, 2069.417724, -945.29718, 9),
 (1, 2069.417724, -1108.966552, 2175.527587, -945.29718, 9),

@@ -17,6 +17,7 @@ import { bindAdminSetskin } from "./setskin";
 import { bindAdminGivemoney } from "./givemoney";
 import { bindAdminMakeadmin } from "./makeadmin";
 import { bindAdminMakeleader } from "./makeleader";
+import { bindAdminAsellhouse } from "./asellhouse";
 import { bindAdminGzcolor } from "./gzcolor";
 import { bindAdminMapTeleport } from "./map";
 import { bindAdminRespcar } from "./respcar";
@@ -48,6 +49,7 @@ export const adminModule: GameModule = {
     bindAdminRespcar();
     bindAdminMakeleader();
     bindAdminGzcolor();
+    bindAdminAsellhouse();
     bindAdminGivemoney();
     bindAdminSetlevel();
     bindAdminMakeadmin();

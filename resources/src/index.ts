@@ -23,6 +23,7 @@ import { hudModule } from "./modules/hud";
 import { adminModule } from "./modules/admin";
 import { orgModule } from "./modules/org";
 import { autoschoolModule } from "./modules/autoschool";
+import { housesModule } from "./modules/houses";
 import type { GameModule } from "./modules/types";
 
 const modules: GameModule[] = [
@@ -34,6 +35,7 @@ const modules: GameModule[] = [
   hospitalModule,
   cityHallModule,
   bankModule,
+  housesModule,
   minerModule,
   gpsModule,
   prisonModule,

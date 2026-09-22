@@ -9,6 +9,15 @@ import {
   isAuthenticated,
   patchAccount,
 } from "../auth/session";
+import {
+  BANK_HOUSE_RENT_CONFIRM_DIALOG_ID,
+  BANK_HOUSE_RENT_DAYS_DIALOG_ID,
+  BANK_HOUSE_RENT_EMPTY_DIALOG_ID,
+  BANK_HOUSE_RENT_INFO_DIALOG_ID,
+  clearHouseRentPending,
+  handleHouseRentDialog,
+  showHouseRentMenu,
+} from "../houses/bank-rent";
 
 export const BANK_MENU_DIALOG_ID = 13;
 export const BANK_BALANCE_DIALOG_ID = 14;
@@ -34,6 +43,7 @@ const MENU_ITEMS = [
   "Пополнить счёт",
   "Снять со счёта",
   "Перевести на счёт",
+  "Оплатить дом",
 ] as const;
 
 type PendingSend = {
@@ -91,6 +101,7 @@ export function startTellers(world: number): void {
       standingOn.delete(id);
       busy.delete(id);
       pendingSend.delete(id);
+      clearHouseRentPending(player);
     }
   });
 }
@@ -144,7 +155,11 @@ function handleDialog(
     dialogId !== BANK_WITHDRAW_DIALOG_ID &&
     dialogId !== BANK_SEND_ID_DIALOG_ID &&
     dialogId !== BANK_SEND_CONFIRM_DIALOG_ID &&
-    dialogId !== BANK_SEND_AMOUNT_DIALOG_ID
+    dialogId !== BANK_SEND_AMOUNT_DIALOG_ID &&
+    dialogId !== BANK_HOUSE_RENT_INFO_DIALOG_ID &&
+    dialogId !== BANK_HOUSE_RENT_DAYS_DIALOG_ID &&
+    dialogId !== BANK_HOUSE_RENT_CONFIRM_DIALOG_ID &&
+    dialogId !== BANK_HOUSE_RENT_EMPTY_DIALOG_ID
   ) {
     return;
   }
@@ -156,9 +171,21 @@ function handleDialog(
     return;
   }
 
+  if (handleHouseRentDialog(player, dialogId, ok, listItem, inputText)) {
+    if (
+      isAtTeller(player) &&
+      (dialogId === BANK_HOUSE_RENT_EMPTY_DIALOG_ID ||
+        (dialogId === BANK_HOUSE_RENT_INFO_DIALOG_ID && !ok))
+    ) {
+      showMenu(player);
+    }
+    return;
+  }
+
   if (dialogId === BANK_MENU_DIALOG_ID) {
     if (!ok) {
       clearPending(player);
+      clearHouseRentPending(player);
       return;
     }
 
@@ -177,6 +204,10 @@ function handleDialog(
     }
     if (item === 3) {
       showSendIdDialog(player);
+      return;
+    }
+    if (item === 4) {
+      showHouseRentMenu(player);
       return;
     }
 

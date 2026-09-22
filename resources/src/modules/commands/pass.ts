@@ -5,6 +5,7 @@ import { isPlayerActive, playerId, playerName } from "../../shared/player";
 import { byGender, genderLabel } from "../auth/gender";
 import { getAccount, type Account } from "../auth/session";
 import { ageFromBirthDate, formatBirthDate } from "../auth/validation";
+import { residenceLabel } from "../houses/residence";
 import { getMembership } from "../org";
 import { registerCommand } from "./registry";
 
@@ -81,6 +82,7 @@ function showPassport(viewer: Player, owner: Account): void {
   const membership = getMembership(owner);
   const body = [
     passRow("Имя", owner.name),
+    passRow("Проживание", residenceLabel(owner.id)),
     passRow("Проживание в стране (лет)", String(ageFromBirthDate(owner.birthDate))),
     passRow("Пол", genderLabel(owner.gender)),
     passRow("Дата рождения", formatBirthDate(owner.birthDate)),
