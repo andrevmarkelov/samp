@@ -57,7 +57,7 @@ resources/src/modules/houses/
   index.ts         старт модуля
 ```
 
-Seed: `sql/houses_seed.sql` (382 дома, id 1–382). Импорт: `scripts/import-houses.mjs`.
+Seed: `sql/houses_seed.sql` (382 дома, id 1–382).
 
 ---
 
@@ -239,7 +239,7 @@ rent_paid_until = база + N дней
 | Что | Файл |
 |---|---|
 | Схема и кэш домов | `houses/repository.ts`, `sql/schema.sql` |
-| Координаты домов | `sql/houses_seed.sql`, `scripts/import-houses.mjs` |
+| Координаты домов | `sql/houses_seed.sql` |
 | Ставка аренды | `houses/rent-math.ts` → `HOUSE_RENT_RATE` |
 | Изъятие в полночь | `houses/rent.ts` |
 | Оплата в банке | `houses/bank-rent.ts`, `bank/tellers.ts` |
