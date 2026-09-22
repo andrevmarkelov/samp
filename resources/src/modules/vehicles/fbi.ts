@@ -40,6 +40,8 @@ export function spawnFbiVehicles(): void {
       color2: BLACK,
       respawnSec: RESPAWN_SEC,
       world: STREET_WORLD,
+      siren: spot.model === 415,
+      lightBar: spot.model === 415,
     });
     if (vehicle) {
       registerOrgVehicle(vehicle, ORG_FBI_ID, DENY);

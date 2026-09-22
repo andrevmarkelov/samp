@@ -63,6 +63,8 @@ export function spawnLspdVehicles(): void {
       color2: colors.color2,
       respawnSec: RESPAWN_SEC,
       world: STREET_WORLD,
+      siren: spot.model === 415,
+      lightBar: spot.model === 415,
     });
     if (vehicle) {
       registerOrgVehicle(vehicle, ORG_LSPD_ID, DENY);

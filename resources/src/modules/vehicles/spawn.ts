@@ -2,6 +2,7 @@ import { Vehicle, omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { isAuthenticated } from "../auth/session";
 import { STREET_WORLD } from "../spawn/point";
+import { attachLightBar } from "./light-bar";
 
 const PLAYER_STATE_DRIVER = 2;
 /** Left Ctrl. KEY_ACTION = 1. */
@@ -23,6 +24,7 @@ export type ServerVehicleDef = {
   respawnSec: number;
   world?: number;
   siren?: boolean;
+  lightBar?: boolean;
 };
 
 /** Ручной двигатель для всего транспорта на сервере. */
@@ -77,6 +79,10 @@ export function createServerVehicle(def: ServerVehicleDef): Vehicle | null {
     setEngine(vehicle, false, false);
   } catch {
     // Машина уже в мире — параметры догонятся на vehicleSpawn.
+  }
+
+  if (def.lightBar) {
+    attachLightBar(vehicle);
   }
 
   return vehicle;

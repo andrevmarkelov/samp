@@ -13,6 +13,7 @@ import { spawnPoliceVehicles } from "./police";
 import { spawnPrisonVehicles } from "./prison";
 import { spawnRadioVehicles } from "./radio";
 import { startSpeedLimiter } from "./limit";
+import { bindLightBarRespawn } from "./light-bar";
 import { createServerVehicle, startEngineControl } from "./spawn";
 
 export { createServerVehicle } from "./spawn";
@@ -41,6 +42,7 @@ export const vehiclesModule: GameModule = {
   name: "vehicles",
   start() {
     startEngineControl();
+    bindLightBarRespawn();
     startSpeedLimiter();
     bindOrgVehicleAccess();
     spawnArmyVehicles();

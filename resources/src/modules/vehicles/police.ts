@@ -45,6 +45,8 @@ export function spawnPoliceVehicles(): void {
       color2: spot.color2,
       respawnSec: RESPAWN_SEC,
       world: STREET_WORLD,
+      siren: spot.model === 415,
+      lightBar: spot.model === 415,
     });
     if (vehicle) {
       registerOrgVehicle(vehicle, ORG_POLICE_ID, DENY);
