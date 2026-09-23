@@ -1,5 +1,6 @@
 import { omp, type Player } from "@omp-node/core";
 import { isPlayerActive, playerId } from "../../shared/player";
+import { trustArmour, trustHealth } from "../anticheat/trust";
 import { applyHealth, getAccount, isAuthenticated, MAX_HEALTH } from "../auth/session";
 import { STREET_WORLD } from "../spawn/point";
 
@@ -166,6 +167,8 @@ function restoreVitals(player: Player, amount: number): void {
     if (savedHp) {
       player.setHealth(savedHp.hp);
       player.setArmor(savedHp.armor);
+      trustHealth(player, savedHp.hp);
+      trustArmour(player, savedHp.armor);
       return;
     }
 
@@ -177,7 +180,9 @@ function restoreVitals(player: Player, amount: number): void {
 
     const live = player.getHealth();
     if (live > 0) {
-      player.setHealth(Math.min(MAX_HEALTH, live + Math.max(0, amount)));
+      const next = Math.min(MAX_HEALTH, live + Math.max(0, amount));
+      player.setHealth(next);
+      trustHealth(player, next);
     }
   } catch {
     // Игрок уже вышел.

@@ -1,5 +1,6 @@
 import { INVALID_VEHICLE_ID, omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
+import { trustPosition } from "../anticheat/trust";
 import { refreshStreamForPlayer } from "../mapping/stream";
 import { registerCommand } from "../commands/registry";
 import { hasAdminAccess } from "./session";
@@ -76,6 +77,7 @@ function teleportToCoords(player: Player, x: number, y: number, z: number): bool
       player.setPos(x, y, z);
     }
 
+    trustPosition(player, x, y, z);
     player.setCameraBehind();
     refreshStreamForPlayer(player);
     return true;

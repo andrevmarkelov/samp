@@ -1,6 +1,7 @@
 import { Dialog, omp, Pickup, TextLabel, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { isPlayerActive, playerId } from "../../shared/player";
+import { grantArmour, grantWeapon } from "../anticheat/trust";
 import { getAccount, isAuthenticated } from "../auth/session";
 import { LAW_ORG_IDS } from "../org/lspd";
 import { getMembership } from "../org/membership";
@@ -182,12 +183,12 @@ function pickItem(listItem: number, inputText: string): LockerItem | null {
 function giveItem(player: Player, item: LockerItem): void {
   try {
     if (item.kind === "armor") {
-      player.setArmor(MAX_ARMOR);
+      grantArmour(player, MAX_ARMOR);
       tell(player, Color.info, "Вы надели бронежилет.");
       return;
     }
 
-    player.giveWeapon(item.id, item.ammo ?? 1);
+    grantWeapon(player, item.id, item.ammo ?? 1);
     tell(player, Color.info, `Вы взяли: ${item.label}.`);
   } catch {
     tell(player, Color.error, "Не удалось выдать снаряжение.");

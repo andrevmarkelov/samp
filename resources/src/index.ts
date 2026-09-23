@@ -24,6 +24,7 @@ import { adminModule } from "./modules/admin";
 import { orgModule } from "./modules/org";
 import { autoschoolModule } from "./modules/autoschool";
 import { housesModule } from "./modules/houses";
+import { anticheatModule } from "./modules/anticheat";
 import type { GameModule } from "./modules/types";
 
 const modules: GameModule[] = [
@@ -51,6 +52,7 @@ const modules: GameModule[] = [
   orgModule,
   autoschoolModule,
   vehiclesModule,
+  anticheatModule,
 ];
 
 omp.on("resourceStart", async () => {

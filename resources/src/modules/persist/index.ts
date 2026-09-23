@@ -2,6 +2,7 @@ import { omp, type Player } from "@omp-node/core";
 import { SERVER_TAG } from "../../shared/brand";
 import { isPlayerActive } from "../../shared/player";
 import { saveUserHealth, saveUserJailedSeconds, saveUserVitals } from "../auth/repository";
+import { trustHealth } from "../anticheat/trust";
 import {
   HEALTH_DECAY_AMOUNT,
   HEALTH_DECAY_MS,
@@ -135,6 +136,7 @@ function decayHealth(player: Player): void {
 
     const next = Math.max(MIN_HEALTH, live - HEALTH_DECAY_AMOUNT);
     player.setHealth(next);
+    trustHealth(player, next);
     patchAccount(player, { health: next });
     queueSave(player);
   } catch {

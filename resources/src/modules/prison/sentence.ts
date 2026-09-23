@@ -1,6 +1,7 @@
 import { omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { isPlayerActive, playerId } from "../../shared/player";
+import { trustHealth } from "../anticheat/trust";
 import { saveUserHospitalized, saveUserJailedSeconds } from "../auth/repository";
 import {
   MAX_HEALTH,
@@ -131,6 +132,7 @@ export async function applyJail(player: Player, minutes: number): Promise<boolea
 
   try {
     player.setHealth(MAX_HEALTH);
+    trustHealth(player, MAX_HEALTH);
   } catch {
     // Слот ещё не готов.
   }

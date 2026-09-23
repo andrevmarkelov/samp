@@ -1,4 +1,5 @@
 import type { Player } from "@omp-node/core";
+import { trustPosition } from "../anticheat/trust";
 
 export type SpawnPoint = {
   x: number;
@@ -99,4 +100,5 @@ export function placeAt(player: Player, point: SpawnPoint): void {
   player.setPos(point.x, point.y, point.z);
   player.setFacingAngle(point.angle);
   player.setCameraBehind();
+  trustPosition(player, point.x, point.y, point.z, point.interior, point.world);
 }

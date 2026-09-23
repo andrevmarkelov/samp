@@ -1,5 +1,6 @@
 import { omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
+import { trustPosition } from "../anticheat/trust";
 import { refreshStreamForPlayer } from "../mapping/stream";
 import { STREET_WORLD } from "../spawn/point";
 import { hasAdminAccess } from "./session";
@@ -29,6 +30,7 @@ function teleportToMapMark(player: Player, x: number, y: number, z: number): voi
       player.setPos(x, y, z + 3);
     }
 
+    trustPosition(player, x, y, z + 3, 0, STREET_WORLD);
     refreshStreamForPlayer(player);
     player.sendClientMessage(
       Color.white,

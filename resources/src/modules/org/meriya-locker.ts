@@ -1,6 +1,7 @@
 import { omp, Pickup, TextLabel, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { isPlayerActive, playerId } from "../../shared/player";
+import { grantArmour, grantWeapon } from "../anticheat/trust";
 import { getAccount, isAuthenticated } from "../auth/session";
 import { STREET_WORLD } from "../spawn/point";
 import { CITY_HALL_INTERIOR, ORG_MERIYA_ID } from "./meriya";
@@ -111,9 +112,9 @@ function tryTake(player: Player): void {
   }
 
   try {
-    player.setArmor(MAX_ARMOR);
-    player.giveWeapon(WEAPON_NIGHTSTICK, 1);
-    player.giveWeapon(WEAPON_DEAGLE, DEAGLE_AMMO);
+    grantArmour(player, MAX_ARMOR);
+    grantWeapon(player, WEAPON_NIGHTSTICK, 1);
+    grantWeapon(player, WEAPON_DEAGLE, DEAGLE_AMMO);
   } catch {
     tell(player, Color.error, "Не удалось выдать снаряжение.");
     return;

@@ -1,5 +1,6 @@
 import type { Player } from "@omp-node/core";
 import { playerId } from "../../shared/player";
+import { trustHealth, trustMoney } from "../anticheat/trust";
 import type { Gender } from "./gender";
 import type { Licenses } from "./licenses";
 
@@ -104,6 +105,7 @@ export function applyWallet(player: Player, account: Account): void {
   } catch {
     // Слот ещё не в игре.
   }
+  trustMoney(player, account.money);
 }
 
 export function applyHealth(player: Player, health: number): void {
@@ -112,6 +114,7 @@ export function applyHealth(player: Player, health: number): void {
   } catch {
     // Слот ещё не в игре.
   }
+  trustHealth(player, health);
 }
 
 export function applyScore(player: Player, level: number): void {

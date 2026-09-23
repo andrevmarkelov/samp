@@ -1,6 +1,7 @@
 import { omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { isPlayerActive, playerChatName } from "../../shared/player";
+import { trustPosition } from "../anticheat/trust";
 import { registerCommand } from "../commands/registry";
 import { hasAdminAccess } from "./session";
 
@@ -34,6 +35,7 @@ function slapPlayer(target: Player): boolean {
   try {
     const pos = target.getPos();
     target.setPos(pos.x, pos.y, pos.z + SLAP_HEIGHT);
+    trustPosition(target, pos.x, pos.y, pos.z + SLAP_HEIGHT);
   } catch {
     return false;
   }

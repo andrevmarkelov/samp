@@ -151,7 +151,7 @@ export const spawnModule: GameModule = {
       if (hospital) {
         try {
           placeAt(player, hospital);
-          player.setHealth(HOSPITAL_HEALTH);
+          applyHealth(player, HOSPITAL_HEALTH);
           refreshStreamForPlayer(player);
         } catch {
           // Игрок уже вышел.

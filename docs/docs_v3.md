@@ -2,7 +2,7 @@
 
 **Дата выхода: 22.09.2026**
 
-Что появилось **после** [docs_v2.md](docs_v2.md). Главное в v3 — **система домов**: покупка, интерьеры, аренда через банк, продажа государству, меню внутри дома.
+Что появилось **после** [docs_v2.md](docs_v2.md). Главное в v3 — **система домов** и **серверный античит** (`anticheat`).
 
 Тексты игроку — **русский (UTF-8)**.
 
@@ -22,7 +22,12 @@
 10. [Паспорт и статистика](#паспорт-и-статистика)
 11. [Диалоги](#диалоги)
 12. [Ограничения и известные нюансы](#ограничения-и-известные-нюансы)
-13. [Куда править](#куда-править)
+13. [Куда править (дома)](#куда-править-дома)
+14. [Античит](#античит)
+15. [Античит: включённые проверки](#античит-включённые-проверки)
+16. [Античит: trust API](#античит-trust-api)
+17. [Античит: наказание и конфиг](#античит-наказание-и-конфиг)
+18. [Куда править (античит)](#куда-править-античит)
 
 ---
 
@@ -234,7 +239,7 @@ rent_paid_until = база + N дней
 
 ---
 
-## Куда править
+## Куда править (дома)
 
 | Что | Файл |
 |---|---|
@@ -253,3 +258,139 @@ rent_paid_until = база + N дней
 | Классы | `houses/classes.ts` |
 | VW домов | `houses/world.ts` → `1000 + id` |
 | Проживание в паспорте | `houses/residence.ts`, `commands/pass.ts`, `commands/stats.ts` |
+
+---
+
+## Античит
+
+Модуль **`anticheat`** — серверные проверки без клиентских плагинов. Зеркалит ожидаемые деньги / HP / броню / оружие / позицию и сравнивает с тем, что приходит от клиента.
+
+Подключается в `src/index.ts` **последним** (после `vehicles`), чтобы trust из гейммода уже был доступен остальным модулям при старте.
+
+```
+… → vehicles → anticheat
+```
+
+```
+resources/src/modules/anticheat/
+  index.ts          старт модуля, реэкспорт trust/config
+  codes.ts          AcCode 0–52, NopCode, слоты оружия
+  config.ts         пороги, список включённых кодов, INSTANT_KICK
+  state.ts          состояние игрока, reconnect по ник+IP
+  trust.ts          API «сервер разрешил» (grace-окна)
+  punish.ts         лог, админам, soft-страйки, kick
+  loop.ts           таймер проверок + bind событий
+  messages.ts       русские названия кодов
+  math.ts           дистанции, время
+  detectors/
+    movement.ts     airbreak / fly / speed / teleport
+    vitals.ts       HP / броня / деньги
+    weapons.ts      оружие / патроны / jetpack / crasher
+    vehicle.ts      HP транспорта и связанные проверки
+    connection.ts   ping / flood / sandbox / reconnect
+```
+
+Идея: **любое легитимное изменение** (телепорт, выдача оружия, зарплата) должно пройти через trust / `applyWallet` / `grantWeapon`, иначе античит увидит расхождение.
+
+---
+
+## Античит: включённые проверки
+
+По умолчанию (`config.ts`) включены коды с реальной логикой и приемлемым FP. Остальные в `DISABLED_CODES` — выключены (заглушки или высокий ложный позитив).
+
+| Код | Имя | Смысл |
+|---|---|---|
+| 0 / 1 | AirBreak пешком / транспорт | резкий разрыв позиции |
+| 2 / 3 | Телепорт пешком / транспорт | скачок дальше порога |
+| 4 | Телепорт в транспорт | сел слишком далеко от машины |
+| 7 / 8 | FlyHack | полёт без основания |
+| 9 / 10 | SpeedHack | скорость выше лимита |
+| 11 / 12 | ХП транспорта / игрока | HP выше доверенного |
+| 13 | Броня | броня выше доверенной |
+| 14 | Деньги | наличные выше зеркала |
+| 15 / 16 | Оружие / патроны (+) | лишнее оружие или рост ammo |
+| 18 | Special action | jetpack без разрешения |
+| 27 | Fake spawn | спавн вне ожидаемого сценария |
+| 37 | Reconnect | тот же ник с того же IP слишком быстро |
+| 38 | High ping | пинг выше `maxPing` (с предупреждениями) |
+| 40 | Sandbox | слишком много коннектов с IP |
+| 47 | Weapon crasher | неверный ID оружия |
+| 49 | Callback flood | спам колбэков |
+| 51 | DoS | аномальный поток пакетов |
+
+**Выключены** (не кикают): Parkour, UnFreeze, FakeNpc, LagComp, ProAim, RCON brute, Attach/Tuning/Seat/Dialog crasher, GodMode, FullAiming, CarShot, QuickTurn, CarJack, AfkGhost, InvalidVersion, Connect/Seat flood, Invisible, DialogHack, TeleportVehToPlayer / Pickup, Tuning, FakeKill, NOP, AmmoInfinite, **RapidFire**, **CJ run**.
+
+RapidFire и CJ run отключены из‑за ложных срабатываний на штатном геймплее.
+
+---
+
+## Античит: trust API
+
+Импорт: `modules/anticheat` или `modules/anticheat/trust`.
+
+| Функция | Когда вызывать |
+|---|---|
+| `trustPosition` | телепорт, спавн, slap, /tpcor, карта админа |
+| `trustMoney` | обычно через `applyWallet` в `auth/session` |
+| `trustHealth` / `setTrustedHealth` | лечение, спавн HP |
+| `trustArmour` / `grantArmour` | выдача брони (локер → `grantArmour`) |
+| `trustWeapon` / `grantWeapon` | выдача оружия (локер → `grantWeapon`) |
+| `clearTrustedWeapons` | сброс оружия сервером |
+| `trustVehicle` | посадка в транспорт сервером |
+| `trustDialog` | сервер открыл диалог |
+| `markSpawned` / `markSpectating` | спавн / спект |
+
+Уже завязано на trust:
+
+- деньги — `applyWallet` (банк, дома, шахтёр, админ money, persist…);
+- позиция — `spawn/point`, admin map / tpcor / slap;
+- оружие и броня — локеры org / prison (`grantWeapon`, `grantArmour`).
+
+**Правило для новых фич:** не трогать `player.setMoney` / `giveWeapon` / `setPos` в обход этих путей — будет ложный кик.
+
+---
+
+## Античит: наказание и конфиг
+
+При срабатывании (`punish.ts`):
+
+1. Лог сервера: `[AC] …`
+2. Сообщение админам (`adminLevel >= 1`)
+3. Сообщение игроку
+4. Kick, если `kickOnDetect = true` и достигнут лимит страйков
+
+| Параметр | Сейчас | Смысл |
+|---|---|---|
+| `enabled` | `true` | модуль активен |
+| `kickOnDetect` | `true` | кикать |
+| `softStrikeMax` | `1` | сколько срабатываний одного кода до кика |
+| `softStrikeDecayMs` | `90000` | сброс счётчика без повторов |
+| `reconnectMinMs` | `8000` | мин. пауза до reconnect (ник+IP) |
+| `maxPing` | `550` | порог High ping |
+| `maxConnectsPerIp` | `4` | Sandbox |
+| `speedFootMax` / `speedVehMax` | `300` / `380` | SpeedHack |
+| `teleportFootDist` / `teleportVehDist` | `50` / `60` | Teleport |
+| `moneyGraceMs` и др. | 2–3 с | окно после trust |
+
+**Сразу кик** (без накопления): Weapon crasher, Fake spawn, Sandbox, DoS — `INSTANT_KICK_CODES`.
+
+Кастомный обработчик: `setCheatHandler((player, code, detail) => …)`; вернуть `false`, чтобы отменить стандартное наказание.
+
+Админской команды отладки нет.
+
+---
+
+## Куда править (античит)
+
+| Что | Файл |
+|---|---|
+| Пороги и вкл/выкл кодов | `anticheat/config.ts` |
+| Список кодов | `anticheat/codes.ts` |
+| Названия в чате/логе | `anticheat/messages.ts` |
+| Kick / страйки / админам | `anticheat/punish.ts` |
+| Таймер и события | `anticheat/loop.ts` |
+| Состояние / reconnect | `anticheat/state.ts` |
+| Trust API | `anticheat/trust.ts` |
+| Детекторы | `anticheat/detectors/*.ts` |
+| Деньги без ложного кика | `auth/session.ts` → `applyWallet` |
+| Оружие из локеров | `org/*-locker.ts`, `prison/prison-locker.ts` |

@@ -1,6 +1,7 @@
 import { omp, Pickup, TextLabel, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { isPlayerActive, playerId } from "../../shared/player";
+import { grantWeapon } from "../anticheat/trust";
 import { getAccount, isAuthenticated } from "../auth/session";
 import { getMembership } from "./membership";
 import { ORG_RADIO_ID, RADIO_INTERIOR, RADIO_WORLD } from "./radio";
@@ -108,7 +109,7 @@ function tryTake(player: Player): void {
   }
 
   try {
-    player.giveWeapon(WEAPON_CAMERA, CAMERA_AMMO);
+    grantWeapon(player, WEAPON_CAMERA, CAMERA_AMMO);
   } catch {
     tell(player, Color.error, "Не удалось выдать фотоаппарат.");
     return;

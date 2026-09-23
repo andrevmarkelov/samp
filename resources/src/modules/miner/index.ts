@@ -1,7 +1,7 @@
 import { Checkpoint, Dialog, omp, Pickup, TextLabel, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { isPlayerActive, playerId } from "../../shared/player";
-import { getAccount, isAuthenticated, patchAccount } from "../auth/session";
+import { getAccount, isAuthenticated, patchAccount, applyWallet } from "../auth/session";
 import { resolvePlayerSkin } from "../org";
 import { queueSave } from "../persist";
 import type { GameModule } from "../types";
@@ -414,10 +414,9 @@ function finishShift(player: Player): void {
 
   if (salary > 0) {
     patchAccount(player, { money: account.money + salary });
-    try {
-      player.giveMoney(salary);
-    } catch {
-      // Слот уже не в мире.
+    const updated = getAccount(player);
+    if (updated) {
+      applyWallet(player, updated);
     }
     queueSave(player);
   }
