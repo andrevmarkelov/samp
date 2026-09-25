@@ -12,6 +12,7 @@ import { SERVER_TAG } from "../../shared/brand";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { applyWallet, getAccount, isAuthenticated, patchAccount } from "../auth/session";
 import { saveUserLicenses, saveUserMoney } from "../auth/repository";
+import { isLoaderOnShift } from "../loader";
 import { isMinerOnShift } from "../miner";
 import { AUTOSCHOOL_INTERIOR } from "../org/autoschool";
 import { isJailed } from "../prison/sentence";
@@ -381,6 +382,11 @@ function tryStartMarker(player: Player): void {
     return;
   }
 
+  if (isLoaderOnShift(player)) {
+    tell(player, Color.error, "Сначала закончите смену грузчика.");
+    return;
+  }
+
   const cash = Math.max(0, Math.floor(account?.money ?? 0));
   if (cash < THEORY_FEE) {
     tell(player, Color.error, `Тест ПДД стоит $${THEORY_FEE}. Недостаточно наличных.`);
@@ -427,7 +433,7 @@ function syncStartMarker(player: Player): void {
   }
 
   startMarkerOn.delete(id);
-  if (isMinerOnShift(player) || isAutoschoolExamOnRouteLocal(player)) {
+  if (isMinerOnShift(player) || isLoaderOnShift(player) || isAutoschoolExamOnRouteLocal(player)) {
     return;
   }
 
@@ -439,7 +445,7 @@ function syncStartMarker(player: Player): void {
 }
 
 function shouldShowStartMarker(player: Player): boolean {
-  if (isMinerOnShift(player) || isAutoschoolExamOnRouteLocal(player)) {
+  if (isMinerOnShift(player) || isLoaderOnShift(player) || isAutoschoolExamOnRouteLocal(player)) {
     return false;
   }
 

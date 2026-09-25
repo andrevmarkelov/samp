@@ -16,6 +16,7 @@ import { gpsModule } from "./modules/gps";
 import { prisonModule } from "./modules/prison";
 import { afkModule } from "./modules/afk";
 import { minerModule } from "./modules/miner";
+import { loaderModule } from "./modules/loader";
 import { paydayModule } from "./modules/payday";
 import { worldTimeModule } from "./modules/worldtime";
 import { zonesModule } from "./modules/zones";
@@ -38,6 +39,7 @@ const modules: GameModule[] = [
   bankModule,
   housesModule,
   minerModule,
+  loaderModule,
   gpsModule,
   prisonModule,
   afkModule,

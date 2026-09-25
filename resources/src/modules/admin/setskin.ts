@@ -4,6 +4,7 @@ import { isPlayerActive, playerChatName } from "../../shared/player";
 import { saveUserSkin } from "../auth/repository";
 import { getAccount, patchAccount } from "../auth/session";
 import { applyOrgVisuals, getMembership } from "../org";
+import { isLoaderOnShift } from "../loader";
 import { isMinerOnShift } from "../miner";
 import { registerCommand } from "../commands/registry";
 import { hasAdminAccess } from "./session";
@@ -51,7 +52,7 @@ function findTarget(slot: number): Player | null {
 }
 
 function applyVisibleSkin(target: Player): void {
-  if (isMinerOnShift(target)) {
+  if (isMinerOnShift(target) || isLoaderOnShift(target)) {
     return;
   }
 

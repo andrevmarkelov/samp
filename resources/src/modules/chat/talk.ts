@@ -2,6 +2,7 @@ import type { Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { CHAT_RADIUS } from "../../shared/nearby";
 import { playerId } from "../../shared/player";
+import { isLoaderCarrying } from "../loader";
 import { isMinerLocked } from "../miner";
 
 const PLAYER_STATE_ONFOOT = 1;
@@ -38,7 +39,7 @@ export function talkDurationMs(text: string): number {
 
 function canPlayTalkAnim(player: Player): boolean {
   try {
-    if (player.isInAnyVehicle() || isMinerLocked(player)) {
+    if (player.isInAnyVehicle() || isMinerLocked(player) || isLoaderCarrying(player)) {
       return false;
     }
 

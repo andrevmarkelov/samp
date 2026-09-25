@@ -2,6 +2,7 @@ import { Checkpoint, Dialog, omp, Pickup, TextLabel, type Player } from "@omp-no
 import { Color } from "../../shared/colors";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { getAccount, isAuthenticated, patchAccount, applyWallet } from "../auth/session";
+import { isLoaderOnShift } from "../loader";
 import { resolvePlayerSkin } from "../org";
 import { queueSave } from "../persist";
 import type { GameModule } from "../types";
@@ -359,6 +360,11 @@ function hire(player: Player): void {
 
   if (account.hospitalized) {
     player.sendClientMessage(Color.error, "Сначала закончите лечение.");
+    return;
+  }
+
+  if (isLoaderOnShift(player)) {
+    player.sendClientMessage(Color.error, "Сначала закончите смену грузчика.");
     return;
   }
 
