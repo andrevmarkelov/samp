@@ -53,7 +53,7 @@ const DOORS: readonly LspdDoor[] = [
     staffOnly: false,
   },
   {
-    pickup: { x: 214.1955, y: 120.771, z: 999.0156, interior: LSPD_INTERIOR },
+    pickup: { x: 215.6279, y: 126.4414, z: 1003.2188, interior: LSPD_INTERIOR },
     dest: {
       x: 1527.4255,
       y: -1677.9736,
@@ -68,10 +68,10 @@ const DOORS: readonly LspdDoor[] = [
   {
     pickup: { x: 1524.7473, y: -1677.832, z: 5.8906, interior: 0 },
     dest: {
-      x: 216.286,
-      y: 120.5165,
-      z: 999.0156,
-      angle: 267.6828,
+      x: 215.6036,
+      y: 123.6982,
+      z: 1003.2188,
+      angle: 179.9486,
       interior: LSPD_INTERIOR,
       world: STREET_WORLD,
     },

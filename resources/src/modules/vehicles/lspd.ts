@@ -47,7 +47,7 @@ const LSPD_VEHICLES: ReadonlyArray<{
   { model: 523, x: 1546.2515, y: -1676.1163, z: 5.3935, angle: 90 },
   { model: 523, x: 1546.2515, y: -1680.2988, z: 5.3935, angle: 90 },
   { model: 523, x: 1546.2515, y: -1684.3185, z: 5.3935, angle: 90 },
-  { model: 497, x: 1564.3232, y: -1649.3898, z: 28.4994, angle: 90 },
+  { model: 497, x: 1550.4297, y: -1643.9872, z: 28.5601, angle: 90 },
 ];
 
 export function spawnLspdVehicles(): void {
