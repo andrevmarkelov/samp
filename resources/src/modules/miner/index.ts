@@ -2,17 +2,19 @@ import { Checkpoint, Dialog, omp, Pickup, TextLabel, type Player } from "@omp-no
 import { Color } from "../../shared/colors";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { getAccount, isAuthenticated, patchAccount, applyWallet } from "../auth/session";
+import { saveUserInventory, saveUserMoney } from "../auth/repository";
 import { isLoaderOnShift } from "../loader";
 import { resolvePlayerSkin } from "../org";
 import { queueSave } from "../persist";
 import type { GameModule } from "../types";
 import { STREET_WORLD } from "../spawn/point";
 import { DROP_POINT, HIRE_POINT, INFO_POINT, MAP_ICON_POINT, METAL_SELL_POINT, METAL_STOCK_LABEL_POINT, MINE_POINTS } from "./points";
-import { addMineMetal, getWarehouse, WAREHOUSE_MINE_ID } from "../warehouse";
+import { addMineMetal, getWarehouse, takeMineMetal, WAREHOUSE_MINE_ID } from "../warehouse";
 
 export const MINER_HIRE_DIALOG_ID = 8;
 export const MINER_QUIT_DIALOG_ID = 9;
 export const MINER_INFO_DIALOG_ID = 10;
+export const MINER_METAL_BUY_DIALOG_ID = 59;
 
 const PICKUP_MODEL = 1275;
 const INFO_PICKUP_MODEL = 1239;
@@ -27,6 +29,7 @@ const TICK_MS = 200;
 const MINE_MS = 5500;
 const PICKUP_ROCKS_MS = 3000;
 const SPECIAL_CHANCE = 0.03;
+const METAL_PRICE_PER_KG = 15;
 const KEY_JUMP = 32;
 const KEY_FIRE = 4;
 const PLAYER_STATE_ONFOOT = 1;
@@ -45,6 +48,7 @@ const STONE_MODEL = 905;
 const SKIN_MALE = 16;
 const SKIN_FEMALE = 191;
 const DIALOG_STYLE_MSGBOX = 0;
+const DIALOG_STYLE_INPUT = 1;
 const MAP_ICON_SLOT = 3;
 const MAP_ICON_TYPE = 11;
 const MAPICON_LOCAL = 0;
@@ -63,6 +67,7 @@ const jobs = new Map<number, Job>();
 const digTimers = new Map<number, ReturnType<typeof setTimeout>>();
 const standingOnHire = new Set<number>();
 const standingOnInfo = new Set<number>();
+const standingOnMetalSell = new Set<number>();
 const iconShown = new Set<number>();
 
 let metalStockLabel: TextLabel | null = null;
@@ -182,7 +187,7 @@ export const minerModule: GameModule = {
       forgetSlot(player);
     });
 
-    omp.on("dialogResponse", (player, dialogId, response) => {
+    omp.on("dialogResponse", (player, dialogId, response, _listItem, inputText) => {
       const id = Number(dialogId);
       const ok = Number(response) !== 0;
 
@@ -195,6 +200,11 @@ export const minerModule: GameModule = {
 
       if (id === MINER_QUIT_DIALOG_ID && ok) {
         finishShift(player);
+        return;
+      }
+
+      if (id === MINER_METAL_BUY_DIALOG_ID && ok) {
+        buyMetal(player, String(inputText ?? ""));
       }
     });
 
@@ -308,6 +318,7 @@ function tickMiner(): void {
       if (world !== STREET_WORLD) {
         standingOnHire.delete(id);
         standingOnInfo.delete(id);
+        standingOnMetalSell.delete(id);
         return;
       }
 
@@ -338,6 +349,18 @@ function tickMiner(): void {
         standingOnInfo.add(id);
         showInfoDialog(player);
       }
+
+      const sellDist = Math.hypot(
+        pos.x - METAL_SELL_POINT.x,
+        pos.y - METAL_SELL_POINT.y,
+        pos.z - METAL_SELL_POINT.z
+      );
+      if (sellDist > PICKUP_RADIUS) {
+        standingOnMetalSell.delete(id);
+      } else if (!standingOnMetalSell.has(id)) {
+        standingOnMetalSell.add(id);
+        showMetalBuyDialog(player);
+      }
     } catch {
       // Слот уже пуст.
     }
@@ -366,6 +389,97 @@ function showInfoDialog(player: Player): void {
   } catch {
     player.sendClientMessage(Color.error, "Не удалось открыть диалог.");
   }
+}
+
+function showMetalBuyDialog(player: Player): void {
+  try {
+    Dialog.show(
+      player,
+      MINER_METAL_BUY_DIALOG_ID,
+      DIALOG_STYLE_INPUT,
+      "Покупка металла",
+      "Сколько кг металла вы хотите купить?\nЦена за кг: 15$",
+      "Купить",
+      "Отмена"
+    );
+  } catch {
+    player.sendClientMessage(Color.error, "Не удалось открыть диалог.");
+  }
+}
+
+function buyMetal(player: Player, rawInput: string): void {
+  if (!isPlayerActive(player) || !isAuthenticated(player)) {
+    return;
+  }
+
+  const account = getAccount(player);
+  if (!account) {
+    return;
+  }
+
+  if (!isOnFootAt(player, METAL_SELL_POINT, PICKUP_RADIUS + 0.8)) {
+    player.sendClientMessage(Color.error, "Подойдите к точке продажи металла.");
+    return;
+  }
+
+  const kg = Math.floor(Number(rawInput.trim().replace(",", ".")));
+  if (!Number.isFinite(kg) || kg <= 0 || !Number.isSafeInteger(kg)) {
+    player.sendClientMessage(Color.error, "Введите целое число кг больше 0.");
+    showMetalBuyDialog(player);
+    return;
+  }
+
+  const stock = getWarehouse(WAREHOUSE_MINE_ID)?.metal ?? 0;
+  if (stock < kg) {
+    player.sendClientMessage(
+      Color.error,
+      stock <= 0
+        ? "На складе нет металла."
+        : `На складе только ${stock} кг металла.`
+    );
+    showMetalBuyDialog(player);
+    return;
+  }
+
+  const total = kg * METAL_PRICE_PER_KG;
+  if (!Number.isSafeInteger(total) || total <= 0) {
+    player.sendClientMessage(Color.error, "Слишком большое количество.");
+    showMetalBuyDialog(player);
+    return;
+  }
+
+  if (account.money < total) {
+    player.sendClientMessage(Color.error, `Недостаточно денег. Нужно $${total}.`);
+    showMetalBuyDialog(player);
+    return;
+  }
+
+  if (!takeMineMetal(kg)) {
+    player.sendClientMessage(Color.error, "На складе недостаточно металла.");
+    showMetalBuyDialog(player);
+    return;
+  }
+
+  const nextMoney = account.money - total;
+  const nextMetal = account.metal + kg;
+  patchAccount(player, { money: nextMoney, metal: nextMetal });
+  const updated = getAccount(player);
+  if (updated) {
+    applyWallet(player, updated);
+  }
+  refreshMetalStockLabel();
+
+  void Promise.all([
+    saveUserMoney(account.id, nextMoney, account.bank),
+    saveUserInventory(account.id, account.drugs, account.ammo, nextMetal),
+  ]).catch(() => {
+    // Кэш уже обновлён.
+  });
+
+  player.sendClientMessage(
+    Color.info,
+    `Вы купили ${kg} кг металла за $${total}.`
+  );
 }
 
 function showHireDialog(player: Player): void {
@@ -898,6 +1012,7 @@ function forgetSlot(player: Player): void {
   jobs.delete(id);
   standingOnHire.delete(id);
   standingOnInfo.delete(id);
+  standingOnMetalSell.delete(id);
   iconShown.delete(id);
 }
 

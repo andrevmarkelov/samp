@@ -29,7 +29,7 @@ export const METAL_STOCK_LABEL_POINT = {
   z: 73.9931,
 } as const;
 
-/** Пикап продажи металла (покупка позже). */
+/** Пикап продажи металла. */
 export const METAL_SELL_POINT = {
   x: 1050.2295,
   y: -314.1089,

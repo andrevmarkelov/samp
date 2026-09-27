@@ -46,6 +46,9 @@ export type Account = {
   donate: number;
   lawfulness: number;
   health: number;
+  drugs: number;
+  ammo: number;
+  metal: number;
   passport: boolean;
   hospitalized: boolean;
   invitedBy: string | null;
@@ -146,6 +149,9 @@ export function patchAccount(
       | "mutedUntil"
       | "jailSeconds"
       | "licenses"
+      | "drugs"
+      | "ammo"
+      | "metal"
     >
   >
 ): void {

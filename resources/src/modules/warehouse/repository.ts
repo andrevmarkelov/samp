@@ -149,6 +149,27 @@ export function addMineMetal(amount: number): number {
   return addWarehouseMetal(WAREHOUSE_MINE_ID, amount);
 }
 
+/** Списать металл со склада. false — недостаточно на складе. */
+export function takeWarehouseMetal(orgId: number, amount: number): boolean {
+  const take = Math.max(0, Math.floor(amount));
+  if (take <= 0) {
+    return false;
+  }
+
+  const record = cache.get(orgId);
+  if (!record || record.metal < take) {
+    return false;
+  }
+
+  record.metal -= take;
+  void persistMetalTake(orgId, take);
+  return true;
+}
+
+export function takeMineMetal(amount: number): boolean {
+  return takeWarehouseMetal(WAREHOUSE_MINE_ID, amount);
+}
+
 async function persistMetalAdd(orgId: number, amount: number): Promise<void> {
   if (!isDatabaseReady() || amount <= 0) {
     return;
@@ -171,6 +192,21 @@ async function persistMetalAdd(orgId: number, amount: number): Promise<void> {
     );
   } catch {
     // Кэш уже обновлён; при следующем старте можно сверить.
+  }
+}
+
+async function persistMetalTake(orgId: number, amount: number): Promise<void> {
+  if (!isDatabaseReady() || amount <= 0) {
+    return;
+  }
+
+  try {
+    await execute(
+      "UPDATE warehouses SET metal = GREATEST(0, CAST(metal AS SIGNED) - ?) WHERE org_id = ?",
+      [amount, orgId]
+    );
+  } catch {
+    // Кэш уже обновлён.
   }
 }
 

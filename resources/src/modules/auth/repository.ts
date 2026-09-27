@@ -27,6 +27,9 @@ type UserRow = RowDataPacket & {
   donate: number;
   lawfulness: number;
   health: number;
+  drugs: number;
+  ammo: number;
+  metal: number;
   passport: number | boolean;
   hospitalized: number | boolean;
   invited_by: string | null;
@@ -76,6 +79,9 @@ CREATE TABLE IF NOT EXISTS users (
   license_fly TINYINT(1) NOT NULL DEFAULT 0,
   license_boat TINYINT(1) NOT NULL DEFAULT 0,
   license_gun TINYINT(1) NOT NULL DEFAULT 0,
+  drugs INT UNSIGNED NOT NULL DEFAULT 0,
+  ammo INT UNSIGNED NOT NULL DEFAULT 0,
+  metal INT UNSIGNED NOT NULL DEFAULT 0,
   banned_until DATETIME NULL DEFAULT NULL,
   ban_reason VARCHAR(128) NULL DEFAULT NULL,
   birth_date DATE NOT NULL,
@@ -180,8 +186,20 @@ const COLUMN_MIGRATIONS = [
     sql: "license_gun TINYINT(1) NOT NULL DEFAULT 0 AFTER license_boat",
   },
   {
+    name: "drugs",
+    sql: "drugs INT UNSIGNED NOT NULL DEFAULT 0 AFTER license_gun",
+  },
+  {
+    name: "ammo",
+    sql: "ammo INT UNSIGNED NOT NULL DEFAULT 0 AFTER drugs",
+  },
+  {
+    name: "metal",
+    sql: "metal INT UNSIGNED NOT NULL DEFAULT 0 AFTER ammo",
+  },
+  {
     name: "banned_until",
-    sql: "banned_until DATETIME NULL DEFAULT NULL AFTER license_gun",
+    sql: "banned_until DATETIME NULL DEFAULT NULL AFTER metal",
   },
   {
     name: "ban_reason",
@@ -257,7 +275,7 @@ async function migrateBannedUntilDatetime(): Promise<void> {
 
 export async function findUserByName(name: string): Promise<UserRow | null> {
   const rows = await query<UserRow>(
-    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, bank, donate, lawfulness, health, passport, hospitalized, invited_by, birth_date, admin_level, org_id, org_rank, muted_until, jail_seconds, license_car, license_moto, license_fly, license_boat, license_gun, banned_until, ban_reason FROM users WHERE name = ? LIMIT 1",
+    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, bank, donate, lawfulness, health, drugs, ammo, metal, passport, hospitalized, invited_by, birth_date, admin_level, org_id, org_rank, muted_until, jail_seconds, license_car, license_moto, license_fly, license_boat, license_gun, banned_until, ban_reason FROM users WHERE name = ? LIMIT 1",
     [name]
   );
   return rows[0] ?? null;
@@ -310,6 +328,9 @@ export async function createUser(input: {
     donate: 0,
     lawfulness: STARTING_LAWFULNESS,
     health: STARTING_HEALTH,
+    drugs: 0,
+    ammo: 0,
+    metal: 0,
     passport: false,
     hospitalized: false,
     invitedBy: null,
@@ -349,6 +370,20 @@ export async function saveUserMoney(
   await execute("UPDATE users SET money = ?, bank = ? WHERE id = ?", [
     money,
     bank,
+    userId,
+  ]);
+}
+
+export async function saveUserInventory(
+  userId: number,
+  drugs: number,
+  ammo: number,
+  metal: number
+): Promise<void> {
+  await execute("UPDATE users SET drugs = ?, ammo = ?, metal = ? WHERE id = ?", [
+    Math.max(0, Math.floor(drugs)),
+    Math.max(0, Math.floor(ammo)),
+    Math.max(0, Math.floor(metal)),
     userId,
   ]);
 }
@@ -607,6 +642,9 @@ export function accountFromRow(row: UserRow): Account {
     donate: Number(row.donate) || 0,
     lawfulness: normalizeLawfulness(row.lawfulness),
     health: normalizeHealth(row.health),
+    drugs: inventoryAmount(row.drugs),
+    ammo: inventoryAmount(row.ammo),
+    metal: inventoryAmount(row.metal),
     passport: Boolean(Number(row.passport)),
     hospitalized: Boolean(Number(row.hospitalized)),
     invitedBy: parseInvitedBy(row.invited_by),
@@ -633,6 +671,11 @@ function licensesFromRow(row: UserRow): Licenses {
 function parseJailSeconds(value: unknown): number {
   const seconds = Math.floor(Number(value) || 0);
   return seconds > 0 ? seconds : 0;
+}
+
+function inventoryAmount(value: unknown): number {
+  const amount = Math.floor(Number(value) || 0);
+  return amount > 0 ? amount : 0;
 }
 
 function parseMutedUntil(value: unknown): number | null {
