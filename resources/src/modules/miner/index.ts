@@ -3,6 +3,7 @@ import { Color } from "../../shared/colors";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { getAccount, isAuthenticated, patchAccount, applyWallet } from "../auth/session";
 import { saveUserInventory, saveUserMoney } from "../auth/repository";
+import { isArmyFactoryOnShift } from "../army-factory";
 import { isLoaderOnShift } from "../loader";
 import { resolvePlayerSkin } from "../org";
 import { queueSave } from "../persist";
@@ -532,6 +533,11 @@ function hire(player: Player): void {
 
   if (isLoaderOnShift(player)) {
     player.sendClientMessage(Color.error, "Сначала закончите смену грузчика.");
+    return;
+  }
+
+  if (isArmyFactoryOnShift(player)) {
+    player.sendClientMessage(Color.error, "Сначала закончите смену в цехе патронов.");
     return;
   }
 

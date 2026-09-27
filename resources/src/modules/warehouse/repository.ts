@@ -149,6 +149,31 @@ export function addMineMetal(amount: number): number {
   return addWarehouseMetal(WAREHOUSE_MINE_ID, amount);
 }
 
+/** Добавить патроны на склад. Обновляет кэш и БД. */
+export function addWarehouseAmmo(orgId: number, amount: number): number {
+  const add = Math.max(0, Math.floor(amount));
+  if (add <= 0) {
+    return getWarehouse(orgId)?.ammo ?? 0;
+  }
+
+  let record = cache.get(orgId);
+  if (!record) {
+    record = {
+      orgId,
+      ammo: 0,
+      meds: 0,
+      metal: 0,
+      drugs: 0,
+      isLocked: warehouseUsesLock(orgId),
+    };
+    cache.set(orgId, record);
+  }
+
+  record.ammo += add;
+  void persistAmmoAdd(orgId, add);
+  return record.ammo;
+}
+
 /** Списать металл со склада. false — недостаточно на складе. */
 export function takeWarehouseMetal(orgId: number, amount: number): boolean {
   const take = Math.max(0, Math.floor(amount));
@@ -204,6 +229,31 @@ async function persistMetalTake(orgId: number, amount: number): Promise<void> {
     await execute(
       "UPDATE warehouses SET metal = GREATEST(0, CAST(metal AS SIGNED) - ?) WHERE org_id = ?",
       [amount, orgId]
+    );
+  } catch {
+    // Кэш уже обновлён.
+  }
+}
+
+async function persistAmmoAdd(orgId: number, amount: number): Promise<void> {
+  if (!isDatabaseReady() || amount <= 0) {
+    return;
+  }
+
+  try {
+    const result = await execute(
+      "UPDATE warehouses SET ammo = ammo + ? WHERE org_id = ?",
+      [amount, orgId]
+    );
+    if (result.affectedRows > 0) {
+      return;
+    }
+
+    await execute(
+      `INSERT INTO warehouses (org_id, ammo, meds, metal, drugs, is_locked)
+       VALUES (?, ?, 0, 0, 0, ?)
+       ON DUPLICATE KEY UPDATE ammo = ammo + VALUES(ammo)`,
+      [orgId, amount, warehouseUsesLock(orgId) ? 1 : 0]
     );
   } catch {
     // Кэш уже обновлён.

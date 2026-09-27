@@ -82,12 +82,14 @@ export function refreshStreamForPlayer(player: Player): void {
   let y = 0;
   let z = 0;
   let world = 0;
+  let interior = 0;
   try {
     const pos = player.getPos();
     x = pos.x;
     y = pos.y;
     z = pos.z;
     world = player.getVirtualWorld();
+    interior = player.getInterior();
   } catch {
     return;
   }
@@ -105,7 +107,7 @@ export function refreshStreamForPlayer(player: Player): void {
     }
 
     const current = bag.get(i);
-    if (!visibleInWorld(def, world)) {
+    if (!visibleInWorld(def, world) || !visibleInInterior(def, interior)) {
       if (current) {
         try {
           current.destroy();
@@ -205,6 +207,10 @@ export function assignStreamWorld(
 
 function visibleInWorld(def: MapObjectDef, world: number): boolean {
   return def.world === -1 || def.world === world;
+}
+
+function visibleInInterior(def: MapObjectDef, interior: number): boolean {
+  return def.interior === -1 || def.interior === interior;
 }
 
 function clearPlayerObjects(player: Player): void {
