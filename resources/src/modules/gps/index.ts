@@ -180,7 +180,7 @@ export function showGpsMenu(player: Player): void {
     return;
   }
 
-  const body = TARGETS.map((target) => target.label).join("\n");
+  const body = TARGETS.map((target, index) => `${index + 1}. ${target.label}`).join("\n");
   try {
     Dialog.show(
       player,

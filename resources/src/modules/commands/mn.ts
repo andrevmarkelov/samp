@@ -86,7 +86,7 @@ function visibleMenuKeys(player: Player): MenuKey[] {
 
 function showMenu(player: Player): void {
   const body = visibleMenuKeys(player)
-    .map((key) => MENU_ITEMS[key])
+    .map((key, index) => `${index + 1}. ${MENU_ITEMS[key]}`)
     .join("\n");
 
   try {
