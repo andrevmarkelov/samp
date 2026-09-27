@@ -1,4 +1,6 @@
 import type { GameModule } from "../types";
+import { bindArmyLocker } from "./army-locker";
+import { bindAmmunationDoors } from "./ammunation-doors";
 import { bindOrgGates } from "./gates";
 import { bindHospitalRoofAccess } from "./hospital-roof";
 import { bindMeriyaStaffDoors } from "./meriya-doors";
@@ -28,8 +30,10 @@ export const orgModule: GameModule = {
     bindMeriyaLocker();
     bindPoliceDoors();
     bindLspdDoors();
+    bindAmmunationDoors();
     bindPoliceLocker();
     bindLspdLocker();
+    bindArmyLocker();
     bindFbiLocker();
     bindPoliceMapIcon();
     bindLspdMapIcon();

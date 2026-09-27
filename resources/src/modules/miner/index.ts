@@ -7,7 +7,8 @@ import { resolvePlayerSkin } from "../org";
 import { queueSave } from "../persist";
 import type { GameModule } from "../types";
 import { STREET_WORLD } from "../spawn/point";
-import { DROP_POINT, HIRE_POINT, INFO_POINT, MAP_ICON_POINT, MINE_POINTS } from "./points";
+import { DROP_POINT, HIRE_POINT, INFO_POINT, MAP_ICON_POINT, METAL_SELL_POINT, METAL_STOCK_LABEL_POINT, MINE_POINTS } from "./points";
+import { addMineMetal, getWarehouse, WAREHOUSE_MINE_ID } from "../warehouse";
 
 export const MINER_HIRE_DIALOG_ID = 8;
 export const MINER_QUIT_DIALOG_ID = 9;
@@ -15,10 +16,12 @@ export const MINER_INFO_DIALOG_ID = 10;
 
 const PICKUP_MODEL = 1275;
 const INFO_PICKUP_MODEL = 1239;
+const METAL_SELL_PICKUP_MODEL = 19134;
 const PICKUP_TYPE = 1;
 const PICKUP_RADIUS = 1.6;
 const CHECKPOINT_RADIUS = 1.8;
 const LABEL_HEIGHT = 0.9;
+const METAL_STOCK_LABEL_HEIGHT = 1.8;
 const LABEL_DRAW_DISTANCE = 18;
 const TICK_MS = 200;
 const MINE_MS = 5500;
@@ -61,6 +64,25 @@ const digTimers = new Map<number, ReturnType<typeof setTimeout>>();
 const standingOnHire = new Set<number>();
 const standingOnInfo = new Set<number>();
 const iconShown = new Set<number>();
+
+let metalStockLabel: TextLabel | null = null;
+
+function metalStockLabelText(): string {
+  const metal = getWarehouse(WAREHOUSE_MINE_ID)?.metal ?? 0;
+  return `Метал\nна Складе\n${metal} кг`;
+}
+
+function refreshMetalStockLabel(): void {
+  if (!metalStockLabel) {
+    return;
+  }
+
+  try {
+    metalStockLabel.updateText(Color.info, metalStockLabelText());
+  } catch {
+    // Лейбл уже уничтожен.
+  }
+}
 
 export function isMinerLocked(player: Player): boolean {
   const id = playerId(player);
@@ -121,6 +143,37 @@ export const minerModule: GameModule = {
       INFO_POINT.y,
       INFO_POINT.z,
       STREET_WORLD
+    );
+
+    metalStockLabel = new TextLabel(
+      metalStockLabelText(),
+      Color.info,
+      METAL_STOCK_LABEL_POINT.x,
+      METAL_STOCK_LABEL_POINT.y,
+      METAL_STOCK_LABEL_POINT.z + METAL_STOCK_LABEL_HEIGHT,
+      LABEL_DRAW_DISTANCE,
+      STREET_WORLD,
+      false
+    );
+
+    new Pickup(
+      METAL_SELL_PICKUP_MODEL,
+      PICKUP_TYPE,
+      METAL_SELL_POINT.x,
+      METAL_SELL_POINT.y,
+      METAL_SELL_POINT.z,
+      STREET_WORLD
+    );
+
+    new TextLabel(
+      "Продажа металла\n15$ за 1кг.",
+      Color.info,
+      METAL_SELL_POINT.x,
+      METAL_SELL_POINT.y,
+      METAL_SELL_POINT.z + LABEL_HEIGHT,
+      LABEL_DRAW_DISTANCE,
+      STREET_WORLD,
+      false
     );
 
     setInterval(tickMiner, TICK_MS);
@@ -656,6 +709,9 @@ function deliver(player: Player, job: Job): void {
   job.salary += pay;
   job.phase = "mine";
   job.mineIndex = pickMine(job.mineIndex);
+
+  addMineMetal(kg);
+  refreshMetalStockLabel();
 
   givePickaxe(player);
   setMineCheckpoint(player, job);

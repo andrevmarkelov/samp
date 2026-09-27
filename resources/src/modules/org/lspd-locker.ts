@@ -3,8 +3,9 @@ import { Color } from "../../shared/colors";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { grantArmour, grantWeapon } from "../anticheat/trust";
 import { getAccount, isAuthenticated } from "../auth/session";
-import { STREET_WORLD } from "../spawn/point";
-import { LSPD_INTERIOR, ORG_LSPD_ID } from "./lspd";
+import { getWarehouse } from "../warehouse";
+import { AMMUNATION_INTERIOR } from "./ammunation-doors";
+import { ORG_LSPD_ID } from "./lspd";
 import { getMembership } from "./membership";
 
 export const LSPD_LOCKER_DIALOG_ID = 23;
@@ -15,16 +16,17 @@ const PLAYER_STATE_ONFOOT = 1;
 const DIALOG_STYLE_LIST = 2;
 const PICKUP_RADIUS = 1.5;
 const TICK_MS = 200;
-const LABEL_HEIGHT = 0.85;
-const LABEL_DRAW_DISTANCE = 12;
+const AMMO_LABEL_HEIGHT = 1.4;
+const AMMO_LABEL_DRAW_DISTANCE = 12;
 const SWAT_SKIN = 285;
 const MAX_ARMOR = 100;
 const DENY = "Вы не состоите в LSPD.";
 
+/** Аммунация LSPD (интерьер 6, VW = org_id). */
 const POINT = {
-  x: 232.5532,
-  y: 121.1288,
-  z: 1003.2188,
+  x: 312.4084,
+  y: -165.5791,
+  z: 999.601,
 } as const;
 
 type LockerItem = {
@@ -45,17 +47,35 @@ const ITEMS: readonly LockerItem[] = [
 ];
 
 const inside = new Set<number>();
+let ammoStockLabel: TextLabel | null = null;
+
+function ammoStockLabelText(): string {
+  const ammo = getWarehouse(ORG_LSPD_ID)?.ammo ?? 0;
+  return `Патроны: ${ammo}`;
+}
+
+export function refreshLspdAmmoStockLabel(): void {
+  if (!ammoStockLabel) {
+    return;
+  }
+
+  try {
+    ammoStockLabel.updateText(Color.info, ammoStockLabelText());
+  } catch {
+    // Лейбл уже уничтожен.
+  }
+}
 
 export function bindLspdLocker(): void {
-  new Pickup(PICKUP_MODEL, PICKUP_TYPE, POINT.x, POINT.y, POINT.z, STREET_WORLD);
-  new TextLabel(
-    "Оружейная\nСклад LSPD",
+  new Pickup(PICKUP_MODEL, PICKUP_TYPE, POINT.x, POINT.y, POINT.z, ORG_LSPD_ID);
+  ammoStockLabel = new TextLabel(
+    ammoStockLabelText(),
     Color.info,
     POINT.x,
     POINT.y,
-    POINT.z + LABEL_HEIGHT,
-    LABEL_DRAW_DISTANCE,
-    STREET_WORLD,
+    POINT.z + AMMO_LABEL_HEIGHT,
+    AMMO_LABEL_DRAW_DISTANCE,
+    ORG_LSPD_ID,
     false
   );
 
@@ -105,8 +125,8 @@ function tickLocker(): void {
       }
 
       if (
-        player.getVirtualWorld() !== STREET_WORLD ||
-        player.getInterior() !== LSPD_INTERIOR
+        player.getVirtualWorld() !== ORG_LSPD_ID ||
+        player.getInterior() !== AMMUNATION_INTERIOR
       ) {
         inside.delete(id);
         return;

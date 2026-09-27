@@ -3,9 +3,10 @@ import { Color } from "../../shared/colors";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { grantArmour, grantWeapon } from "../anticheat/trust";
 import { getAccount, isAuthenticated } from "../auth/session";
-import { STREET_WORLD } from "../spawn/point";
+import { getWarehouse } from "../warehouse";
+import { AMMUNATION_INTERIOR } from "./ammunation-doors";
 import { getMembership } from "./membership";
-import { ORG_POLICE_ID, POLICE_INTERIOR } from "./police";
+import { ORG_POLICE_ID } from "./police";
 
 export const POLICE_LOCKER_DIALOG_ID = 22;
 
@@ -15,16 +16,17 @@ const PLAYER_STATE_ONFOOT = 1;
 const DIALOG_STYLE_LIST = 2;
 const PICKUP_RADIUS = 1.5;
 const TICK_MS = 200;
-const LABEL_HEIGHT = 0.85;
-const LABEL_DRAW_DISTANCE = 12;
+const AMMO_LABEL_HEIGHT = 1.4;
+const AMMO_LABEL_DRAW_DISTANCE = 12;
 const SWAT_SKIN = 285;
 const MAX_ARMOR = 100;
 const DENY = "Вы не состоите в областной полиции.";
 
+/** Аммунация областной полиции (интерьер 6, VW = org_id). */
 const POINT = {
-  x: 255.2279,
-  y: 78.1871,
-  z: 1003.6406,
+  x: 312.4084,
+  y: -165.5791,
+  z: 999.601,
 } as const;
 
 type LockerItem = {
@@ -45,17 +47,35 @@ const ITEMS: readonly LockerItem[] = [
 ];
 
 const inside = new Set<number>();
+let ammoStockLabel: TextLabel | null = null;
+
+function ammoStockLabelText(): string {
+  const ammo = getWarehouse(ORG_POLICE_ID)?.ammo ?? 0;
+  return `Патроны: ${ammo}`;
+}
+
+export function refreshPoliceAmmoStockLabel(): void {
+  if (!ammoStockLabel) {
+    return;
+  }
+
+  try {
+    ammoStockLabel.updateText(Color.info, ammoStockLabelText());
+  } catch {
+    // Лейбл уже уничтожен.
+  }
+}
 
 export function bindPoliceLocker(): void {
-  new Pickup(PICKUP_MODEL, PICKUP_TYPE, POINT.x, POINT.y, POINT.z, STREET_WORLD);
-  new TextLabel(
-    "Оружейная\nСклад полиции",
+  new Pickup(PICKUP_MODEL, PICKUP_TYPE, POINT.x, POINT.y, POINT.z, ORG_POLICE_ID);
+  ammoStockLabel = new TextLabel(
+    ammoStockLabelText(),
     Color.info,
     POINT.x,
     POINT.y,
-    POINT.z + LABEL_HEIGHT,
-    LABEL_DRAW_DISTANCE,
-    STREET_WORLD,
+    POINT.z + AMMO_LABEL_HEIGHT,
+    AMMO_LABEL_DRAW_DISTANCE,
+    ORG_POLICE_ID,
     false
   );
 
@@ -105,8 +125,8 @@ function tickLocker(): void {
       }
 
       if (
-        player.getVirtualWorld() !== STREET_WORLD ||
-        player.getInterior() !== POLICE_INTERIOR
+        player.getVirtualWorld() !== ORG_POLICE_ID ||
+        player.getInterior() !== AMMUNATION_INTERIOR
       ) {
         inside.delete(id);
         return;

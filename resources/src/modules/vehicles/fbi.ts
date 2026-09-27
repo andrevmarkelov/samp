@@ -25,7 +25,7 @@ const FBI_VEHICLES: ReadonlyArray<{
   { model: 415, x: 599.6034, y: -1490.5652, z: 14.8676, angle: 270.8626 },
   { model: 560, x: 596.3918, y: -1422.7373, z: 13.4693, angle: 274.8309 },
   { model: 560, x: 606.1831, y: -1421.9963, z: 13.4656, angle: 274.1085 },
-  { model: 487, x: 597.4208, y: -1441.3842, z: 80.3492, angle: 267.1091 },
+  { model: 487, x: 598.6076, y: -1443.3608, z: 80.3526, angle: 269.8108 },
 ];
 
 export function spawnFbiVehicles(): void {
@@ -40,7 +40,7 @@ export function spawnFbiVehicles(): void {
       color2: BLACK,
       respawnSec: RESPAWN_SEC,
       world: STREET_WORLD,
-      siren: spot.model === 415,
+      siren: spot.model === 415 || spot.model === 560,
       lightBar: spot.model === 415,
     });
     if (vehicle) {

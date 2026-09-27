@@ -26,6 +26,7 @@ import { bindAdminRespcar } from "./respcar";
 import { bindAdminTpcor } from "./tpcor";
 import { bindAdminTpint } from "./tpint";
 import { bindAdminVeh } from "./veh";
+import { bindAdminWarehouse } from "./warehouse";
 
 export { isAdminLoggedIn } from "./session";
 
@@ -53,6 +54,7 @@ export const adminModule: GameModule = {
     bindAdminMakeleader();
     bindAdminGzcolor();
     bindAdminAsellhouse();
+    bindAdminWarehouse();
     bindAdminGivemoney();
     bindAdminSetlevel();
     bindAdminMakeadmin();

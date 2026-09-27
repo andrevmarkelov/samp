@@ -1,10 +1,16 @@
 import { STREET_WORLD } from "../spawn/point";
+import { ORG_FBI_ID } from "./fbi";
+import { ORG_LSPD_ID } from "./lspd";
+import { ORG_POLICE_ID } from "./police";
 import type { OrganizationDef, OrgGateDef, OrgRankDef } from "./types";
 import { MAX_ORG_RANK } from "./types";
 
 export const ORG_ARMY_ID = 1;
 
 const ARMY_COLOR = 0x9c7a4bff;
+const ARMY_GATE_ORG_IDS = [ORG_ARMY_ID, ORG_POLICE_ID, ORG_LSPD_ID, ORG_FBI_ID] as const;
+const ARMY_GATE_DENY =
+  "Открыть могут сотрудники Армии, областной полиции, LSPD и FBI.";
 
 function armyRanks(): OrgRankDef[] {
   const rows: Array<{ title: string; male: number; female: number; pay: number }> = [
@@ -51,12 +57,13 @@ if (ARMY.ranks.length !== MAX_ORG_RANK) {
 
 const ARMY_GATE = {
   orgId: ORG_ARMY_ID,
+  orgIds: ARMY_GATE_ORG_IDS,
   model: 19912,
   rx: 0,
   ry: 0,
   rz: 90,
   radius: 14,
-  denyMessage: "Вы не состоите в армии.",
+  denyMessage: ARMY_GATE_DENY,
 } as const;
 
 export const ARMY_GATES: OrgGateDef[] = [

@@ -181,3 +181,30 @@ ON DUPLICATE KEY UPDATE
   min_y = VALUES(min_y),
   max_x = VALUES(max_x),
   max_y = VALUES(max_y);
+
+-- Склады: org_id органа или 0 = склад шахты (не орган игрока).
+CREATE TABLE IF NOT EXISTS warehouses (
+  org_id SMALLINT UNSIGNED NOT NULL,
+  ammo INT UNSIGNED NOT NULL DEFAULT 0,
+  meds INT UNSIGNED NOT NULL DEFAULT 0,
+  metal INT UNSIGNED NOT NULL DEFAULT 0,
+  drugs INT UNSIGNED NOT NULL DEFAULT 0,
+  is_locked TINYINT(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (org_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT IGNORE INTO warehouses (org_id, ammo, meds, metal, drugs, is_locked) VALUES
+(0, 0, 0, 0, 0, 0),
+(1, 0, 0, 0, 0, 0),
+(2, 0, 0, 0, 0, 0),
+(4, 0, 0, 0, 0, 0),
+(5, 0, 0, 0, 0, 0),
+(6, 0, 0, 0, 0, 0),
+(9, 0, 0, 0, 0, 1),
+(10, 0, 0, 0, 0, 1),
+(11, 0, 0, 0, 0, 1),
+(12, 0, 0, 0, 0, 1),
+(13, 0, 0, 0, 0, 1),
+(14, 0, 0, 0, 0, 1),
+(15, 0, 0, 0, 0, 1),
+(16, 0, 0, 0, 0, 1);

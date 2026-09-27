@@ -5,10 +5,10 @@ import { grantArmour, grantWeapon } from "../anticheat/trust";
 import { getAccount, isAuthenticated } from "../auth/session";
 import { getWarehouse } from "../warehouse";
 import { AMMUNATION_INTERIOR } from "./ammunation-doors";
-import { ORG_FBI_ID } from "./fbi";
+import { ORG_ARMY_ID } from "./army";
 import { getMembership } from "./membership";
 
-export const FBI_LOCKER_DIALOG_ID = 24;
+export const ARMY_LOCKER_DIALOG_ID = 54;
 
 const PICKUP_MODEL = 19134;
 const PICKUP_TYPE = 1;
@@ -18,11 +18,10 @@ const PICKUP_RADIUS = 1.5;
 const TICK_MS = 200;
 const AMMO_LABEL_HEIGHT = 1.4;
 const AMMO_LABEL_DRAW_DISTANCE = 12;
-const SWAT_SKIN = 285;
 const MAX_ARMOR = 100;
-const DENY = "Вы не состоите в FBI.";
+const DENY = "Вы не состоите в Армии.";
 
-/** Аммунация FBI (интерьер 6, VW = org_id). */
+/** Аммунация Армии (интерьер 6, VW = org_id). */
 const POINT = {
   x: 312.4084,
   y: -165.5791,
@@ -31,31 +30,27 @@ const POINT = {
 
 type LockerItem = {
   label: string;
-  kind: "armor" | "weapon" | "skin";
+  kind: "armor" | "weapon";
   id: number;
   ammo?: number;
 };
 
 const ITEMS: readonly LockerItem[] = [
   { label: "Бронежилет", kind: "armor", id: 0 },
-  { label: "Дубинка", kind: "weapon", id: 3, ammo: 1 },
   { label: "Desert Eagle", kind: "weapon", id: 24, ammo: 50 },
-  { label: "Shotgun", kind: "weapon", id: 25, ammo: 40 },
-  { label: "MP5", kind: "weapon", id: 29, ammo: 120 },
   { label: "M4", kind: "weapon", id: 31, ammo: 150 },
-  { label: "Sniper Rifle", kind: "weapon", id: 34, ammo: 30 },
-  { label: "Спец. форма SWAT", kind: "skin", id: SWAT_SKIN },
+  { label: "Rifle", kind: "weapon", id: 33, ammo: 50 },
 ];
 
 const inside = new Set<number>();
 let ammoStockLabel: TextLabel | null = null;
 
 function ammoStockLabelText(): string {
-  const ammo = getWarehouse(ORG_FBI_ID)?.ammo ?? 0;
+  const ammo = getWarehouse(ORG_ARMY_ID)?.ammo ?? 0;
   return `Патроны: ${ammo}`;
 }
 
-export function refreshFbiAmmoStockLabel(): void {
+export function refreshArmyAmmoStockLabel(): void {
   if (!ammoStockLabel) {
     return;
   }
@@ -67,8 +62,8 @@ export function refreshFbiAmmoStockLabel(): void {
   }
 }
 
-export function bindFbiLocker(): void {
-  new Pickup(PICKUP_MODEL, PICKUP_TYPE, POINT.x, POINT.y, POINT.z, ORG_FBI_ID);
+export function bindArmyLocker(): void {
+  new Pickup(PICKUP_MODEL, PICKUP_TYPE, POINT.x, POINT.y, POINT.z, ORG_ARMY_ID);
   ammoStockLabel = new TextLabel(
     ammoStockLabelText(),
     Color.info,
@@ -76,14 +71,14 @@ export function bindFbiLocker(): void {
     POINT.y,
     POINT.z + AMMO_LABEL_HEIGHT,
     AMMO_LABEL_DRAW_DISTANCE,
-    ORG_FBI_ID,
+    ORG_ARMY_ID,
     false
   );
 
   setInterval(tickLocker, TICK_MS);
 
   omp.on("dialogResponse", (player, dialogId, response, listItem, inputText) => {
-    if (Number(dialogId) !== FBI_LOCKER_DIALOG_ID) {
+    if (Number(dialogId) !== ARMY_LOCKER_DIALOG_ID) {
       return;
     }
 
@@ -126,7 +121,7 @@ function tickLocker(): void {
       }
 
       if (
-        player.getVirtualWorld() !== ORG_FBI_ID ||
+        player.getVirtualWorld() !== ORG_ARMY_ID ||
         player.getInterior() !== AMMUNATION_INTERIOR
       ) {
         inside.delete(id);
@@ -173,7 +168,7 @@ function canUseLocker(player: Player, tellDeny = false): boolean {
   }
 
   const membership = getMembership(account);
-  if (!membership || membership.org.id !== ORG_FBI_ID) {
+  if (!membership || membership.org.id !== ORG_ARMY_ID) {
     if (tellDeny) {
       tell(player, Color.error, DENY);
     }
@@ -187,7 +182,7 @@ function showLocker(player: Player): void {
   try {
     Dialog.show(
       player,
-      FBI_LOCKER_DIALOG_ID,
+      ARMY_LOCKER_DIALOG_ID,
       DIALOG_STYLE_LIST,
       "Оружейная",
       ITEMS.map((item, index) => `${index + 1}. ${item.label}`).join("\n"),
@@ -214,12 +209,6 @@ function giveItem(player: Player, item: LockerItem): void {
     if (item.kind === "armor") {
       grantArmour(player, MAX_ARMOR);
       tell(player, Color.info, "Вы надели бронежилет.");
-      return;
-    }
-
-    if (item.kind === "skin") {
-      player.setSkin(item.id);
-      tell(player, Color.info, "Вы надели спец. форму SWAT. После смерти или выхода она сбросится.");
       return;
     }
 

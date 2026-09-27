@@ -22,6 +22,20 @@ export const DROP_POINT = {
   z: 73.9931,
 } as const;
 
+/** Текст: металл на складе. */
+export const METAL_STOCK_LABEL_POINT = {
+  x: 1040.8379,
+  y: -312.8458,
+  z: 73.9931,
+} as const;
+
+/** Пикап продажи металла (покупка позже). */
+export const METAL_SELL_POINT = {
+  x: 1050.2295,
+  y: -314.1089,
+  z: 73.9931,
+} as const;
+
 export const MINE_POINTS: readonly { x: number; y: number; z: number }[] = [
   { x: 1083.5027, y: -349.6535, z: 75.0384 },
   { x: 1078.2799, y: -357.5945, z: 75.0473 },
