@@ -68,6 +68,14 @@ export function bindAdminMakeadmin(): void {
         return;
       }
 
+      if (playerId(player) === playerId(target)) {
+        player.sendClientMessage(
+          Color.error,
+          "Нельзя выдать или снять админку себе."
+        );
+        return;
+      }
+
       const account = getAccount(target);
       if (!account) {
         player.sendClientMessage(Color.error, "Игрок не найден.");
@@ -106,19 +114,14 @@ async function grantAdmin(
   clearAloginDialog(target);
 
   const tag = playerChatName(target);
-  const same = playerId(admin) === playerId(target);
 
   if (level < 1) {
-    if (!same) {
-      admin.sendClientMessage(Color.info, `Вы сняли админку: ${tag}.`);
-    }
+    admin.sendClientMessage(Color.info, `Вы сняли админку: ${tag}.`);
     target.sendClientMessage(Color.info, "Вас сняли с администрирования.");
     return;
   }
 
-  if (!same) {
-    admin.sendClientMessage(Color.info, `Вы выдали админку ${tag}: ${level} lvl.`);
-  }
+  admin.sendClientMessage(Color.info, `Вы выдали админку ${tag}: ${level} lvl.`);
   target.sendClientMessage(
     Color.info,
     `Вам выдали администрирование. Уровень: ${level}. Придумайте пароль от админки.`

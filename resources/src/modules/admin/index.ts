@@ -17,7 +17,9 @@ import { bindAdminSetskin } from "./setskin";
 import { bindAdminGivemoney } from "./givemoney";
 import { bindAdminMakeadmin } from "./makeadmin";
 import { bindAdminMakeleader } from "./makeleader";
+import { bindAdminArang } from "./arang";
 import { bindAdminAsellhouse } from "./asellhouse";
+import { bindAdminGoto } from "./goto";
 import { bindAdminGzcolor } from "./gzcolor";
 import { bindAdminMapTeleport } from "./map";
 import { bindAdminRespcar } from "./respcar";
@@ -40,6 +42,7 @@ export const adminModule: GameModule = {
     bindAdminBan();
     bindAdminJail();
     bindAdminMute();
+    bindAdminGoto();
     bindAdminAo();
     bindAdminTpcor();
     bindAdminTpint();
@@ -53,6 +56,7 @@ export const adminModule: GameModule = {
     bindAdminGivemoney();
     bindAdminSetlevel();
     bindAdminMakeadmin();
+    bindAdminArang();
     bindAdminMapTeleport();
 
     omp.on("playerConnect", (player) => {

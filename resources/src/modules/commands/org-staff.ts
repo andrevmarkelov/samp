@@ -186,18 +186,6 @@ async function setOrg(player: Player, orgId: number, orgRank: number): Promise<b
 
 function parseRankDelta(args: string): { slot: number; delta: 1 | -1 } | null {
   const parts = args.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 1 && parts[0]) {
-    const glued = parts[0].match(/^(\d+)([+-])$/);
-    if (!glued?.[1] || !glued[2]) {
-      return null;
-    }
-    const slot = Number(glued[1]);
-    if (!Number.isInteger(slot) || slot < 0) {
-      return null;
-    }
-    return { slot, delta: glued[2] === "+" ? 1 : -1 };
-  }
-
   if (parts.length !== 2 || !parts[0] || !parts[1]) {
     return null;
   }
@@ -379,7 +367,7 @@ registerCommand("uninvite", "Уволить из организации", (playe
   })();
 });
 
-registerCommand("rank", "Изменить ранг в организации", (player, args) => {
+registerCommand("rang", "Изменить ранг в организации", (player, args) => {
   const staff = requireStaff(player);
   if (!staff) {
     return;
@@ -387,7 +375,7 @@ registerCommand("rank", "Изменить ранг в организации", (
 
   const parsed = parseRankDelta(args);
   if (!parsed) {
-    tell(player, Color.error, "Использование: /rank [id] [+/-]");
+    tell(player, Color.error, "Использование: /rang [id] [+/-]");
     return;
   }
 

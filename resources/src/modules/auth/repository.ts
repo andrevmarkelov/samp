@@ -511,6 +511,17 @@ export async function saveAdminAccess(
   );
 }
 
+/** Меняет уровень админки, пароль не трогает. */
+export async function saveAdminLevel(
+  userId: number,
+  adminLevel: number
+): Promise<void> {
+  await execute("UPDATE users SET admin_level = ? WHERE id = ?", [
+    adminLevel,
+    userId,
+  ]);
+}
+
 export async function saveAdminPassword(
   userId: number,
   passwordHash: string
