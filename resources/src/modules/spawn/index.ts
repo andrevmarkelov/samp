@@ -22,6 +22,7 @@ import {
   DEFAULT_SPAWN,
   DEFAULT_SPAWN_SKIN,
   NO_TEAM,
+  clearPlaceAtSettle,
   pickHospitalSpawn,
   placeAt,
   writeSpawnInfo,
@@ -232,6 +233,7 @@ export const spawnModule: GameModule = {
     });
 
     omp.on("playerDisconnect", (player) => {
+      clearPlaceAtSettle(player);
       const id = playerId(player);
       if (id !== null) {
         pendingHospital.delete(id);
