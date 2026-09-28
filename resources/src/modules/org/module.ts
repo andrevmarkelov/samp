@@ -4,6 +4,8 @@ import { bindArmyFactoryDoors } from "./army-factory-doors";
 import { bindAmmunationDoors } from "./ammunation-doors";
 import { bindOrgGates } from "./gates";
 import { bindHospitalRoofAccess } from "./hospital-roof";
+import { bindHospitalDoors } from "./hospital-doors";
+import { bindHospitalStock } from "./hospital-stock";
 import { bindMeriyaStaffDoors } from "./meriya-doors";
 import { bindMeriyaLocker } from "./meriya-locker";
 import { bindPoliceDoors } from "./police-doors";
@@ -27,6 +29,8 @@ export const orgModule: GameModule = {
   start() {
     bindOrgGates();
     bindHospitalRoofAccess();
+    bindHospitalDoors();
+    bindHospitalStock();
     bindMeriyaStaffDoors();
     bindMeriyaLocker();
     bindPoliceDoors();

@@ -52,16 +52,16 @@ const STREET_PICKUP = {
 } as const;
 
 const INTERIOR_PICKUP = {
-  x: 1607.174,
-  y: 1810.1447,
-  z: -20.7665,
+  x: 1176.376,
+  y: -1330.9333,
+  z: 4001.1001,
 } as const;
 
 const FROM_STREET: SpawnPoint = {
-  x: 1607.1842,
-  y: 1807.3461,
-  z: -20.7645,
-  angle: 179.9952,
+  x: 1172.933,
+  y: -1330.9065,
+  z: 4001.1001,
+  angle: 89.6127,
   interior: 0,
   world: HOSPITAL_WORLD,
 };
@@ -75,25 +75,58 @@ const FROM_INTERIOR: SpawnPoint = {
   world: STREET_WORLD,
 };
 
+/** Холл приёмного → служебный блок (кадры, оперблок, руководство…). */
+const HALL_TO_SERVICE_PICKUP = {
+  x: 1165.1902,
+  y: -1322.7876,
+  z: 4001.1001,
+} as const;
+
+const TO_SERVICE_BLOCK: SpawnPoint = {
+  x: 1151.0358,
+  y: -1364.811,
+  z: 3001.0845,
+  angle: 1.2748,
+  interior: 0,
+  world: HOSPITAL_WORLD,
+};
+
+/** Служебный блок → холл приёмного. */
+const SERVICE_TO_HALL_PICKUP = {
+  x: 1151.0732,
+  y: -1366.5275,
+  z: 3001.0845,
+} as const;
+
+const TO_RECEPTION_HALL: SpawnPoint = {
+  x: 1165.1576,
+  y: -1324.4823,
+  z: 4001.1001,
+  angle: 179.5168,
+  interior: 0,
+  world: HOSPITAL_WORLD,
+};
+
 const BEDS: readonly SpawnPoint[] = [
-  { x: 1597.9979, y: 1804.3722, z: -20.7924, angle: 269.3663, interior: 0, world: HOSPITAL_WORLD },
-  { x: 1597.9989, y: 1806.8933, z: -20.7924, angle: 269.9929, interior: 0, world: HOSPITAL_WORLD },
-  { x: 1597.9972, y: 1809.387, z: -20.7924, angle: 270.6196, interior: 0, world: HOSPITAL_WORLD },
-  { x: 1593.9376, y: 1810.5353, z: -20.7924, angle: 90.788, interior: 0, world: HOSPITAL_WORLD },
-  { x: 1593.9384, y: 1808.0323, z: -20.7924, angle: 90.7879, interior: 0, world: HOSPITAL_WORLD },
-  { x: 1593.9371, y: 1805.5417, z: -20.7924, angle: 91.7279, interior: 0, world: HOSPITAL_WORLD },
-  { x: 1587.9996, y: 1804.3844, z: -20.7924, angle: 269.0529, interior: 0, world: HOSPITAL_WORLD },
-  { x: 1587.9966, y: 1806.8986, z: -20.7924, angle: 269.3662, interior: 0, world: HOSPITAL_WORLD },
-  { x: 1587.9971, y: 1809.3759, z: -20.7924, angle: 271.8729, interior: 0, world: HOSPITAL_WORLD },
-  { x: 1583.9344, y: 1810.5408, z: -20.7924, angle: 88.5712, interior: 0, world: HOSPITAL_WORLD },
-  { x: 1583.9381, y: 1808.0299, z: -20.7924, angle: 89.8245, interior: 0, world: HOSPITAL_WORLD },
-  { x: 1583.9341, y: 1805.5366, z: -20.7924, angle: 90.1378, interior: 0, world: HOSPITAL_WORLD },
-  { x: 1578.0, y: 1804.3511, z: -20.7924, angle: 270.5962, interior: 0, world: HOSPITAL_WORLD },
-  { x: 1578.0, y: 1806.8785, z: -20.7924, angle: 269.6563, interior: 0, world: HOSPITAL_WORLD },
-  { x: 1578.0009, y: 1809.3735, z: -20.7924, angle: 269.3429, interior: 0, world: HOSPITAL_WORLD },
-  { x: 1573.9343, y: 1810.5559, z: -20.7924, angle: 90.4513, interior: 0, world: HOSPITAL_WORLD },
-  { x: 1573.9373, y: 1808.0479, z: -20.7924, angle: 90.1379, interior: 0, world: HOSPITAL_WORLD },
-  { x: 1573.9379, y: 1805.5472, z: -20.7924, angle: 89.1979, interior: 0, world: HOSPITAL_WORLD },
+  { x: 1172.7423, y: -1342.6758, z: 4001.1001, angle: 0.2888, interior: 0, world: HOSPITAL_WORLD },
+  { x: 1174.9169, y: -1342.6736, z: 4001.1001, angle: 358.7221, interior: 0, world: HOSPITAL_WORLD },
+  { x: 1174.8799, y: -1346.8517, z: 4001.1001, angle: 180.4572, interior: 0, world: HOSPITAL_WORLD },
+  { x: 1172.7137, y: -1346.851, z: 4001.1001, angle: 180.1438, interior: 0, world: HOSPITAL_WORLD },
+  { x: 1172.7706, y: -1352.4978, z: 4001.1001, angle: 359.3722, interior: 0, world: HOSPITAL_WORLD },
+  { x: 1174.8793, y: -1352.5005, z: 4001.1001, angle: 359.3722, interior: 0, world: HOSPITAL_WORLD },
+  { x: 1174.8811, y: -1356.6752, z: 4001.1001, angle: 179.5406, interior: 0, world: HOSPITAL_WORLD },
+  { x: 1172.7496, y: -1356.6752, z: 4001.1001, angle: 179.5406, interior: 0, world: HOSPITAL_WORLD },
+  { x: 1169.9792, y: -1364.0752, z: 4001.1001, angle: 178.9139, interior: 0, world: HOSPITAL_WORLD },
+  { x: 1165.1626, y: -1364.0757, z: 4001.1001, angle: 180.4806, interior: 0, world: HOSPITAL_WORLD },
+  { x: 1160.39, y: -1364.0764, z: 4001.1001, angle: 179.8539, interior: 0, world: HOSPITAL_WORLD },
+  { x: 1157.639, y: -1356.6758, z: 4001.1001, angle: 179.564, interior: 0, world: HOSPITAL_WORLD },
+  { x: 1155.4634, y: -1356.6747, z: 4001.1001, angle: 180.1907, interior: 0, world: HOSPITAL_WORLD },
+  { x: 1155.493, y: -1352.498, z: 4001.1001, angle: 358.7924, interior: 0, world: HOSPITAL_WORLD },
+  { x: 1157.6072, y: -1352.4983, z: 4001.1001, angle: 0.359, interior: 0, world: HOSPITAL_WORLD },
+  { x: 1157.6229, y: -1346.8712, z: 4001.1001, angle: 181.7808, interior: 0, world: HOSPITAL_WORLD },
+  { x: 1155.475, y: -1346.8712, z: 4001.1001, angle: 179.9008, interior: 0, world: HOSPITAL_WORLD },
+  { x: 1155.4849, y: -1342.6945, z: 4001.1001, angle: 0.0692, interior: 0, world: HOSPITAL_WORLD },
+  { x: 1157.6219, y: -1342.6943, z: 4001.1001, angle: 0.3825, interior: 0, world: HOSPITAL_WORLD },
 ];
 
 const lastTeleportAt = new Map<number, number>();
@@ -126,6 +159,25 @@ export const hospitalModule: GameModule = {
 
     createPickupLabel(STREET_PICKUP, STREET_WORLD, "Городская больница\nВход");
     createPickupLabel(INTERIOR_PICKUP, HOSPITAL_WORLD, "Выход на улицу");
+
+    new Pickup(
+      PICKUP_MODEL,
+      PICKUP_TYPE,
+      HALL_TO_SERVICE_PICKUP.x,
+      HALL_TO_SERVICE_PICKUP.y,
+      HALL_TO_SERVICE_PICKUP.z,
+      HOSPITAL_WORLD
+    );
+    new Pickup(
+      PICKUP_MODEL,
+      PICKUP_TYPE,
+      SERVICE_TO_HALL_PICKUP.x,
+      SERVICE_TO_HALL_PICKUP.y,
+      SERVICE_TO_HALL_PICKUP.z,
+      HOSPITAL_WORLD
+    );
+    createPickupLabel(HALL_TO_SERVICE_PICKUP, HOSPITAL_WORLD, "Служебный блок\nВход");
+    createPickupLabel(SERVICE_TO_HALL_PICKUP, HOSPITAL_WORLD, "Приёмный холл\nВыход");
 
     for (let i = 0; i < BEDS.length; i++) {
       const bed = BEDS[i];
@@ -414,6 +466,36 @@ function tickHospital(): void {
         ) <= PICKUP_RADIUS
       ) {
         tryLeaveHospital(player);
+        return;
+      }
+
+      if (
+        world === HOSPITAL_WORLD &&
+        distance3d(
+          pos.x,
+          pos.y,
+          pos.z,
+          HALL_TO_SERVICE_PICKUP.x,
+          HALL_TO_SERVICE_PICKUP.y,
+          HALL_TO_SERVICE_PICKUP.z
+        ) <= PICKUP_RADIUS
+      ) {
+        teleport(player, TO_SERVICE_BLOCK);
+        return;
+      }
+
+      if (
+        world === HOSPITAL_WORLD &&
+        distance3d(
+          pos.x,
+          pos.y,
+          pos.z,
+          SERVICE_TO_HALL_PICKUP.x,
+          SERVICE_TO_HALL_PICKUP.y,
+          SERVICE_TO_HALL_PICKUP.z
+        ) <= PICKUP_RADIUS
+      ) {
+        teleport(player, TO_RECEPTION_HALL);
       }
     } catch {
       // Слот пустой или игрок уже вышел.

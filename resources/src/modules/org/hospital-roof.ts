@@ -57,17 +57,17 @@ const DOORS: readonly StaffDoor[] = [
   {
     pickup: { x: 1147.801, y: -1317.7454, z: 13.6535, world: STREET_WORLD },
     dest: {
-      x: 1613.2654,
-      y: 1801.5596,
-      z: -20.7585,
-      angle: 90.0208,
+      x: 1150.2346,
+      y: -1346.0052,
+      z: 3001.0845,
+      angle: 268.864,
       interior: 0,
       world: HOSPITAL_WORLD,
     },
     label: "Больница\nВход",
   },
   {
-    pickup: { x: 1615.3278, y: 1801.5503, z: -20.7585, world: HOSPITAL_WORLD },
+    pickup: { x: 1148.1534, y: -1345.9833, z: 3001.0845, world: HOSPITAL_WORLD },
     dest: {
       x: 1147.804,
       y: -1315.7272,

@@ -80,7 +80,8 @@ public/
     deploy.md                    выкладка на VPS
   maps/                          CreateObject / CreateDynamicObject
     jail.txt                     интерьер тюрьмы (в небе)
-    hospital.txt
+    hospital_new.txt             интерьер больницы (холл/служебный блок)
+    hospitalMap.txt              экстерьер больницы (улица)
     mine.txt
     army.txt                     объекты армии; ворота gates в коде, не дублировать
   sql/schema.sql                 эталон таблицы users

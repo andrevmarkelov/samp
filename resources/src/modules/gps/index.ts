@@ -5,6 +5,7 @@ import { isAuthenticated } from "../auth/session";
 import { isLoaderOnShift } from "../loader";
 import { isMinerOnShift } from "../miner";
 import { isAutoschoolExamOnRoute } from "../autoschool/session";
+import { isHospitalMedDeliveryActive } from "../vehicles/hospital";
 import type { GameModule } from "../types";
 
 export const GPS_DIALOG_ID = 7;
@@ -244,7 +245,12 @@ function setRoute(player: Player, target: GpsTarget): void {
       GPS_ICON_COLOR,
       MAPICON_GLOBAL
     );
-    if (!isMinerOnShift(player) && !isLoaderOnShift(player) && !isAutoschoolExamOnRoute(player)) {
+    if (
+      !isMinerOnShift(player) &&
+      !isLoaderOnShift(player) &&
+      !isAutoschoolExamOnRoute(player) &&
+      !isHospitalMedDeliveryActive(player)
+    ) {
       Checkpoint.set(player, target.x, target.y, target.z, CHECKPOINT_RADIUS);
     }
   } catch {
@@ -287,6 +293,7 @@ function tickGps(): void {
         !isMinerOnShift(player) &&
         !isLoaderOnShift(player) &&
         !isAutoschoolExamOnRoute(player) &&
+        !isHospitalMedDeliveryActive(player) &&
         !Checkpoint.isActive(player)
       ) {
         Checkpoint.set(player, target.x, target.y, target.z, CHECKPOINT_RADIUS);
@@ -319,7 +326,12 @@ function clearRoute(player: Player, id: number): void {
   activeByPlayer.delete(id);
   try {
     player.removeMapIcon(GPS_ICON_SLOT);
-    if (!isMinerOnShift(player) && !isLoaderOnShift(player) && !isAutoschoolExamOnRoute(player)) {
+    if (
+      !isMinerOnShift(player) &&
+      !isLoaderOnShift(player) &&
+      !isAutoschoolExamOnRoute(player) &&
+      !isHospitalMedDeliveryActive(player)
+    ) {
       Checkpoint.disable(player);
     }
   } catch {

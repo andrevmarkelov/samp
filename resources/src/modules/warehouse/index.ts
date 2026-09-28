@@ -9,6 +9,7 @@ import { startMafiaWarehouseDisplays } from "./mafia-stock";
 export {
   addMineMetal,
   addWarehouseAmmo,
+  addWarehouseMeds,
   addWarehouseMetal,
   takeMineMetal,
   takeWarehouseMetal,
