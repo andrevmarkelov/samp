@@ -11,6 +11,8 @@ import {
   YAKUZA_WORLD,
 } from "../org";
 import { getWarehouse } from "./repository";
+import { notifyOrgStockStanding } from "./stock-interact";
+import { clearOrgStockVisit } from "./stock-visit";
 
 const POINT = {
   x: 1261.6088,
@@ -21,6 +23,7 @@ const POINT = {
 const LABEL_HEIGHT = 2.2;
 const LABEL_DRAW_DISTANCE = 12;
 const CHECKPOINT_RADIUS = 1.5;
+const LEAVE_RADIUS = 2.8;
 const SHOW_DISTANCE = 45;
 const TICK_MS = 400;
 
@@ -89,6 +92,45 @@ export function refreshMafiaWarehouseLabels(): void {
   }
 }
 
+/** Точка склада мафии, если игрок в радиусе чекпоинта. */
+export function findMafiaStockAtPlayer(player: Player): {
+  orgId: number;
+  x: number;
+  y: number;
+  z: number;
+  world: number;
+  interior: number;
+} | null {
+  try {
+    if (player.getInterior() !== MAFIA_INTERIOR) {
+      return null;
+    }
+
+    const world = player.getVirtualWorld();
+    const def = MAFIA_STOCKS.find((item) => item.world === world);
+    if (!def) {
+      return null;
+    }
+
+    const pos = player.getPos();
+    const dist = Math.hypot(pos.x - POINT.x, pos.y - POINT.y, pos.z - POINT.z);
+    if (dist > LEAVE_RADIUS) {
+      return null;
+    }
+
+    return {
+      orgId: def.orgId,
+      x: POINT.x,
+      y: POINT.y,
+      z: POINT.z,
+      world: def.world,
+      interior: MAFIA_INTERIOR,
+    };
+  } catch {
+    return null;
+  }
+}
+
 function tickMafiaWarehouseCheckpoints(): void {
   omp.players.forEach((player) => {
     updateCheckpointForPlayer(player);
@@ -102,6 +144,7 @@ function updateCheckpointForPlayer(player: Player): void {
   }
 
   let show = false;
+  let onCheckpoint = false;
   try {
     if (player.getInterior() === MAFIA_INTERIOR) {
       const world = player.getVirtualWorld();
@@ -109,27 +152,35 @@ function updateCheckpointForPlayer(player: Player): void {
         const pos = player.getPos();
         const dist = Math.hypot(pos.x - POINT.x, pos.y - POINT.y, pos.z - POINT.z);
         show = dist <= SHOW_DISTANCE;
+        onCheckpoint = dist <= LEAVE_RADIUS;
       }
     }
   } catch {
     show = false;
+    onCheckpoint = false;
   }
 
   if (show) {
     try {
-      Checkpoint.set(player, POINT.x, POINT.y, POINT.z, CHECKPOINT_RADIUS);
-      checkpointShown.add(id);
+      if (!checkpointShown.has(id)) {
+        Checkpoint.set(player, POINT.x, POINT.y, POINT.z, CHECKPOINT_RADIUS);
+        checkpointShown.add(id);
+      }
     } catch {
       // Игрок уже вышел.
     }
+    notifyOrgStockStanding(player, onCheckpoint);
     return;
   }
 
+  // Не наш склад — не трогаем pending/visit.
   if (!checkpointShown.has(id)) {
     return;
   }
 
   checkpointShown.delete(id);
+  clearOrgStockVisit(player);
+  notifyOrgStockStanding(player, false);
   try {
     Checkpoint.disable(player);
   } catch {

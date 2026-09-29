@@ -127,19 +127,7 @@ export function addWarehouseMetal(orgId: number, amount: number): number {
     return getWarehouse(orgId)?.metal ?? 0;
   }
 
-  let record = cache.get(orgId);
-  if (!record) {
-    record = {
-      orgId,
-      ammo: 0,
-      meds: 0,
-      metal: 0,
-      drugs: 0,
-      isLocked: warehouseUsesLock(orgId),
-    };
-    cache.set(orgId, record);
-  }
-
+  const record = ensureRecord(orgId);
   record.metal += add;
   void persistMetalAdd(orgId, add);
   return record.metal;
@@ -156,19 +144,7 @@ export function addWarehouseAmmo(orgId: number, amount: number): number {
     return getWarehouse(orgId)?.ammo ?? 0;
   }
 
-  let record = cache.get(orgId);
-  if (!record) {
-    record = {
-      orgId,
-      ammo: 0,
-      meds: 0,
-      metal: 0,
-      drugs: 0,
-      isLocked: warehouseUsesLock(orgId),
-    };
-    cache.set(orgId, record);
-  }
-
+  const record = ensureRecord(orgId);
   record.ammo += add;
   void persistAmmoAdd(orgId, add);
   return record.ammo;
@@ -181,22 +157,40 @@ export function addWarehouseMeds(orgId: number, amount: number): number {
     return getWarehouse(orgId)?.meds ?? 0;
   }
 
-  let record = cache.get(orgId);
-  if (!record) {
-    record = {
-      orgId,
-      ammo: 0,
-      meds: 0,
-      metal: 0,
-      drugs: 0,
-      isLocked: warehouseUsesLock(orgId),
-    };
-    cache.set(orgId, record);
-  }
-
+  const record = ensureRecord(orgId);
   record.meds += add;
   void persistMedsAdd(orgId, add);
   return record.meds;
+}
+
+/** Добавить наркотики на склад. Обновляет кэш и БД. */
+export function addWarehouseDrugs(orgId: number, amount: number): number {
+  const add = Math.max(0, Math.floor(amount));
+  if (add <= 0) {
+    return getWarehouse(orgId)?.drugs ?? 0;
+  }
+
+  const record = ensureRecord(orgId);
+  record.drugs += add;
+  void persistDrugsAdd(orgId, add);
+  return record.drugs;
+}
+
+/** Списать патроны со склада. false — недостаточно на складе. */
+export function takeWarehouseAmmo(orgId: number, amount: number): boolean {
+  const take = Math.max(0, Math.floor(amount));
+  if (take <= 0) {
+    return false;
+  }
+
+  const record = cache.get(orgId);
+  if (!record || record.ammo < take) {
+    return false;
+  }
+
+  record.ammo -= take;
+  void persistAmmoTake(orgId, take);
+  return true;
 }
 
 /** Списать металл со склада. false — недостаточно на складе. */
@@ -216,8 +210,53 @@ export function takeWarehouseMetal(orgId: number, amount: number): boolean {
   return true;
 }
 
+/** Списать наркотики со склада. false — недостаточно на складе. */
+export function takeWarehouseDrugs(orgId: number, amount: number): boolean {
+  const take = Math.max(0, Math.floor(amount));
+  if (take <= 0) {
+    return false;
+  }
+
+  const record = cache.get(orgId);
+  if (!record || record.drugs < take) {
+    return false;
+  }
+
+  record.drugs -= take;
+  void persistDrugsTake(orgId, take);
+  return true;
+}
+
+/** Открыть/закрыть склад банды или мафии. */
+export function setWarehouseLocked(orgId: number, locked: boolean): boolean {
+  if (!warehouseUsesLock(orgId)) {
+    return false;
+  }
+
+  const record = ensureRecord(orgId);
+  record.isLocked = locked;
+  void persistLock(orgId, locked);
+  return true;
+}
+
 export function takeMineMetal(amount: number): boolean {
   return takeWarehouseMetal(WAREHOUSE_MINE_ID, amount);
+}
+
+function ensureRecord(orgId: number): WarehouseRecord {
+  let record = cache.get(orgId);
+  if (!record) {
+    record = {
+      orgId,
+      ammo: 0,
+      meds: 0,
+      metal: 0,
+      drugs: 0,
+      isLocked: warehouseUsesLock(orgId),
+    };
+    cache.set(orgId, record);
+  }
+  return record;
 }
 
 async function persistMetalAdd(orgId: number, amount: number): Promise<void> {
@@ -304,6 +343,86 @@ async function persistMedsAdd(orgId: number, amount: number): Promise<void> {
        VALUES (?, 0, ?, 0, 0, ?)
        ON DUPLICATE KEY UPDATE meds = meds + VALUES(meds)`,
       [orgId, amount, warehouseUsesLock(orgId) ? 1 : 0]
+    );
+  } catch {
+    // Кэш уже обновлён.
+  }
+}
+
+async function persistAmmoTake(orgId: number, amount: number): Promise<void> {
+  if (!isDatabaseReady() || amount <= 0) {
+    return;
+  }
+
+  try {
+    await execute(
+      "UPDATE warehouses SET ammo = GREATEST(0, CAST(ammo AS SIGNED) - ?) WHERE org_id = ?",
+      [amount, orgId]
+    );
+  } catch {
+    // Кэш уже обновлён.
+  }
+}
+
+async function persistDrugsAdd(orgId: number, amount: number): Promise<void> {
+  if (!isDatabaseReady() || amount <= 0) {
+    return;
+  }
+
+  try {
+    const result = await execute(
+      "UPDATE warehouses SET drugs = drugs + ? WHERE org_id = ?",
+      [amount, orgId]
+    );
+    if (result.affectedRows > 0) {
+      return;
+    }
+
+    await execute(
+      `INSERT INTO warehouses (org_id, ammo, meds, metal, drugs, is_locked)
+       VALUES (?, 0, 0, 0, ?, ?)
+       ON DUPLICATE KEY UPDATE drugs = drugs + VALUES(drugs)`,
+      [orgId, amount, warehouseUsesLock(orgId) ? 1 : 0]
+    );
+  } catch {
+    // Кэш уже обновлён.
+  }
+}
+
+async function persistDrugsTake(orgId: number, amount: number): Promise<void> {
+  if (!isDatabaseReady() || amount <= 0) {
+    return;
+  }
+
+  try {
+    await execute(
+      "UPDATE warehouses SET drugs = GREATEST(0, CAST(drugs AS SIGNED) - ?) WHERE org_id = ?",
+      [amount, orgId]
+    );
+  } catch {
+    // Кэш уже обновлён.
+  }
+}
+
+async function persistLock(orgId: number, locked: boolean): Promise<void> {
+  if (!isDatabaseReady()) {
+    return;
+  }
+
+  try {
+    const result = await execute(
+      "UPDATE warehouses SET is_locked = ? WHERE org_id = ?",
+      [locked ? 1 : 0, orgId]
+    );
+    if (result.affectedRows > 0) {
+      return;
+    }
+
+    await execute(
+      `INSERT INTO warehouses (org_id, ammo, meds, metal, drugs, is_locked)
+       VALUES (?, 0, 0, 0, 0, ?)
+       ON DUPLICATE KEY UPDATE is_locked = VALUES(is_locked)`,
+      [orgId, locked ? 1 : 0]
     );
   } catch {
     // Кэш уже обновлён.

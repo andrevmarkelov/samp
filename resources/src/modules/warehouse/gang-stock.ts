@@ -14,10 +14,14 @@ import {
   VAGOS_WORLD,
 } from "../org";
 import { getWarehouse } from "./repository";
+import { notifyOrgStockStanding } from "./stock-interact";
+import { clearOrgStockVisit } from "./stock-visit";
 
 const LABEL_HEIGHT = 1.2;
 const LABEL_DRAW_DISTANCE = 12;
 const CHECKPOINT_RADIUS = 1.5;
+/** Выход с маркера (чуть больше радиуса — без дребезга на границе). */
+const LEAVE_RADIUS = 2.8;
 const SHOW_DISTANCE = 45;
 const TICK_MS = 400;
 
@@ -133,6 +137,37 @@ export function refreshGangWarehouseLabels(): void {
   }
 }
 
+/** Точка склада банды, если игрок в радиусе чекпоинта. */
+export function findGangStockAtPlayer(player: Player): {
+  orgId: number;
+  x: number;
+  y: number;
+  z: number;
+  world: number;
+  interior: number;
+} | null {
+  try {
+    const world = player.getVirtualWorld();
+    const interior = player.getInterior();
+    const pos = player.getPos();
+
+    for (const def of GANG_STOCK_DEFS) {
+      if (def.world !== world || def.interior !== interior) {
+        continue;
+      }
+
+      const dist = Math.hypot(pos.x - def.x, pos.y - def.y, pos.z - def.z);
+      if (dist <= LEAVE_RADIUS) {
+        return def;
+      }
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
 function tickGangWarehouseCheckpoints(): void {
   omp.players.forEach((player) => {
     updateCheckpointForPlayer(player);
@@ -170,22 +205,33 @@ function updateCheckpointForPlayer(player: Player): void {
 
   const stock = findActiveStock(player);
   if (stock) {
+    let onCheckpoint = false;
     try {
-      Checkpoint.set(player, stock.x, stock.y, stock.z, CHECKPOINT_RADIUS);
-      checkpointShown.add(id);
+      const pos = player.getPos();
+      const dist = Math.hypot(pos.x - stock.x, pos.y - stock.y, pos.z - stock.z);
+      onCheckpoint = dist <= LEAVE_RADIUS;
+
+      if (!checkpointShown.has(id)) {
+        Checkpoint.set(player, stock.x, stock.y, stock.z, CHECKPOINT_RADIUS);
+        checkpointShown.add(id);
+      }
       activeStockByPlayer.set(id, stock);
     } catch {
       // Игрок уже вышел.
     }
+    notifyOrgStockStanding(player, onCheckpoint);
     return;
   }
 
+  // Не наш склад — не трогаем pending/visit (иначе тик мафии сбивает банду и наоборот).
   if (!checkpointShown.has(id)) {
     return;
   }
 
   checkpointShown.delete(id);
   activeStockByPlayer.delete(id);
+  clearOrgStockVisit(player);
+  notifyOrgStockStanding(player, false);
   try {
     Checkpoint.disable(player);
   } catch {
