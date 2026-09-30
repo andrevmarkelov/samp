@@ -1,6 +1,7 @@
 import { STREET_WORLD } from "../spawn/point";
 import { ORG_ARMY_ID } from "../org";
 import { registerOrgVehicle } from "./access";
+import { bindArmyAmmoDelivery, bindArmyAmmoTruck } from "./army-ammo-delivery";
 import { createServerVehicle } from "./spawn";
 
 const RESPAWN_SEC = 100;
@@ -8,6 +9,7 @@ const RANDOM_COLOR = -1;
 const ARMY_CAR_COLOR = 173;
 const COLORED_MODELS = new Set([431, 445, 500]);
 const DENY = "Вы не состоите в армии.";
+const BARRACKS_MODEL = 433;
 
 const ARMY_VEHICLES: ReadonlyArray<{
   model: number;
@@ -44,6 +46,8 @@ const ARMY_VEHICLES: ReadonlyArray<{
 ];
 
 export function spawnArmyVehicles(): void {
+  bindArmyAmmoDelivery();
+
   for (const spot of ARMY_VEHICLES) {
     const color = COLORED_MODELS.has(spot.model) ? ARMY_CAR_COLOR : RANDOM_COLOR;
     const vehicle = createServerVehicle({
@@ -59,6 +63,9 @@ export function spawnArmyVehicles(): void {
     });
     if (vehicle) {
       registerOrgVehicle(vehicle, ORG_ARMY_ID, DENY);
+      if (spot.model === BARRACKS_MODEL) {
+        bindArmyAmmoTruck(vehicle);
+      }
     }
   }
 }

@@ -6,6 +6,7 @@ import { isLoaderOnShift } from "../loader";
 import { isMinerOnShift } from "../miner";
 import { isAutoschoolExamOnRoute } from "../autoschool/session";
 import { isHospitalMedDeliveryActive } from "../vehicles/hospital";
+import { isArmyAmmoCarrying } from "../vehicles/army-ammo-delivery";
 import type { GameModule } from "../types";
 
 export const GPS_DIALOG_ID = 7;
@@ -249,7 +250,8 @@ function setRoute(player: Player, target: GpsTarget): void {
       !isMinerOnShift(player) &&
       !isLoaderOnShift(player) &&
       !isAutoschoolExamOnRoute(player) &&
-      !isHospitalMedDeliveryActive(player)
+      !isHospitalMedDeliveryActive(player) &&
+      !isArmyAmmoCarrying(player)
     ) {
       Checkpoint.set(player, target.x, target.y, target.z, CHECKPOINT_RADIUS);
     }
@@ -294,6 +296,7 @@ function tickGps(): void {
         !isLoaderOnShift(player) &&
         !isAutoschoolExamOnRoute(player) &&
         !isHospitalMedDeliveryActive(player) &&
+        !isArmyAmmoCarrying(player) &&
         !Checkpoint.isActive(player)
       ) {
         Checkpoint.set(player, target.x, target.y, target.z, CHECKPOINT_RADIUS);
@@ -330,7 +333,8 @@ function clearRoute(player: Player, id: number): void {
       !isMinerOnShift(player) &&
       !isLoaderOnShift(player) &&
       !isAutoschoolExamOnRoute(player) &&
-      !isHospitalMedDeliveryActive(player)
+      !isHospitalMedDeliveryActive(player) &&
+      !isArmyAmmoCarrying(player)
     ) {
       Checkpoint.disable(player);
     }

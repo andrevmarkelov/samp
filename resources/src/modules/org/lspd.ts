@@ -8,6 +8,9 @@ import type { OrgGateDef } from "./types";
 export const ORG_LSPD_ID = 5;
 export const LSPD_INTERIOR = 10;
 
+/** = ORG_ARMY_ID; без импорта army.ts (цикл с ARMY_GATE_ORG_IDS). */
+const ORG_ARMY_FOR_BARRIER = 1;
+
 export const LSPD = defineGovOrg(
   ORG_LSPD_ID,
   "LSPD",
@@ -23,13 +26,23 @@ export const LSPD = defineGovOrg(
   POLICE_RANKS
 );
 
+/** Ворота гаража: без Армии. */
 export const LAW_ORG_IDS = [ORG_LSPD_ID, ORG_POLICE_ID, ORG_FBI_ID] as const;
-const LAW_GATE_DENY = "Открыть могут сотрудники LSPD, областной полиции и FBI.";
+/** Шлагбаум у входа: + Армия (доставка патронов). */
+const BARRIER_ORG_IDS = [
+  ORG_LSPD_ID,
+  ORG_POLICE_ID,
+  ORG_FBI_ID,
+  ORG_ARMY_FOR_BARRIER,
+] as const;
+const BARRIER_DENY =
+  "Открыть могут сотрудники LSPD, областной полиции, FBI и Армии.";
+const GARAGE_DENY = "Открыть могут сотрудники LSPD, областной полиции и FBI.";
 
 export const LSPD_GATES: OrgGateDef[] = [
   {
     orgId: ORG_LSPD_ID,
-    orgIds: LAW_ORG_IDS,
+    orgIds: BARRIER_ORG_IDS,
     model: 968,
     x: 1544.69019,
     y: -1630.83936,
@@ -40,7 +53,7 @@ export const LSPD_GATES: OrgGateDef[] = [
     ryOpen: 0,
     rz: 90,
     radius: 14,
-    denyMessage: LAW_GATE_DENY,
+    denyMessage: BARRIER_DENY,
   },
   {
     orgId: ORG_LSPD_ID,
@@ -54,6 +67,6 @@ export const LSPD_GATES: OrgGateDef[] = [
     ry: 0,
     rz: 0,
     radius: 14,
-    denyMessage: LAW_GATE_DENY,
+    denyMessage: GARAGE_DENY,
   },
 ];
