@@ -4,7 +4,8 @@ import { isPlayerActive, playerId } from "../../shared/player";
 import { getAccount, isAuthenticated } from "../auth/session";
 import { refreshStreamForPlayer } from "../mapping/stream";
 import { STREET_WORLD, placeAt, type SpawnPoint } from "../spawn/point";
-import { CITY_HALL_INTERIOR, ORG_MERIYA_ID } from "./meriya";
+import { ORG_FBI_ID } from "./fbi";
+import { MERIYA_CUSTOM_INTERIOR, MERIYA_WORLD, ORG_MERIYA_ID } from "./meriya";
 import { getMembership } from "./membership";
 
 const PICKUP_MODEL = 19132;
@@ -16,7 +17,10 @@ const PICKUP_RADIUS = 1.5;
 const TICK_MS = 200;
 const LABEL_HEIGHT = 0.85;
 const LABEL_DRAW_DISTANCE = 12;
-const DENY = "Вы не состоите в мэрии.";
+const DENY = "Проход только для сотрудников Мэрии и FBI.";
+
+/** Служебный вход / парковка / крыша. */
+const STAFF_ORGS: ReadonlySet<number> = new Set([ORG_MERIYA_ID, ORG_FBI_ID]);
 
 type StaffDoor = {
   pickup: { x: number; y: number; z: number; interior: number; world: number };
@@ -34,22 +38,22 @@ const DOORS: readonly StaffDoor[] = [
       world: STREET_WORLD,
     },
     dest: {
-      x: 366.8912,
-      y: 194.0827,
-      z: 1008.3828,
-      angle: 90.3365,
-      interior: CITY_HALL_INTERIOR,
-      world: STREET_WORLD,
+      x: -801.2946,
+      y: -687.5372,
+      z: 4001.0859,
+      angle: 359.343,
+      interior: MERIYA_CUSTOM_INTERIOR,
+      world: MERIYA_WORLD,
     },
     label: "Мэрия\nСлужебный вход",
   },
   {
     pickup: {
-      x: 368.4198,
-      y: 194.0984,
-      z: 1008.3828,
-      interior: CITY_HALL_INTERIOR,
-      world: STREET_WORLD,
+      x: -801.3113,
+      y: -689.2332,
+      z: 4001.0859,
+      interior: MERIYA_CUSTOM_INTERIOR,
+      world: MERIYA_WORLD,
     },
     dest: {
       x: 1408.3652,
@@ -63,11 +67,11 @@ const DOORS: readonly StaffDoor[] = [
   },
   {
     pickup: {
-      x: 350.1312,
-      y: 178.0575,
-      z: 1014.1875,
-      interior: CITY_HALL_INTERIOR,
-      world: STREET_WORLD,
+      x: -801.2748,
+      y: -689.3614,
+      z: 4004.585,
+      interior: MERIYA_CUSTOM_INTERIOR,
+      world: MERIYA_WORLD,
     },
     dest: {
       x: 1445.2192,
@@ -88,12 +92,12 @@ const DOORS: readonly StaffDoor[] = [
       world: STREET_WORLD,
     },
     dest: {
-      x: 350.1312,
-      y: 179.9575,
-      z: 1014.1875,
-      angle: 1.3958,
-      interior: CITY_HALL_INTERIOR,
-      world: STREET_WORLD,
+      x: -801.2263,
+      y: -687.4423,
+      z: 4004.585,
+      angle: 0.5962,
+      interior: MERIYA_CUSTOM_INTERIOR,
+      world: MERIYA_WORLD,
     },
     label: "Мэрия\nС крыши",
   },
@@ -172,7 +176,7 @@ function tryUse(player: Player, dest: SpawnPoint): void {
   }
 
   const membership = account ? getMembership(account) : null;
-  if (!membership || membership.org.id !== ORG_MERIYA_ID) {
+  if (!membership || !STAFF_ORGS.has(membership.org.id)) {
     deny(player, DENY);
     return;
   }

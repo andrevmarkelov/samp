@@ -3,8 +3,7 @@ import { Color } from "../../shared/colors";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { grantArmour, grantWeapon } from "../anticheat/trust";
 import { getAccount, isAuthenticated } from "../auth/session";
-import { STREET_WORLD } from "../spawn/point";
-import { CITY_HALL_INTERIOR, ORG_MERIYA_ID } from "./meriya";
+import { MERIYA_CUSTOM_INTERIOR, MERIYA_WORLD, ORG_MERIYA_ID } from "./meriya";
 import { getMembership } from "./membership";
 
 const PICKUP_MODEL = 19134;
@@ -21,15 +20,15 @@ const DEAGLE_AMMO = 50;
 const DENY = "Вы не состоите в мэрии.";
 
 const POINT = {
-  x: 357.6911,
-  y: 150.9142,
-  z: 1025.7891,
+  x: -806.9103,
+  y: -681.7728,
+  z: 4001.0859,
 } as const;
 
 const inside = new Set<number>();
 
 export function bindMeriyaLocker(): void {
-  new Pickup(PICKUP_MODEL, PICKUP_TYPE, POINT.x, POINT.y, POINT.z, STREET_WORLD);
+  new Pickup(PICKUP_MODEL, PICKUP_TYPE, POINT.x, POINT.y, POINT.z, MERIYA_WORLD);
   new TextLabel(
     "Склад мэрии\nБроня, дубинка, Deagle",
     Color.info,
@@ -37,7 +36,7 @@ export function bindMeriyaLocker(): void {
     POINT.y,
     POINT.z + LABEL_HEIGHT,
     LABEL_DRAW_DISTANCE,
-    STREET_WORLD,
+    MERIYA_WORLD,
     false
   );
 
@@ -69,8 +68,8 @@ function tickLocker(): void {
       }
 
       if (
-        player.getVirtualWorld() !== STREET_WORLD ||
-        player.getInterior() !== CITY_HALL_INTERIOR
+        player.getVirtualWorld() !== MERIYA_WORLD ||
+        player.getInterior() !== MERIYA_CUSTOM_INTERIOR
       ) {
         inside.delete(id);
         return;

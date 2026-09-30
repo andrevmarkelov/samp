@@ -1,11 +1,12 @@
-import { STREET_WORLD } from "../spawn/point";
 import type { OrganizationDef, OrgRankDef } from "./types";
 import { MAX_ORG_RANK } from "./types";
 
 export const ORG_MERIYA_ID = 3;
 
 const MERIYA_COLOR = 0xffff00ff;
-export const CITY_HALL_INTERIOR = 3;
+/** Кастомный интерьер мэрии (`maps/cityhall.txt`): interior 0, VW = org id. */
+export const MERIYA_WORLD = ORG_MERIYA_ID;
+export const MERIYA_CUSTOM_INTERIOR = 0;
 
 function meriyaRanks(): OrgRankDef[] {
   const rows: Array<{ title: string; male: number; female: number; pay: number }> = [
@@ -36,12 +37,12 @@ export const MERIYA: OrganizationDef = {
   gov: true,
   illegal: false,
   spawn: {
-    x: 357.3111,
-    y: 162.1018,
-    z: 1025.7964,
-    angle: 270.2384,
-    interior: CITY_HALL_INTERIOR,
-    world: STREET_WORLD,
+    x: -772.7266,
+    y: -674.1481,
+    z: 4001.0859,
+    angle: 89.9524,
+    interior: MERIYA_CUSTOM_INTERIOR,
+    world: MERIYA_WORLD,
   },
   ranks: meriyaRanks(),
 };

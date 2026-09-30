@@ -41,6 +41,7 @@ export const PRISON_YARD_WORLD = 4;
 /** Мафии (интерьер 5): LCN VW 14, Yakuza 15, Русская 16 — `org/mafias.ts`. */
 /** Банды (дома): Grove VW 9, Ballas 10, Vagos 11, Rifa 12, Aztecas 13 — `org/gangs.ts`. */
 /** Радиоцентр (кастомный интерьер): VW 8 — `org/radio.ts`. */
+/** Мэрия (кастомный интерьер): VW 3 (= org id) — `org/meriya.ts`. Совпадает с PRISON_WORLD; координаты далеко. */
 
 /** Обычный спавн, пока игрок не в организации. */
 export const DEFAULT_SPAWN: SpawnPoint = {

@@ -7,6 +7,8 @@ import type { GameModule } from "../types";
 import { saveUserPassport } from "../auth/repository";
 import { getAccount, patchAccount } from "../auth/session";
 import { STREET_WORLD, placeAt, type SpawnPoint } from "../spawn/point";
+import { refreshStreamForPlayer } from "../mapping/stream";
+import { MERIYA_CUSTOM_INTERIOR, MERIYA_WORLD } from "../org/meriya";
 
 const PICKUP_MODEL = 19132;
 const PICKUP_TYPE = 1;
@@ -20,7 +22,6 @@ const MAPICON_LOCAL = 0;
 const ICON_RADIUS = 300;
 const LABEL_HEIGHT = 0.85;
 const LABEL_DRAW_DISTANCE = 12;
-const CITY_HALL_INTERIOR = 3;
 
 const STREET_PICKUP = {
   x: 1481.0596,
@@ -29,18 +30,18 @@ const STREET_PICKUP = {
 } as const;
 
 const INTERIOR_PICKUP = {
-  x: 389.993,
-  y: 173.8064,
-  z: 1008.3828,
+  x: -786.299,
+  y: -665.2824,
+  z: 4001.0859,
 } as const;
 
 const FROM_STREET: SpawnPoint = {
-  x: 387.926,
-  y: 173.7338,
-  z: 1008.3828,
-  angle: 89.0833,
-  interior: CITY_HALL_INTERIOR,
-  world: STREET_WORLD,
+  x: -788.3665,
+  y: -665.2628,
+  z: 4001.0859,
+  angle: 89.5604,
+  interior: MERIYA_CUSTOM_INTERIOR,
+  world: MERIYA_WORLD,
 };
 
 const FROM_INTERIOR: SpawnPoint = {
@@ -53,18 +54,18 @@ const FROM_INTERIOR: SpawnPoint = {
 };
 
 const PASSPORT_PICKUP = {
-  x: 358.5322,
-  y: 168.9705,
-  z: 1008.3828,
+  x: -808.2054,
+  y: -677.0803,
+  z: 4001.0859,
 } as const;
 const PASSPORT_PICKUP_MODEL = 1581;
 const PASSPORT_MSG_COOLDOWN_MS = 3000;
 const PASSPORT_CLERK_SKIN = 141;
 const PASSPORT_CLERK = {
-  x: 356.2971,
-  y: 168.9869,
-  z: 1008.3762,
-  angle: 268.6251,
+  x: -806.2914,
+  y: -677.1661,
+  z: 4001.0859,
+  angle: 88.6992,
 } as const;
 
 const lastTeleportAt = new Map<number, number>();
@@ -88,7 +89,7 @@ export const cityHallModule: GameModule = {
       INTERIOR_PICKUP.x,
       INTERIOR_PICKUP.y,
       INTERIOR_PICKUP.z,
-      STREET_WORLD
+      MERIYA_WORLD
     );
 
     new TextLabel(
@@ -108,7 +109,7 @@ export const cityHallModule: GameModule = {
       INTERIOR_PICKUP.y,
       INTERIOR_PICKUP.z + LABEL_HEIGHT,
       LABEL_DRAW_DISTANCE,
-      STREET_WORLD,
+      MERIYA_WORLD,
       false
     );
 
@@ -118,7 +119,7 @@ export const cityHallModule: GameModule = {
       PASSPORT_PICKUP.x,
       PASSPORT_PICKUP.y,
       PASSPORT_PICKUP.z,
-      STREET_WORLD
+      MERIYA_WORLD
     );
 
     new TextLabel(
@@ -128,7 +129,7 @@ export const cityHallModule: GameModule = {
       PASSPORT_PICKUP.y,
       PASSPORT_PICKUP.z + LABEL_HEIGHT,
       LABEL_DRAW_DISTANCE,
-      STREET_WORLD,
+      MERIYA_WORLD,
       false
     );
 
@@ -155,7 +156,7 @@ function spawnPassportClerk(): void {
     PASSPORT_CLERK.z,
     PASSPORT_CLERK.angle
   );
-  actor.setVirtualWorld(STREET_WORLD);
+  actor.setVirtualWorld(MERIYA_WORLD);
   actor.setInvulnerable(true);
 
   new TextLabel(
@@ -165,7 +166,7 @@ function spawnPassportClerk(): void {
     PASSPORT_CLERK.y,
     PASSPORT_CLERK.z + 1.15,
     LABEL_DRAW_DISTANCE,
-    STREET_WORLD,
+    MERIYA_WORLD,
     false
   );
 }
@@ -198,8 +199,8 @@ function tickCityHall(): void {
       }
 
       if (
-        world === STREET_WORLD &&
-        interior === CITY_HALL_INTERIOR &&
+        world === MERIYA_WORLD &&
+        interior === MERIYA_CUSTOM_INTERIOR &&
         distance3d(
           pos.x,
           pos.y,
@@ -214,8 +215,8 @@ function tickCityHall(): void {
       }
 
       if (
-        world === STREET_WORLD &&
-        interior === CITY_HALL_INTERIOR &&
+        world === MERIYA_WORLD &&
+        interior === MERIYA_CUSTOM_INTERIOR &&
         distance3d(
           pos.x,
           pos.y,
@@ -315,6 +316,7 @@ function teleport(player: Player, point: SpawnPoint): void {
 
   try {
     placeAt(player, point);
+    refreshStreamForPlayer(player);
   } catch {
     // Игрок уже вышел.
   }
