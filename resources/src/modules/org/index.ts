@@ -47,6 +47,14 @@ export {
   YAKUZA_WORLD,
 } from "./mafias";
 export {
+  applyArmyDisguiseVisuals,
+  canKeepArmyDisguise,
+  clearArmyDisguise,
+  isArmyDisguised,
+  startArmyDisguise,
+  syncArmyDisguise,
+} from "./army-disguise";
+export {
   applyOrgVisuals,
   resolveChatColor,
   resolveNametagColor,

@@ -15,9 +15,12 @@ import {
   ORG_RIFA_ID,
   ORG_VAGOS_ID,
   getMembership,
+  isArmyDisguised,
+  startArmyDisguise,
 } from "../org";
 import { STREET_WORLD } from "../spawn/point";
 import type { GameModule } from "../types";
+import { bindArmyAmmoCrates } from "./army-crates";
 
 export const GHETTO_DEALER_MENU_DIALOG_ID = 63;
 export const GHETTO_DEALER_BUY_DIALOG_ID = 64;
@@ -34,6 +37,7 @@ const LABEL_HEIGHT = 1.15;
 const LABEL_DRAW_DISTANCE = 18;
 const DRUG_PRICE = 50;
 const MAX_BUY = 500;
+const FORM_PRICE = 100_000;
 const ANIM_SYNC_ALL = 1;
 
 const DEALER = {
@@ -59,6 +63,7 @@ export const ghettoModule: GameModule = {
   start() {
     spawnDealer();
     bindDealer();
+    bindArmyAmmoCrates();
   },
 };
 
@@ -190,7 +195,7 @@ function showMenu(player: Player): void {
       GHETTO_DEALER_MENU_DIALOG_ID,
       DIALOG_STYLE_LIST,
       DEALER_NAME,
-      "Купить наркотики",
+      `Купить наркотики\nФорма армии ($${FORM_PRICE})`,
       "Выбрать",
       "Отмена"
     );
@@ -208,11 +213,79 @@ function onMenuResponse(player: Player, accepted: boolean, listItem: number): vo
     return;
   }
 
-  if (listItem !== 0) {
+  if (listItem === 0) {
+    showBuyDialog(player);
     return;
   }
 
-  showBuyDialog(player);
+  if (listItem === 1) {
+    buyArmyForm(player);
+  }
+}
+
+function buyArmyForm(player: Player): void {
+  if (!isPlayerActive(player) || !isAuthenticated(player)) {
+    return;
+  }
+
+  if (!isNearDealer(player)) {
+    player.sendClientMessage(Color.error, "Подойдите ближе к барыге.");
+    return;
+  }
+
+  if (!isGhettoGangMember(player)) {
+    denyOutsider(player);
+    return;
+  }
+
+  const account = getAccount(player);
+  if (!account) {
+    return;
+  }
+
+  if (account.jailSeconds > 0) {
+    player.sendClientMessage(Color.error, "В тюрьме форма недоступна.");
+    return;
+  }
+
+  if (isArmyDisguised(player)) {
+    player.sendClientMessage(Color.error, `${DEALER_NAME}: ты уже в форме.`);
+    return;
+  }
+
+  if (account.money < FORM_PRICE) {
+    player.sendClientMessage(
+      Color.error,
+      `Недостаточно денег. Нужно $${FORM_PRICE}.`
+    );
+    return;
+  }
+
+  // Сначала форма — иначе при сбое выдачи деньги уже списаны.
+  if (!startArmyDisguise(player)) {
+    player.sendClientMessage(Color.error, "Не удалось выдать форму.");
+    return;
+  }
+
+  const nextMoney = account.money - FORM_PRICE;
+  patchAccount(player, { money: nextMoney });
+  const updated = getAccount(player);
+  if (updated) {
+    applyWallet(player, updated);
+  }
+
+  void saveUserMoney(account.id, nextMoney, account.bank).catch(() => {
+    // Кэш уже обновлён.
+  });
+
+  player.sendClientMessage(
+    Color.info,
+    `${DEALER_NAME}: держи форму за $${FORM_PRICE}. Ворота армии откроются.`
+  );
+  player.sendClientMessage(
+    Color.gray,
+    "После смерти или выхода форма снимется."
+  );
 }
 
 function showBuyDialog(player: Player): void {

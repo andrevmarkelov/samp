@@ -2,6 +2,10 @@ import type { Player } from "@omp-node/core";
 import type { Account } from "../auth/session";
 import { getAccount } from "../auth/session";
 import { Color } from "../../shared/colors";
+import {
+  applyArmyDisguiseVisuals,
+  syncArmyDisguise,
+} from "./army-disguise";
 import { getMembership } from "./membership";
 
 const CIVILIAN_COLOR = 0xffffffff;
@@ -34,6 +38,12 @@ export function resolveChatColor(account: Account): number {
 export function applyOrgVisuals(player: Player): void {
   const account = getAccount(player);
   if (!account) {
+    return;
+  }
+
+  // Маскировка армии (банды): скин/цвет как у армии, членство банды не меняется.
+  if (syncArmyDisguise(player)) {
+    applyArmyDisguiseVisuals(player, account);
     return;
   }
 

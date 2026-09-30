@@ -1,4 +1,5 @@
 import type { GameModule } from "../types";
+import { bindArmyDisguise } from "./army-disguise";
 import { bindArmyLocker } from "./army-locker";
 import { bindArmyFactoryDoors } from "./army-factory-doors";
 import { bindAmmunationDoors } from "./ammunation-doors";
@@ -28,6 +29,7 @@ export const orgModule: GameModule = {
   name: "org",
   start() {
     bindOrgGates();
+    bindArmyDisguise();
     bindHospitalRoofAccess();
     bindHospitalDoors();
     bindHospitalStock();

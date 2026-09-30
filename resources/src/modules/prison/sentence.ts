@@ -12,6 +12,7 @@ import {
 } from "../auth/session";
 import { refreshStreamForPlayer } from "../mapping/stream";
 import { applyOrgVisuals } from "../org/appearance";
+import { clearArmyDisguise } from "../org/army-disguise";
 import { resolveOrgSpawn } from "../org/membership";
 import {
   DEFAULT_SPAWN,
@@ -138,6 +139,7 @@ export async function applyJail(player: Player, minutes: number): Promise<boolea
   }
 
   placeInJail(player);
+  clearArmyDisguise(player);
   applyOrgVisuals(player);
   tell(player, Color.error, `Вас посадили в тюрьму. Срок: ${minutes} мин.`);
   return true;

@@ -3,6 +3,8 @@ import { Color } from "../../shared/colors";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { getAccount, isAuthenticated } from "../auth/session";
 import { STREET_WORLD } from "../spawn/point";
+import { isArmyDisguised, syncArmyDisguise } from "./army-disguise";
+import { ORG_ARMY_ID } from "./army";
 import { allOrgGates } from "./catalog";
 import { getMembership } from "./membership";
 import type { OrgGateDef } from "./types";
@@ -142,7 +144,15 @@ function onGateKey(player: Player): void {
   const account = getAccount(player);
   const membership = account ? getMembership(account) : null;
   const orgId = membership?.org.id;
-  if (orgId === undefined || !allowedOrgIds(gate.def).includes(orgId)) {
+  const byOrg =
+    orgId !== undefined && allowedOrgIds(gate.def).includes(orgId);
+  // Маскировка: только ворота армии и только пока форма ещё валидна.
+  const byDisguise =
+    gate.def.orgId === ORG_ARMY_ID &&
+    isArmyDisguised(player) &&
+    syncArmyDisguise(player);
+
+  if (!byOrg && !byDisguise) {
     denyOpen(player, gate.def.denyMessage);
     return;
   }
