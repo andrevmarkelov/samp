@@ -12,6 +12,8 @@ import "./stats";
 import "./time";
 import "./pass";
 import "./lic";
+import "./vbilet";
+import "./medcard";
 import "./selllic";
 import "./hospital";
 import "./gps";
@@ -34,6 +36,7 @@ import { bindOrgStaff } from "./org-staff";
 import { bindSellLic } from "./selllic";
 import { bindTimeLabels } from "./time";
 import { bindAds } from "./ads";
+import { bindMedcardOffers } from "./medcard";
 
 export const commandsModule: GameModule = {
   name: "commands",
@@ -46,5 +49,6 @@ export const commandsModule: GameModule = {
     bindSellLic();
     bindTimeLabels();
     bindAds();
+    bindMedcardOffers();
   },
 };

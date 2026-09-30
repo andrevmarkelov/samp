@@ -6,6 +6,7 @@ import {
   STARTING_LAWFULNESS,
   normalizeHealth,
   normalizeLawfulness,
+  normalizeWantedLevel,
   type Account,
 } from "./session";
 import { parseOrgId, parseOrgRank } from "../org/membership";
@@ -32,6 +33,9 @@ type UserRow = RowDataPacket & {
   metal: number;
   passport: number | boolean;
   hospitalized: number | boolean;
+  wanted_level: number;
+  military_id: number | boolean;
+  medcard: number | boolean;
   invited_by: string | null;
   birth_date: Date | string;
   admin_level: number;
@@ -82,6 +86,9 @@ CREATE TABLE IF NOT EXISTS users (
   drugs INT UNSIGNED NOT NULL DEFAULT 0,
   ammo INT UNSIGNED NOT NULL DEFAULT 0,
   metal INT UNSIGNED NOT NULL DEFAULT 0,
+  wanted_level TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  military_id TINYINT(1) NOT NULL DEFAULT 0,
+  medcard TINYINT(1) NOT NULL DEFAULT 0,
   banned_until DATETIME NULL DEFAULT NULL,
   ban_reason VARCHAR(128) NULL DEFAULT NULL,
   birth_date DATE NOT NULL,
@@ -198,8 +205,20 @@ const COLUMN_MIGRATIONS = [
     sql: "metal INT UNSIGNED NOT NULL DEFAULT 0 AFTER ammo",
   },
   {
+    name: "wanted_level",
+    sql: "wanted_level TINYINT UNSIGNED NOT NULL DEFAULT 0 AFTER metal",
+  },
+  {
+    name: "military_id",
+    sql: "military_id TINYINT(1) NOT NULL DEFAULT 0 AFTER wanted_level",
+  },
+  {
+    name: "medcard",
+    sql: "medcard TINYINT(1) NOT NULL DEFAULT 0 AFTER military_id",
+  },
+  {
     name: "banned_until",
-    sql: "banned_until DATETIME NULL DEFAULT NULL AFTER metal",
+    sql: "banned_until DATETIME NULL DEFAULT NULL AFTER medcard",
   },
   {
     name: "ban_reason",
@@ -275,7 +294,7 @@ async function migrateBannedUntilDatetime(): Promise<void> {
 
 export async function findUserByName(name: string): Promise<UserRow | null> {
   const rows = await query<UserRow>(
-    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, bank, donate, lawfulness, health, drugs, ammo, metal, passport, hospitalized, invited_by, birth_date, admin_level, org_id, org_rank, muted_until, jail_seconds, license_car, license_moto, license_fly, license_boat, license_gun, banned_until, ban_reason FROM users WHERE name = ? LIMIT 1",
+    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, bank, donate, lawfulness, health, drugs, ammo, metal, passport, hospitalized, wanted_level, military_id, medcard, invited_by, birth_date, admin_level, org_id, org_rank, muted_until, jail_seconds, license_car, license_moto, license_fly, license_boat, license_gun, banned_until, ban_reason FROM users WHERE name = ? LIMIT 1",
     [name]
   );
   return rows[0] ?? null;
@@ -333,6 +352,9 @@ export async function createUser(input: {
     metal: 0,
     passport: false,
     hospitalized: false,
+    wantedLevel: 0,
+    militaryId: false,
+    medcard: false,
     invitedBy: null,
     birthDate: input.birthDate,
     adminLevel: 0,
@@ -467,6 +489,36 @@ export async function saveUserBankTransfer(
 
 export async function saveUserPassport(userId: number): Promise<void> {
   await execute("UPDATE users SET passport = 1 WHERE id = ?", [userId]);
+}
+
+export async function saveUserWantedLevel(
+  userId: number,
+  wantedLevel: number
+): Promise<void> {
+  await execute("UPDATE users SET wanted_level = ? WHERE id = ?", [
+    normalizeWantedLevel(wantedLevel),
+    userId,
+  ]);
+}
+
+export async function saveUserMilitaryId(
+  userId: number,
+  hasMilitaryId: boolean
+): Promise<void> {
+  await execute("UPDATE users SET military_id = ? WHERE id = ?", [
+    hasMilitaryId ? 1 : 0,
+    userId,
+  ]);
+}
+
+export async function saveUserMedcard(
+  userId: number,
+  hasMedcard: boolean
+): Promise<void> {
+  await execute("UPDATE users SET medcard = ? WHERE id = ?", [
+    hasMedcard ? 1 : 0,
+    userId,
+  ]);
 }
 
 export async function saveUserHospitalized(
@@ -647,6 +699,9 @@ export function accountFromRow(row: UserRow): Account {
     metal: inventoryAmount(row.metal),
     passport: Boolean(Number(row.passport)),
     hospitalized: Boolean(Number(row.hospitalized)),
+    wantedLevel: normalizeWantedLevel(row.wanted_level),
+    militaryId: Boolean(Number(row.military_id)),
+    medcard: Boolean(Number(row.medcard)),
     invitedBy: parseInvitedBy(row.invited_by),
     birthDate: toIsoDate(row.birth_date),
     adminLevel: parseAdminLevel(row.admin_level),

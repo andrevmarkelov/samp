@@ -51,6 +51,12 @@ export type Account = {
   metal: number;
   passport: boolean;
   hospitalized: boolean;
+  /** Розыск 0–6 (звёзды SA). */
+  wantedLevel: number;
+  /** Военный билет. */
+  militaryId: boolean;
+  /** Медицинская карта. */
+  medcard: boolean;
   invitedBy: string | null;
   birthDate: string;
   adminLevel: number;
@@ -128,6 +134,25 @@ export function applyScore(player: Player, level: number): void {
   }
 }
 
+/** Звёзды розыска GTA SA (0–6). */
+export function applyWantedLevel(player: Player, level: number): void {
+  const wanted = normalizeWantedLevel(level);
+  try {
+    player.setWantedLevel(wanted);
+  } catch {
+    // Слот ещё не в игре.
+  }
+}
+
+export function normalizeWantedLevel(value: unknown): number {
+  const level = Math.floor(Number(value));
+  if (!Number.isFinite(level) || level <= 0) {
+    return 0;
+  }
+
+  return Math.min(6, level);
+}
+
 export function patchAccount(
   player: Player,
   patch: Partial<
@@ -139,6 +164,9 @@ export function patchAccount(
       | "lawfulness"
       | "passport"
       | "hospitalized"
+      | "wantedLevel"
+      | "militaryId"
+      | "medcard"
       | "invitedBy"
       | "level"
       | "exp"

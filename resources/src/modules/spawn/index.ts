@@ -7,6 +7,7 @@ import {
   MAX_HEALTH,
   applyHealth,
   applyScore,
+  applyWantedLevel,
   applyWallet,
   getAccount,
   isAuthenticated,
@@ -121,6 +122,7 @@ export const spawnModule: GameModule = {
         applyOrgVisuals(player);
         if (account) {
           applyScore(player, account.level);
+          applyWantedLevel(player, account.wantedLevel);
         }
         player.setCameraBehind();
       } catch {
