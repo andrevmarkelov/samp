@@ -12,6 +12,7 @@ import { startBusinessMarkers } from "./markers";
 import { bindBusinessMenu } from "./menu";
 import { bindBusinessPurchase } from "./purchase";
 import { ensureBusinessesTable, listBusinesses } from "./repository";
+import { startShop247 } from "./shop-247";
 import { startStreetFoodStalls } from "./street-food";
 import { notifyBusinessTaxReminder, startBusinessTaxScheduler } from "./tax";
 
@@ -32,6 +33,7 @@ export const businessesModule: GameModule = {
       startBusinessExits();
       startStreetFoodStalls();
       startAmmuShops();
+      startShop247();
       bindBusinessMapIcons();
       bindBusinessPurchase();
       bindBusinessMenu();

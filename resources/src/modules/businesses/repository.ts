@@ -12,6 +12,10 @@ export type PayVehicleRentalResult =
   | { ok: true; cashLeft: number; balance: number; businessGain: number; amount: number }
   | { ok: false; reason: "not_found" | "funds" | "db" };
 
+export type PayPhonePurchaseResult =
+  | { ok: true; cashLeft: number; balance: number; phone: string }
+  | { ok: false; reason: "not_found" | "funds" | "owned" | "db" };
+
 const CREATE_BUSINESSES_SQL = `
 CREATE TABLE IF NOT EXISTS businesses (
   id SMALLINT UNSIGNED NOT NULL,
@@ -799,6 +803,134 @@ export async function payBusinessCashShare(
 
     await conn.commit();
     return { ok: true, cashLeft, balance, businessGain, amount: price };
+  } catch {
+    await conn.rollback();
+    return { ok: false, reason: "db" };
+  } finally {
+    conn.release();
+  }
+}
+
+const PHONE_ALLOC_ATTEMPTS = 40;
+
+function randomPhoneDigits(): string {
+  const n = Math.floor(Math.random() * 1_000_000);
+  return String(n).padStart(6, "0");
+}
+
+/**
+ * Покупка телефона: списание наличных, 80% на бизнес, уникальный 6-значный номер.
+ * Всё в одной транзакции (при неудаче — полный откат).
+ */
+export async function payBusinessPhonePurchase(
+  businessId: number,
+  payerId: number,
+  price: number,
+  share = 0.8
+): Promise<PayPhonePurchaseResult> {
+  if (!Number.isInteger(price) || price < 1) {
+    return { ok: false, reason: "db" };
+  }
+
+  const rate = Math.min(1, Math.max(0, share));
+  const businessGain = Math.floor(price * rate);
+  const conn = await getPool().getConnection();
+
+  try {
+    await conn.beginTransaction();
+
+    const [bizRows] = await conn.query<RowDataPacket[]>(
+      "SELECT id, balance FROM businesses WHERE id = ? LIMIT 1 FOR UPDATE",
+      [businessId]
+    );
+    const bizRow = bizRows[0];
+    if (!bizRow) {
+      await conn.rollback();
+      return { ok: false, reason: "not_found" };
+    }
+
+    const [userRows] = await conn.query<RowDataPacket[]>(
+      "SELECT money, phone FROM users WHERE id = ? LIMIT 1 FOR UPDATE",
+      [payerId]
+    );
+    const userRow = userRows[0];
+    if (!userRow) {
+      await conn.rollback();
+      return { ok: false, reason: "db" };
+    }
+
+    if (userRow.phone !== null && String(userRow.phone).trim() !== "") {
+      await conn.rollback();
+      return { ok: false, reason: "owned" };
+    }
+
+    const money = Math.max(0, Math.floor(Number(userRow.money)));
+    if (money < price) {
+      await conn.rollback();
+      return { ok: false, reason: "funds" };
+    }
+
+    const cashLeft = money - price;
+    const balance = Math.min(
+      MAX_MONEY,
+      Math.max(0, Math.floor(Number(bizRow.balance))) + businessGain
+    );
+
+    const [userUpdate] = await conn.query<ResultSetHeader>(
+      "UPDATE users SET money = ? WHERE id = ? AND money >= ? AND phone IS NULL",
+      [cashLeft, payerId, price]
+    );
+    if (userUpdate.affectedRows !== 1) {
+      await conn.rollback();
+      // Повторно смотрим причину: телефон могли выдать параллельно.
+      const [again] = await conn.query<RowDataPacket[]>(
+        "SELECT phone FROM users WHERE id = ? LIMIT 1",
+        [payerId]
+      );
+      const row = again[0];
+      if (row && row.phone !== null && String(row.phone).trim() !== "") {
+        return { ok: false, reason: "owned" };
+      }
+      return { ok: false, reason: "funds" };
+    }
+
+    const [bizUpdate] = await conn.query<ResultSetHeader>(
+      "UPDATE businesses SET balance = ? WHERE id = ?",
+      [balance, businessId]
+    );
+    if (bizUpdate.affectedRows !== 1) {
+      await conn.rollback();
+      return { ok: false, reason: "db" };
+    }
+
+    let phone: string | null = null;
+    for (let attempt = 0; attempt < PHONE_ALLOC_ATTEMPTS; attempt++) {
+      const candidate = randomPhoneDigits();
+      const [taken] = await conn.query<RowDataPacket[]>(
+        "SELECT 1 AS ok FROM users WHERE phone = ? LIMIT 1",
+        [candidate]
+      );
+      if (taken.length > 0) {
+        continue;
+      }
+
+      const [phoneUpdate] = await conn.query<ResultSetHeader>(
+        "UPDATE users SET phone = ? WHERE id = ? AND phone IS NULL",
+        [candidate, payerId]
+      );
+      if (phoneUpdate.affectedRows === 1) {
+        phone = candidate;
+        break;
+      }
+    }
+
+    if (!phone) {
+      await conn.rollback();
+      return { ok: false, reason: "db" };
+    }
+
+    await conn.commit();
+    return { ok: true, cashLeft, balance, phone };
   } catch {
     await conn.rollback();
     return { ok: false, reason: "db" };

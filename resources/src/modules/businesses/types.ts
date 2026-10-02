@@ -54,6 +54,10 @@ export function isAmmuType(typeId: number): boolean {
   return typeId === BusinessType.AMMU;
 }
 
+export function isShop247Type(typeId: number): boolean {
+  return typeId === BusinessType.SHOP_247;
+}
+
 const TYPE_LABEL: Readonly<Record<number, string>> = {
   [BusinessType.SHOP_247]: "24/7",
   [BusinessType.AMMU]: "Магазин оружия",

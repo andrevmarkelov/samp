@@ -37,10 +37,11 @@ registerCommand("leaders", "Список лидеров online", (player) => {
       return;
     }
 
+    const phone = account.phone ? ` | тел. ${account.phone}` : "";
     list.push({
       orgName: membership.org.name,
       slot: playerId(other) ?? 0,
-      line: `${playerChatName(other)} | ${membership.org.name} | ${membership.rank.title}`,
+      line: `${playerChatName(other)} | ${membership.org.name} | ${membership.rank.title}${phone}`,
     });
   });
 

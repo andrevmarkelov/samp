@@ -44,6 +44,7 @@ type Ad = {
   authorName: string;
   authorGender: Gender;
   authorTag: string;
+  authorPhone: string;
   text: string;
   editorName: string;
   editorGender: Gender;
@@ -99,6 +100,10 @@ export function bindAds(): void {
   });
 
   omp.on("playerDisconnect", (player) => {
+    const account = getAccount(player);
+    if (account) {
+      submitting.delete(account.id);
+    }
     returnAdToQueue(player);
   });
 }
@@ -106,6 +111,15 @@ export function bindAds(): void {
 function openSubmitDialog(player: Player, error?: string): void {
   const account = getAccount(player);
   if (!account) {
+    return;
+  }
+
+  if (!account.phone) {
+    tell(
+      player,
+      Color.error,
+      "Для подачи объявления нужен мобильный телефон. Купите его в 24/7."
+    );
     return;
   }
 
@@ -141,6 +155,15 @@ async function submitAd(player: Player, raw: string): Promise<void> {
     return;
   }
 
+  if (!account.phone) {
+    tell(
+      player,
+      Color.error,
+      "Для подачи объявления нужен мобильный телефон. Купите его в 24/7."
+    );
+    return;
+  }
+
   if (submitting.has(account.id) || hasAdInFlight(account.id)) {
     tell(player, Color.error, "У вас уже есть объявление в очереди.");
     return;
@@ -157,46 +180,47 @@ async function submitAd(player: Player, raw: string): Promise<void> {
     return;
   }
 
+  const phone = account.phone;
   const nextCash = account.money - AD_FEE;
   submitting.add(account.id);
   try {
     await saveUserMoney(account.id, nextCash, account.bank);
+
+    const live = getAccount(player);
+    if (live && live.id === account.id) {
+      patchAccount(player, { money: nextCash });
+      applyWallet(player, { ...live, money: nextCash });
+    }
+
+    const authorTag =
+      isPlayerActive(player) && live?.id === account.id
+        ? playerChatName(player)
+        : account.name;
+    pending.push({
+      authorId: account.id,
+      authorName: account.name,
+      authorGender: account.gender,
+      authorTag,
+      authorPhone: phone,
+      text,
+      editorName: "",
+      editorGender: account.gender,
+      editorTag: "",
+      publishAt: 0,
+    });
+
+    if (isPlayerActive(player) && live?.id === account.id) {
+      tell(player, Color.info, `Объявление отправлено на проверку. Списано $${AD_FEE}.`);
+    }
+    notifyRadioStaff(
+      Color.info,
+      `Поступило новое объявление от ${authorTag} (тел. ${phone}). Введите /edit.`
+    );
   } catch {
-    submitting.delete(account.id);
     tell(player, Color.error, "Не удалось списать оплату. Попробуйте ещё раз.");
-    return;
+  } finally {
+    submitting.delete(account.id);
   }
-
-  const live = getAccount(player);
-  if (live && live.id === account.id) {
-    patchAccount(player, { money: nextCash });
-    applyWallet(player, { ...live, money: nextCash });
-  }
-
-  const authorTag =
-    isPlayerActive(player) && live?.id === account.id
-      ? playerChatName(player)
-      : account.name;
-  pending.push({
-    authorId: account.id,
-    authorName: account.name,
-    authorGender: account.gender,
-    authorTag,
-    text,
-    editorName: "",
-    editorGender: account.gender,
-    editorTag: "",
-    publishAt: 0,
-  });
-  submitting.delete(account.id);
-
-  if (isPlayerActive(player) && live?.id === account.id) {
-    tell(player, Color.info, `Объявление отправлено на проверку. Списано $${AD_FEE}.`);
-  }
-  notifyRadioStaff(
-    Color.info,
-    `Поступило новое объявление от ${authorTag}. Введите /edit.`
-  );
 }
 
 function startEdit(player: Player): void {
@@ -374,7 +398,8 @@ function tickPublish(): void {
   const text = ad.text.endsWith(".") || ad.text.endsWith("!") || ad.text.endsWith("?")
     ? ad.text
     : `${ad.text}.`;
-  const first = clipClientMessage(`LS | ${text} | ${sent} ${ad.authorTag}`);
+  const authorLine = `${ad.authorTag} (тел. ${ad.authorPhone})`;
+  const first = clipClientMessage(`LS | ${text} | ${sent} ${authorLine}`);
   const second = clipClientMessage(
     ` Объявление ${checked} сотрудник Радиоцентра ${ad.editorTag}`
   );
