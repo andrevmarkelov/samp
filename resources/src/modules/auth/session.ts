@@ -11,8 +11,17 @@ export const MIN_LAWFULNESS = -100;
 export const STARTING_LAWFULNESS = 100;
 export const HOSPITAL_HEALTH = MIN_HEALTH;
 export const STARTING_HEALTH = 100;
+export const MAX_HUNGER = 100;
+export const STARTING_HUNGER = 100;
+/** Длина номера телефона (6 цифр). null — телефона нет. */
+export const PHONE_DIGITS = 6;
 export const HEALTH_DECAY_AMOUNT = 1;
+/** Тик голода / HP при голоде 0 (как раньше для HP). */
 export const HEALTH_DECAY_MS = 15 * 60 * 1000;
+/** Списание голода за тик (100 → 0 примерно за 5 ч). */
+export const HUNGER_DECAY_AMOUNT = 5;
+/** Пороги предупреждений о голоде (сверху вниз). */
+export const HUNGER_WARN_LEVELS = [40, 30, 20] as const;
 export const VITALS_SAVE_MS = 3 * 60 * 1000;
 
 export function normalizeHealth(value: unknown): number {
@@ -22,6 +31,30 @@ export function normalizeHealth(value: unknown): number {
   }
 
   return Math.min(MAX_HEALTH, health);
+}
+
+export function normalizeHunger(value: unknown): number {
+  const hunger = Math.floor(Number(value));
+  if (!Number.isFinite(hunger)) {
+    return STARTING_HUNGER;
+  }
+
+  return Math.min(MAX_HUNGER, Math.max(0, hunger));
+}
+
+/** Нормализованный номер (6 цифр) или null, если телефона нет / невалиден. */
+export function normalizePhone(value: unknown): string | null {
+  if (value === null || value === undefined) {
+    return null;
+  }
+  const raw = String(value).trim();
+  if (!raw) {
+    return null;
+  }
+  if (!new RegExp(`^\\d{${PHONE_DIGITS}}$`).test(raw)) {
+    return null;
+  }
+  return raw;
 }
 
 export function normalizeLawfulness(value: unknown): number {
@@ -57,6 +90,10 @@ export type Account = {
   militaryId: boolean;
   /** Медицинская карта. */
   medcard: boolean;
+  /** Голод 0–100 (100 — сыт). */
+  hunger: number;
+  /** Номер телефона (6 цифр) или null, если телефона нет. */
+  phone: string | null;
   invitedBy: string | null;
   birthDate: string;
   adminLevel: number;
@@ -167,6 +204,8 @@ export function patchAccount(
       | "wantedLevel"
       | "militaryId"
       | "medcard"
+      | "hunger"
+      | "phone"
       | "invitedBy"
       | "level"
       | "exp"

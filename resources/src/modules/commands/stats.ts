@@ -3,7 +3,7 @@ import { Color } from "../../shared/colors";
 import { formatMoney } from "../../shared/money";
 import { formatBirthDate } from "../auth/validation";
 import { genderLabel } from "../auth/gender";
-import { getAccount } from "../auth/session";
+import { MAX_HUNGER, getAccount, normalizeHunger } from "../auth/session";
 import { residenceLabel } from "../houses/residence";
 import { businessOwnershipLabel } from "../businesses/ownership";
 import { getMembership, resolvePlayerSkin } from "../org";
@@ -62,6 +62,7 @@ export function showStatsDialog(player: Player): void {
     statsRow("Военный билет", account.militaryId ? "Есть" : "Нет"),
     statsRow("Медкарта", account.medcard ? "Есть" : "Нет"),
     statsRow("Здоровье", String(health)),
+    statsRow("Голод", `${normalizeHunger(account.hunger)}/${MAX_HUNGER}`),
     statsRow("Организация", membership?.org.name ?? "Нет"),
     statsRow("Должность", rank),
   ].join("\n");

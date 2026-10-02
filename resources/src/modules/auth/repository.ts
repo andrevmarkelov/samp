@@ -3,9 +3,12 @@ import { execute, getPool, query } from "../../shared/database";
 import { isGender, type Gender } from "./gender";
 import {
   STARTING_HEALTH,
+  STARTING_HUNGER,
   STARTING_LAWFULNESS,
   normalizeHealth,
+  normalizeHunger,
   normalizeLawfulness,
+  normalizePhone,
   normalizeWantedLevel,
   type Account,
 } from "./session";
@@ -36,6 +39,8 @@ type UserRow = RowDataPacket & {
   wanted_level: number;
   military_id: number | boolean;
   medcard: number | boolean;
+  hunger: number;
+  phone: string | null;
   invited_by: string | null;
   birth_date: Date | string;
   admin_level: number;
@@ -89,13 +94,16 @@ CREATE TABLE IF NOT EXISTS users (
   wanted_level TINYINT UNSIGNED NOT NULL DEFAULT 0,
   military_id TINYINT(1) NOT NULL DEFAULT 0,
   medcard TINYINT(1) NOT NULL DEFAULT 0,
+  hunger TINYINT UNSIGNED NOT NULL DEFAULT 100,
+  phone CHAR(6) NULL DEFAULT NULL,
   banned_until DATETIME NULL DEFAULT NULL,
   ban_reason VARCHAR(128) NULL DEFAULT NULL,
   birth_date DATE NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   UNIQUE KEY uq_users_name (name),
-  UNIQUE KEY uq_users_email (email)
+  UNIQUE KEY uq_users_email (email),
+  UNIQUE KEY uq_users_phone (phone)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 `;
 
@@ -217,8 +225,16 @@ const COLUMN_MIGRATIONS = [
     sql: "medcard TINYINT(1) NOT NULL DEFAULT 0 AFTER military_id",
   },
   {
+    name: "hunger",
+    sql: "hunger TINYINT UNSIGNED NOT NULL DEFAULT 100 AFTER medcard",
+  },
+  {
+    name: "phone",
+    sql: "phone CHAR(6) NULL DEFAULT NULL AFTER hunger",
+  },
+  {
     name: "banned_until",
-    sql: "banned_until DATETIME NULL DEFAULT NULL AFTER medcard",
+    sql: "banned_until DATETIME NULL DEFAULT NULL AFTER phone",
   },
   {
     name: "ban_reason",
@@ -237,7 +253,28 @@ export async function ensureUsersTable(): Promise<void> {
     await getPool().query(`ALTER TABLE users ADD COLUMN ${column.sql}`);
   }
 
+  await ensurePhoneUniqueIndex();
   await migrateBannedUntilDatetime();
+}
+
+async function ensurePhoneUniqueIndex(): Promise<void> {
+  if (!(await columnExists("phone"))) {
+    return;
+  }
+
+  const rows = await query<RowDataPacket>(
+    `SELECT 1 AS ok
+     FROM information_schema.STATISTICS
+     WHERE TABLE_SCHEMA = DATABASE()
+       AND TABLE_NAME = 'users'
+       AND INDEX_NAME = 'uq_users_phone'
+     LIMIT 1`
+  );
+  if (rows.length > 0) {
+    return;
+  }
+
+  await getPool().query("ALTER TABLE users ADD UNIQUE KEY uq_users_phone (phone)");
 }
 
 async function columnExists(column: string): Promise<boolean> {
@@ -294,7 +331,7 @@ async function migrateBannedUntilDatetime(): Promise<void> {
 
 export async function findUserByName(name: string): Promise<UserRow | null> {
   const rows = await query<UserRow>(
-    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, bank, donate, lawfulness, health, drugs, ammo, metal, passport, hospitalized, wanted_level, military_id, medcard, invited_by, birth_date, admin_level, org_id, org_rank, muted_until, jail_seconds, license_car, license_moto, license_fly, license_boat, license_gun, banned_until, ban_reason FROM users WHERE name = ? LIMIT 1",
+    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, bank, donate, lawfulness, health, drugs, ammo, metal, passport, hospitalized, wanted_level, military_id, medcard, hunger, phone, invited_by, birth_date, admin_level, org_id, org_rank, muted_until, jail_seconds, license_car, license_moto, license_fly, license_boat, license_gun, banned_until, ban_reason FROM users WHERE name = ? LIMIT 1",
     [name]
   );
   return rows[0] ?? null;
@@ -355,6 +392,8 @@ export async function createUser(input: {
     wantedLevel: 0,
     militaryId: false,
     medcard: false,
+    hunger: STARTING_HUNGER,
+    phone: null,
     invitedBy: null,
     birthDate: input.birthDate,
     adminLevel: 0,
@@ -370,14 +409,13 @@ export async function saveUserVitals(
   userId: number,
   health: number,
   money: number,
-  bank: number
+  bank: number,
+  hunger: number
 ): Promise<void> {
-  await execute("UPDATE users SET health = ?, money = ?, bank = ? WHERE id = ?", [
-    health,
-    money,
-    bank,
-    userId,
-  ]);
+  await execute(
+    "UPDATE users SET health = ?, money = ?, bank = ?, hunger = ? WHERE id = ?",
+    [health, money, bank, normalizeHunger(hunger), userId]
+  );
 }
 
 export async function saveUserHealth(userId: number, health: number): Promise<void> {
@@ -517,6 +555,23 @@ export async function saveUserMedcard(
 ): Promise<void> {
   await execute("UPDATE users SET medcard = ? WHERE id = ?", [
     hasMedcard ? 1 : 0,
+    userId,
+  ]);
+}
+
+export async function saveUserHunger(userId: number, hunger: number): Promise<void> {
+  await execute("UPDATE users SET hunger = ? WHERE id = ?", [
+    normalizeHunger(hunger),
+    userId,
+  ]);
+}
+
+export async function saveUserPhone(
+  userId: number,
+  phone: string | null
+): Promise<void> {
+  await execute("UPDATE users SET phone = ? WHERE id = ?", [
+    normalizePhone(phone),
     userId,
   ]);
 }
@@ -702,6 +757,8 @@ export function accountFromRow(row: UserRow): Account {
     wantedLevel: normalizeWantedLevel(row.wanted_level),
     militaryId: Boolean(Number(row.military_id)),
     medcard: Boolean(Number(row.medcard)),
+    hunger: normalizeHunger(row.hunger),
+    phone: normalizePhone(row.phone),
     invitedBy: parseInvitedBy(row.invited_by),
     birthDate: toIsoDate(row.birth_date),
     adminLevel: parseAdminLevel(row.admin_level),

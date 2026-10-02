@@ -11,6 +11,7 @@ import { startBusinessMarkers } from "./markers";
 import { bindBusinessMenu } from "./menu";
 import { bindBusinessPurchase } from "./purchase";
 import { ensureBusinessesTable, listBusinesses } from "./repository";
+import { startStreetFoodStalls } from "./street-food";
 import { notifyBusinessTaxReminder, startBusinessTaxScheduler } from "./tax";
 
 const taxReminderShown = new Set<number>();
@@ -28,6 +29,7 @@ export const businessesModule: GameModule = {
       startBusinessMarkers();
       startBusinessEntrances();
       startBusinessExits();
+      startStreetFoodStalls();
       bindBusinessMapIcons();
       bindBusinessPurchase();
       bindBusinessMenu();

@@ -725,11 +725,22 @@ export async function payVehicleRental(
   payerId: number,
   price: number
 ): Promise<PayVehicleRentalResult> {
+  return payBusinessCashShare(businessId, payerId, price, 0.8);
+}
+
+/** Наличные → бизнес: доля `share` (0..1) на balance, остальное «комиссия». */
+export async function payBusinessCashShare(
+  businessId: number,
+  payerId: number,
+  price: number,
+  share = 0.8
+): Promise<PayVehicleRentalResult> {
   if (!Number.isInteger(price) || price < 1) {
     return { ok: false, reason: "db" };
   }
 
-  const businessGain = Math.floor(price * 0.8);
+  const rate = Math.min(1, Math.max(0, share));
+  const businessGain = Math.floor(price * rate);
   const conn = await getPool().getConnection();
 
   try {

@@ -34,13 +34,16 @@ CREATE TABLE IF NOT EXISTS users (
   wanted_level TINYINT UNSIGNED NOT NULL DEFAULT 0,
   military_id TINYINT(1) NOT NULL DEFAULT 0,
   medcard TINYINT(1) NOT NULL DEFAULT 0,
+  hunger TINYINT UNSIGNED NOT NULL DEFAULT 100,
+  phone CHAR(6) NULL DEFAULT NULL,
   banned_until DATETIME NULL DEFAULT NULL,
   ban_reason VARCHAR(128) NULL DEFAULT NULL,
   birth_date DATE NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   UNIQUE KEY uq_users_name (name),
-  UNIQUE KEY uq_users_email (email)
+  UNIQUE KEY uq_users_email (email),
+  UNIQUE KEY uq_users_phone (phone)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS gang_zones (

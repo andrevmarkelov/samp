@@ -1,17 +1,21 @@
 import { omp, type Player } from "@omp-node/core";
 import { SERVER_TAG } from "../../shared/brand";
-import { isPlayerActive } from "../../shared/player";
-import { saveUserHealth, saveUserJailedSeconds, saveUserVitals } from "../auth/repository";
+import { Color } from "../../shared/colors";
+import { isPlayerActive, playerId } from "../../shared/player";
+import { saveUserHealth, saveUserHunger, saveUserJailedSeconds, saveUserVitals } from "../auth/repository";
 import { trustHealth } from "../anticheat/trust";
 import {
   HEALTH_DECAY_AMOUNT,
   HEALTH_DECAY_MS,
+  HUNGER_DECAY_AMOUNT,
+  HUNGER_WARN_LEVELS,
   MAX_HEALTH,
   MIN_HEALTH,
   VITALS_SAVE_MS,
   applyWallet,
   getAccount,
   isAuthenticated,
+  normalizeHunger,
   patchAccount,
 } from "../auth/session";
 import { isSafeZoneDamage } from "../zones/safe";
@@ -23,6 +27,15 @@ const PLAYER_STATE_DRIVER = 2;
 const PLAYER_STATE_PASSENGER = 3;
 const PLAYER_STATE_WASTED = 7;
 const PLAYER_STATE_SPECTATING = 9;
+
+const HUNGER_WARN_TEXT: Record<(typeof HUNGER_WARN_LEVELS)[number], string> = {
+  40: "Вы проголодались.",
+  30: "Вы сильно проголодались.",
+  20: "Вы очень голодны. Найдите еду.",
+};
+
+/** Какие пороги голода уже показали игроку (чтобы не спамить). */
+const hungerWarned = new Map<number, Set<number>>();
 
 function isInWorld(player: Player): boolean {
   try {
@@ -71,24 +84,28 @@ export function queueSave(player: Player): void {
   persistJailSeconds(account.id, account.jailSeconds, account.name);
 
   const health = readLiveHealth(player, account.health);
+  const hunger = normalizeHunger(account.hunger);
 
   if (isBankBusy(player)) {
-    patchAccount(player, { health });
+    patchAccount(player, { health, hunger });
     void saveUserHealth(account.id, health).catch((error: unknown) => {
       const message = error instanceof Error ? error.message : String(error);
       omp.log(`[${SERVER_TAG}] не удалось сохранить HP ${account.name}: ${message}`);
+    });
+    void saveUserHunger(account.id, hunger).catch(() => {
+      // Периодический save подхватит.
     });
     return;
   }
   const money = Math.max(0, Math.floor(account.money));
   const bank = Math.max(0, Math.floor(account.bank));
-  patchAccount(player, { health, money, bank });
+  patchAccount(player, { health, money, bank, hunger });
 
   if (isInWorld(player)) {
     applyWallet(player, { ...account, money });
   }
 
-  void saveUserVitals(account.id, health, money, bank).catch((error: unknown) => {
+  void saveUserVitals(account.id, health, money, bank, hunger).catch((error: unknown) => {
     const message = error instanceof Error ? error.message : String(error);
     omp.log(`[${SERVER_TAG}] не удалось сохранить персонажа ${account.name}: ${message}`);
   });
@@ -110,7 +127,55 @@ function rememberHealth(player: Player): void {
   }
 }
 
-function decayHealth(player: Player): void {
+function warnHungerIfNeeded(player: Player, prev: number, next: number): void {
+  const slotId = playerId(player);
+  if (slotId === null) {
+    return;
+  }
+
+  let shown = hungerWarned.get(slotId);
+  if (!shown) {
+    shown = new Set();
+    hungerWarned.set(slotId, shown);
+  }
+
+  for (const level of HUNGER_WARN_LEVELS) {
+    if (prev > level && next <= level && !shown.has(level)) {
+      shown.add(level);
+      player.sendClientMessage(Color.error, HUNGER_WARN_TEXT[level]);
+    }
+  }
+
+  // Поели — снова можно предупреждать при следующем падении.
+  for (const level of HUNGER_WARN_LEVELS) {
+    if (next > level) {
+      shown.delete(level);
+    }
+  }
+}
+
+/** Сбросить предупреждения о голоде после еды / восстановления. */
+export function notifyHungerRestored(player: Player, hunger: number): void {
+  const slotId = playerId(player);
+  if (slotId === null) {
+    return;
+  }
+
+  const shown = hungerWarned.get(slotId);
+  if (!shown) {
+    return;
+  }
+
+  const level = normalizeHunger(hunger);
+  for (const warn of HUNGER_WARN_LEVELS) {
+    if (level > warn) {
+      shown.delete(warn);
+    }
+  }
+}
+
+/** Голод падает всегда; HP — только при голоде 0. */
+function decayVitals(player: Player): void {
   if (!isPlayerActive(player) || !isAuthenticated(player)) {
     return;
   }
@@ -126,6 +191,21 @@ function decayHealth(player: Player): void {
     }
 
     if (!player.isSpawned() || player.getState() === PLAYER_STATE_WASTED) {
+      return;
+    }
+
+    const prevHunger = normalizeHunger(account.hunger);
+
+    if (prevHunger > 0) {
+      const nextHunger = Math.max(0, prevHunger - HUNGER_DECAY_AMOUNT);
+      patchAccount(player, { hunger: nextHunger });
+      warnHungerIfNeeded(player, prevHunger, nextHunger);
+      queueSave(player);
+
+      if (nextHunger > 0) {
+        return;
+      }
+      // Достигли 0 в этом тике — HP ещё не трогаем, начнём со следующего.
       return;
     }
 
@@ -172,6 +252,10 @@ export const persistModule: GameModule = {
     });
 
     omp.on("playerDisconnect", (player) => {
+      const slotId = playerId(player);
+      if (slotId !== null) {
+        hungerWarned.delete(slotId);
+      }
       queueSave(player);
     });
 
@@ -184,7 +268,7 @@ export const persistModule: GameModule = {
     }, VITALS_SAVE_MS);
 
     setInterval(() => {
-      omp.players.forEach(decayHealth);
+      omp.players.forEach(decayVitals);
     }, HEALTH_DECAY_MS);
   },
 };
