@@ -237,10 +237,6 @@ function welcome(player: Player, name: string): void {
     Color.info,
     `Добро пожаловать на ${SERVER_NAME}, ${name}.`
   );
-  player.sendClientMessage(
-    Color.white,
-    `[${SERVER_TAG}] Локальный чат, /s /w /me /do /try /todo /b. Напиши /help.`
-  );
 }
 
 function newRegister(name: string): Extract<Pending, { kind: "register" }> {

@@ -1,4 +1,5 @@
 import { Dialog, type Player } from "@omp-node/core";
+import { SERVER_NAME } from "../../shared/brand";
 import { Color } from "../../shared/colors";
 import { isPlayerActive, kickSamePlayer } from "../../shared/player";
 import { DEFAULT_SPAWN, STREET_WORLD } from "../spawn/point";
@@ -73,55 +74,78 @@ export function showRulesDialog(player: Player): void {
 }
 
 export function showLoginDialog(player: Player, name: string, error?: string): void {
-  const prefix = error ? `${error}\n\n` : "";
+  const prefix = error ? `{FF6347}${error}{FFFFFF}\n\n` : "";
+  const body = [
+    prefix + `Добро пожаловать на сервер ${SERVER_NAME}`,
+    "Ваш ник зарегистрирован.",
+    "",
+    `Логин: {33FF33}${name}{FFFFFF}`,
+    "",
+    "Введите пароль:",
+  ].join("\n");
+
   showAuthDialog(
     player,
     DialogStyle.password,
     "Авторизация",
-    `${prefix}Ник ${name} уже зарегистрирован.\nВведи пароль:`,
+    body,
     "Войти",
     "Выход"
   );
 }
 
 export function showEmailDialog(player: Player, name: string, error?: string): void {
-  const prefix = error ? `${error}\n\n` : "";
+  const prefix = error ? `{FF6347}${error}{FFFFFF}\n\n` : "";
   showAuthDialog(
     player,
     DialogStyle.input,
     "Регистрация",
-    `${prefix}Ник ${name} свободен.\nВведи почту:`,
+    `${prefix}Ник {33FF33}${name}{FFFFFF} свободен.\nВведите почту:`,
     "Далее",
     "Назад"
   );
 }
 
 export function showPasswordDialog(player: Player, error?: string): void {
-  const prefix = error ? `${error}\n\n` : "";
+  const prefix = error ? `{FF6347}${error}{FFFFFF}\n\n` : "";
+  const body = [
+    prefix + `Добро пожаловать на сервер ${SERVER_NAME}`,
+    "Чтобы начать игру, вам необходимо пройти регистрацию.",
+    "",
+    "Введите пароль для вашего аккаунта.",
+    "Он будет запрашиваться каждый раз, когда вы заходите на сервер.",
+    "",
+    "{33FF33}Примечания:",
+    "- Пароль может состоять из русских и латинских символов",
+    "- Пароль чувствителен к регистру",
+    "- Пароль не должен содержать пробелы",
+    "- Длина пароля от 6 до 32 символов",
+  ].join("\n");
+
   showAuthDialog(
     player,
     DialogStyle.password,
     "Регистрация",
-    `${prefix}Придумай пароль (от 6 символов):`,
+    body,
     "Далее",
     "Назад"
   );
 }
 
 export function showPasswordConfirmDialog(player: Player, error?: string): void {
-  const prefix = error ? `${error}\n\n` : "";
+  const prefix = error ? `{FF6347}${error}{FFFFFF}\n\n` : "";
   showAuthDialog(
     player,
     DialogStyle.password,
     "Регистрация",
-    `${prefix}Повтори пароль:`,
+    `${prefix}Повторите пароль:`,
     "Далее",
     "Назад"
   );
 }
 
 export function showBirthDateDialog(player: Player, error?: string): void {
-  const prefix = error ? `${error}\n\n` : "";
+  const prefix = error ? `{FF6347}${error}{FFFFFF}\n\n` : "";
   showAuthDialog(
     player,
     DialogStyle.input,

@@ -37,6 +37,7 @@ import { bindSellLic } from "./selllic";
 import { bindTimeLabels } from "./time";
 import { bindAds } from "./ads";
 import { bindMedcardOffers } from "./medcard";
+import { bindHelpDialogs } from "./help";
 
 export const commandsModule: GameModule = {
   name: "commands",
@@ -44,6 +45,7 @@ export const commandsModule: GameModule = {
     bindCommandListener();
     bindMenuDialogs();
     bindGpsDialogs();
+    bindHelpDialogs();
     bindReportDialogs();
     bindOrgStaff();
     bindSellLic();

@@ -212,10 +212,6 @@ export const spawnModule: GameModule = {
 
       if (account && firstSpawn) {
         applyWallet(player, account);
-        player.sendClientMessage(
-          Color.gray,
-          "Ты появился на спавне. /help — список команд."
-        );
       }
 
       if (account) {
