@@ -4,6 +4,7 @@ import { isDatabaseReady } from "../../shared/database";
 import { playerId } from "../../shared/player";
 import { isAuthenticated } from "../auth/session";
 import type { GameModule } from "../types";
+import { startAmmuShops } from "./ammu";
 import { startBusinessEntrances } from "./enter";
 import { startBusinessExits } from "./exits";
 import { bindBusinessMapIcons, refreshBusinessMapIcons } from "./map-icons";
@@ -30,6 +31,7 @@ export const businessesModule: GameModule = {
       startBusinessEntrances();
       startBusinessExits();
       startStreetFoodStalls();
+      startAmmuShops();
       bindBusinessMapIcons();
       bindBusinessPurchase();
       bindBusinessMenu();

@@ -50,6 +50,10 @@ export function isStreetFoodType(typeId: number): boolean {
   return typeId === BusinessType.STREET_FOOD;
 }
 
+export function isAmmuType(typeId: number): boolean {
+  return typeId === BusinessType.AMMU;
+}
+
 const TYPE_LABEL: Readonly<Record<number, string>> = {
   [BusinessType.SHOP_247]: "24/7",
   [BusinessType.AMMU]: "Магазин оружия",

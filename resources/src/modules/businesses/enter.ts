@@ -14,6 +14,7 @@ import {
   setBusinessBalance,
 } from "./repository";
 import { setInsideBusiness } from "./session";
+import { isAmmuType } from "./types";
 import { businessVirtualWorld } from "./world";
 
 /** Левый ALT — медленная ходьба (KEY_WALK). */
@@ -134,6 +135,18 @@ async function tryEnterBusiness(player: Player): Promise<void> {
     return;
   }
 
+  if (
+    isAmmuType(business.typeId) &&
+    !account.licenses.gun &&
+    business.ownerId !== account.id
+  ) {
+    player.sendClientMessage(
+      Color.error,
+      "Для входа в магазин оружия нужна лицензия на оружие."
+    );
+    return;
+  }
+
   const now = Date.now();
   const last = lastTeleportAt.get(slotId) ?? 0;
   if (now - last < TELEPORT_COOLDOWN_MS) {
@@ -159,13 +172,13 @@ async function tryEnterBusiness(player: Player): Promise<void> {
     try {
       result = await payBusinessEntranceFee(business.id, account.id, fee);
     } catch (error: unknown) {
-      entering.delete(account.id);
       const message = error instanceof Error ? error.message : String(error);
       omp.log(`[${SERVER_TAG}] вход в бизнес ${business.id} (${account.name}): ${message}`);
       player.sendClientMessage(Color.error, "Не удалось оплатить вход.");
       return;
+    } finally {
+      entering.delete(account.id);
     }
-    entering.delete(account.id);
 
     if (!result.ok) {
       if (result.reason === "funds") {

@@ -686,9 +686,10 @@ export async function payBusinessEntranceFee(
     }
 
     const cashLeft = money - fee;
+    const businessGain = Math.floor(fee * 0.8);
     const balance = Math.min(
       MAX_MONEY,
-      Math.max(0, Math.floor(Number(bizRow.balance))) + fee
+      Math.max(0, Math.floor(Number(bizRow.balance))) + businessGain
     );
 
     const [userUpdate] = await conn.query<ResultSetHeader>(
