@@ -2,6 +2,11 @@ import { Dialog, omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { WHISPER_RADIUS, arePlayersNearby } from "../../shared/nearby";
 import { isPlayerActive, playerId, playerName } from "../../shared/player";
+import {
+  claimYnOffer,
+  getYnOfferKind,
+  releaseYnOffer,
+} from "../../shared/yn-offer";
 import { byGender } from "../auth/gender";
 import { saveUserMedcard, saveUserMoney } from "../auth/repository";
 import {
@@ -189,6 +194,11 @@ registerCommand(
       return;
     }
 
+    if (pendingOffers.has(targetSlot) || !claimYnOffer(targetSlot, "medcard")) {
+      player.sendClientMessage(Color.error, "У игрока уже есть активное предложение.");
+      return;
+    }
+
     pendingOffers.set(targetSlot, {
       issuerId: issuerSlot,
       issuerUserId: account.id,
@@ -219,17 +229,19 @@ export function bindMedcardOffers(): void {
     }
 
     const slot = playerId(player);
-    if (slot === null) {
+    if (slot === null || getYnOfferKind(slot) !== "medcard") {
       return;
     }
 
     const offer = pendingOffers.get(slot);
     if (!offer) {
+      releaseYnOffer(slot, "medcard");
       return;
     }
 
     if (Date.now() > offer.expiresAt) {
       pendingOffers.delete(slot);
+      releaseYnOffer(slot, "medcard");
       player.sendClientMessage(Color.error, "Предложение медкарты истекло.");
       return;
     }
@@ -250,10 +262,14 @@ export function bindMedcardOffers(): void {
       return;
     }
 
-    pendingOffers.delete(slot);
+    if (pendingOffers.has(slot)) {
+      pendingOffers.delete(slot);
+      releaseYnOffer(slot, "medcard");
+    }
     for (const [targetSlot, offer] of pendingOffers) {
       if (offer.issuerId === slot) {
         pendingOffers.delete(targetSlot);
+        releaseYnOffer(targetSlot, "medcard");
       }
     }
   });
@@ -261,6 +277,7 @@ export function bindMedcardOffers(): void {
 
 function acceptOffer(target: Player, targetSlot: number, offer: MedcardOffer): void {
   pendingOffers.delete(targetSlot);
+  releaseYnOffer(targetSlot, "medcard");
 
   const targetAccount = getAccount(target);
   if (!targetAccount || !isAuthenticated(target)) {
@@ -346,6 +363,7 @@ function acceptOffer(target: Player, targetSlot: number, offer: MedcardOffer): v
 
 function refuseOffer(target: Player, targetSlot: number, offer: MedcardOffer): void {
   pendingOffers.delete(targetSlot);
+  releaseYnOffer(targetSlot, "medcard");
   target.sendClientMessage(Color.gray, "Вы отказались от медкарты.");
 
   const issuer = omp.players.at(offer.issuerId);

@@ -1,0 +1,31 @@
+/** Один активный Y/N-оффер на игрока (бизнес / машина / медкарта и т.п.). */
+
+export type YnOfferKind = "biz" | "car" | "medcard";
+
+const activeBySlot = new Map<number, YnOfferKind>();
+
+/** Занять слот под оффер. false — уже есть другой. */
+export function claimYnOffer(slot: number, kind: YnOfferKind): boolean {
+  const current = activeBySlot.get(slot);
+  if (current !== undefined && current !== kind) {
+    return false;
+  }
+  activeBySlot.set(slot, kind);
+  return true;
+}
+
+export function getYnOfferKind(slot: number): YnOfferKind | undefined {
+  return activeBySlot.get(slot);
+}
+
+/** Снять оффер. Если kind задан — только совпадающий. */
+export function releaseYnOffer(slot: number, kind?: YnOfferKind): void {
+  if (kind !== undefined && activeBySlot.get(slot) !== kind) {
+    return;
+  }
+  activeBySlot.delete(slot);
+}
+
+export function hasYnOffer(slot: number): boolean {
+  return activeBySlot.has(slot);
+}

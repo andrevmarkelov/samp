@@ -4,6 +4,11 @@ import { Color } from "../../shared/colors";
 import { formatMoney } from "../../shared/money";
 import { WHISPER_RADIUS, arePlayersNearby } from "../../shared/nearby";
 import { isPlayerActive, playerId, playerName } from "../../shared/player";
+import {
+  claimYnOffer,
+  getYnOfferKind,
+  releaseYnOffer,
+} from "../../shared/yn-offer";
 import { saveUserMoney } from "../auth/repository";
 import { applyWallet, getAccount, isAuthenticated, patchAccount } from "../auth/session";
 import { registerCommand } from "../commands/registry";
@@ -80,17 +85,19 @@ export function bindBusinessMenu(): void {
     }
 
     const slot = playerId(player);
-    if (slot === null) {
+    if (slot === null || getYnOfferKind(slot) !== "biz") {
       return;
     }
 
     const offer = pendingOffers.get(slot);
     if (!offer) {
+      releaseYnOffer(slot, "biz");
       return;
     }
 
     if (Date.now() > offer.expiresAt) {
       pendingOffers.delete(slot);
+      releaseYnOffer(slot, "biz");
       player.sendClientMessage(Color.error, "Предложение о покупке бизнеса истекло.");
       return;
     }
@@ -109,10 +116,14 @@ export function bindBusinessMenu(): void {
     const slot = playerId(player);
     if (slot !== null) {
       pendingPlayerSale.delete(slot);
-      pendingOffers.delete(slot);
+      if (pendingOffers.has(slot)) {
+        pendingOffers.delete(slot);
+        releaseYnOffer(slot, "biz");
+      }
       for (const [buyerSlot, offer] of pendingOffers) {
         if (offer.sellerSlot === slot) {
           pendingOffers.delete(buyerSlot);
+          releaseYnOffer(buyerSlot, "biz");
         }
       }
     }
@@ -459,7 +470,7 @@ function sendSellOfferToPlayer(player: Player): void {
     return;
   }
 
-  if (pendingOffers.has(buyerSlot)) {
+  if (pendingOffers.has(buyerSlot) || !claimYnOffer(buyerSlot, "biz")) {
     player.sendClientMessage(Color.error, "У игрока уже есть активное предложение.");
     return;
   }
@@ -558,6 +569,7 @@ async function acceptBizOffer(
   offer: BizOffer
 ): Promise<void> {
   pendingOffers.delete(buyerSlot);
+  releaseYnOffer(buyerSlot, "biz");
 
   const buyerAccount = getAccount(buyer);
   if (!buyerAccount || !isAuthenticated(buyer)) {
@@ -704,6 +716,7 @@ async function acceptBizOffer(
 
 function refuseBizOffer(buyer: Player, buyerSlot: number, offer: BizOffer): void {
   pendingOffers.delete(buyerSlot);
+  releaseYnOffer(buyerSlot, "biz");
   buyer.sendClientMessage(Color.gray, "Вы отказались от покупки бизнеса.");
 
   const seller = omp.players.at(offer.sellerSlot);

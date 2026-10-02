@@ -244,3 +244,25 @@ CREATE TABLE IF NOT EXISTS businesses (
   KEY idx_businesses_type_id (type_id),
   CONSTRAINT fk_businesses_owner FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Личный транспорт игроков (координаты спавна — из houses.vehicle_* владельца).
+CREATE TABLE IF NOT EXISTS player_vehicles (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  model_id SMALLINT UNSIGNED NOT NULL,
+  owner_id INT UNSIGNED NOT NULL,
+  color1 TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  color2 TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  fuel TINYINT UNSIGNED NOT NULL DEFAULT 100,
+  health FLOAT NOT NULL DEFAULT 1000,
+  is_locked TINYINT(1) NOT NULL DEFAULT 1,
+  has_nitro TINYINT(1) NOT NULL DEFAULT 0,
+  trunk_metal INT UNSIGNED NOT NULL DEFAULT 0,
+  trunk_ammo INT UNSIGNED NOT NULL DEFAULT 0,
+  trunk_drugs INT UNSIGNED NOT NULL DEFAULT 0,
+  purchase_price INT UNSIGNED NOT NULL DEFAULT 0,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_player_vehicles_owner_id (owner_id),
+  KEY idx_player_vehicles_model_id (model_id),
+  CONSTRAINT fk_player_vehicles_owner FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

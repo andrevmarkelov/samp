@@ -279,6 +279,10 @@ rent_paid_until = база + N дней
 | 81 | `businesses/bank-tax` | Ввод суммы снятия прибыли |
 | 82 | `businesses/bank-tax` | Подтверждение снятия прибыли |
 | 83 | `vehicles/rental` | Подтверждение аренды автомобиля |
+| 84 | `vehicles/dealership` | Каталог автосалона / моторынка |
+| 85 | `vehicles/dealership` | Подтверждение покупки ТС |
+| 86 | `vehicles/commands` | Меню /car |
+| 87 | `vehicles/commands` | Информация о личном ТС |
 
 ---
 
@@ -853,6 +857,41 @@ resources/src/modules/businesses/
 | `/unrent` | завершить аренду; если сидит в ней — выкидывает, машина респавнится |
 | Выход из игры | аренда сразу прекращается, машина возвращается на точку |
 
+### Покупка личного транспорта
+
+Автосалоны / моторынок (`vehicles/dealership.ts`), бизнесы **#13** элит, **#14** эконом, **#15** моторынок.
+
+| Правило | Как |
+|---|---|
+| Условие | паспорт + лицензия (авто / мото) + **свой дом** |
+| Лимит | **1** транспорт на игрока |
+| Оплата | наличные; **80%** → `businesses.balance` |
+| Цвет | `1, 1` (белый) |
+| Спавн | `houses.vehicle_x/y/z` + `vehicle_angle` владельца |
+| Таблица | `player_vehicles` |
+
+**Каталог (цены):**
+
+- Элит: Buffalo `95 000$`, Infernus `350 000$`
+- Эконом: Landstalker `28 000$`, Bravura `18 000$`
+- Моторынок: Faggio `5 000$` … NRG-500 `120 000$` (PCJ, Freeway, Sanchez, Quad, FCR, BF-400, Wayfarer)
+
+Встать на пикап у входа → список → подтверждение.
+
+### Личный транспорт: /lock и /car
+
+| Команда | Действие |
+|---|---|
+| `/lock` | открыть/закрыть свой ТС рядом или сидя в нём; статус в БД |
+| `/car` → Информация | id, бензин, HP, открыта/закрыта |
+| `/car` → Припарковать | респавн у дома (`houses.vehicle_*`); пассажиров выкидывает |
+
+- Закрыта — **никто** не сядет (даже владелец); открыта — может любой.
+- В спидометре: **зелёный Open** = открыта, **красный Open** = закрыта.
+- При посадке за руль: `Транспорт принадлежит Name_Surname[ID].`
+- HP сохраняется при выходе из машины / disconnect / парковке.
+- При выходе из игры runtime-машина **удаляется**; снова — через `/car` → Припарковать.
+
 ---
 
 ## Банк: бизнес (налог и прибыль)
@@ -944,6 +983,8 @@ resources/src/modules/businesses/
 | Бизнесы: налог / прибыль в банке | `businesses/bank-tax.ts`, `bank/tellers.ts` |
 | Бизнесы: изъятие за налог | `businesses/tax.ts`, `repository.ts` → `forfeitExpiredBusinesses` |
 | Аренда авто (пляж / Jefferson) | `vehicles/rental.ts` |
+| Автосалоны / моторынок | `vehicles/dealership.ts`, `vehicles/player-vehicles.ts` |
+| Личный ТС: /lock /car | `vehicles/personal.ts`, `vehicles/commands.ts` |
 | Бизнесы: /biz /buybiz | `businesses/menu.ts`, `businesses/purchase.ts` |
 | Бизнесы: вход / выход / маркеры | `businesses/enter.ts`, `exits.ts`, `markers.ts` |
 | Бизнесы: иконки / типы | `businesses/map-icons.ts`, `businesses/types.ts` |

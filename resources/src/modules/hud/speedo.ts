@@ -2,6 +2,7 @@ import { TextDraw, omp, type Player, type Vehicle } from "@omp-node/core";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { isEngineOn, isLightsOn } from "../vehicles/spawn";
 import { getVehicleLimit } from "../vehicles/limit";
+import { isPersonalVehicleLocked } from "../vehicles/personal";
 
 const PLAYER_STATE_DRIVER = 2;
 const UPDATE_MS = 500;
@@ -67,7 +68,7 @@ function createPlayerDraws(): SpeedoDraws | null {
     return draw;
   });
   const status = tryDraw(() => {
-    const draw = new TextDraw(425.0, 416.5, statusLine(false, false, null));
+    const draw = new TextDraw(425.0, 416.5, statusLine(false, false, null, null));
     styleLine(draw);
     return draw;
   });
@@ -136,11 +137,19 @@ function hideFor(player: Player, id: number): void {
   }
 }
 
-function statusLine(engineOn: boolean, lightsOn: boolean, limitKmh: number | null): string {
+function statusLine(
+  engineOn: boolean,
+  lightsOn: boolean,
+  limitKmh: number | null,
+  locked: boolean | null
+): string {
+  // Зелёный Open — открыта; красный Open — закрыта. Для чужого ТС — белый.
+  const open =
+    locked === null ? "~w~Open" : locked ? "~r~Open" : "~g~Open";
   const motor = engineOn ? "~g~M" : "~w~M";
   const lights = lightsOn ? "~g~L" : "~w~L";
   const limiter = limitKmh ? `~r~${limitKmh}` : "~w~max";
-  return `~g~Open    ${limiter}   ~w~E ~w~S   ${motor} ${lights} ~w~B`;
+  return `${open}    ${limiter}   ~w~E ~w~S   ${motor} ${lights} ~w~B`;
 }
 
 function driverVehicle(player: Player): Vehicle | null {
@@ -205,7 +214,12 @@ function updateSpeed(player: Player, id: number): void {
     hud.speed.setString(`${vehicleSpeedKmh(vehicle)} km/h`);
     hud.health.setString(`${vehicleHealth(vehicle)}`);
     hud.status.setString(
-      statusLine(isEngineOn(vehicle), isLightsOn(vehicle), getVehicleLimit(vehicle))
+      statusLine(
+        isEngineOn(vehicle),
+        isLightsOn(vehicle),
+        getVehicleLimit(vehicle),
+        isPersonalVehicleLocked(vehicle)
+      )
     );
   } catch {
     // Textdraw уже уничтожен.
