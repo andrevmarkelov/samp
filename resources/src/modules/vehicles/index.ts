@@ -12,6 +12,7 @@ import { spawnLspdVehicles } from "./lspd";
 import { spawnPoliceVehicles } from "./police";
 import { spawnPrisonVehicles } from "./prison";
 import { spawnRadioVehicles } from "./radio";
+import { spawnRentalVehicles } from "./rental";
 import { startSpeedLimiter } from "./limit";
 import { bindLightBarRespawn } from "./light-bar";
 import { createServerVehicle, startEngineControl } from "./spawn";
@@ -56,6 +57,7 @@ export const vehiclesModule: GameModule = {
     spawnPrisonVehicles();
     spawnGangVehicles();
     spawnMafiaVehicles();
+    spawnRentalVehicles();
 
     for (const spot of STATION_SCOOTERS) {
       createServerVehicle({

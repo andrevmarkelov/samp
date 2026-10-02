@@ -2,6 +2,7 @@ import { INVALID_VEHICLE_ID, omp, type Vehicle } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { isPlayerActive, playerChatName } from "../../shared/player";
 import { registerCommand } from "../commands/registry";
+import { isActiveRentalVehicle } from "../vehicles/rental";
 import { hasAdminAccess } from "./session";
 
 const DELAY_MS = 30_000;
@@ -59,6 +60,10 @@ function respawnEmptyVehicles(): void {
     try {
       const id = vehicle.getID();
       if (id !== null && busy.has(id)) {
+        continue;
+      }
+
+      if (id !== null && isActiveRentalVehicle(id)) {
         continue;
       }
 

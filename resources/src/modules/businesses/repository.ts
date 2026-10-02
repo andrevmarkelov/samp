@@ -8,6 +8,10 @@ export type PayEntranceFeeResult =
   | { ok: true; cashLeft: number; balance: number }
   | { ok: false; reason: "not_found" | "funds" | "db" };
 
+export type PayVehicleRentalResult =
+  | { ok: true; cashLeft: number; balance: number; businessGain: number; amount: number }
+  | { ok: false; reason: "not_found" | "funds" | "db" };
+
 const CREATE_BUSINESSES_SQL = `
 CREATE TABLE IF NOT EXISTS businesses (
   id SMALLINT UNSIGNED NOT NULL,
@@ -707,6 +711,82 @@ export async function payBusinessEntranceFee(
 
     await conn.commit();
     return { ok: true, cashLeft, balance };
+  } catch {
+    await conn.rollback();
+    return { ok: false, reason: "db" };
+  } finally {
+    conn.release();
+  }
+}
+
+/** Списывает стоимость аренды с наличных; 80% идёт на balance бизнеса. */
+export async function payVehicleRental(
+  businessId: number,
+  payerId: number,
+  price: number
+): Promise<PayVehicleRentalResult> {
+  if (!Number.isInteger(price) || price < 1) {
+    return { ok: false, reason: "db" };
+  }
+
+  const businessGain = Math.floor(price * 0.8);
+  const conn = await getPool().getConnection();
+
+  try {
+    await conn.beginTransaction();
+
+    const [bizRows] = await conn.query<RowDataPacket[]>(
+      "SELECT id, balance FROM businesses WHERE id = ? LIMIT 1 FOR UPDATE",
+      [businessId]
+    );
+    const bizRow = bizRows[0];
+    if (!bizRow) {
+      await conn.rollback();
+      return { ok: false, reason: "not_found" };
+    }
+
+    const [userRows] = await conn.query<RowDataPacket[]>(
+      "SELECT money FROM users WHERE id = ? LIMIT 1 FOR UPDATE",
+      [payerId]
+    );
+    const userRow = userRows[0];
+    if (!userRow) {
+      await conn.rollback();
+      return { ok: false, reason: "db" };
+    }
+
+    const money = Math.max(0, Math.floor(Number(userRow.money)));
+    if (money < price) {
+      await conn.rollback();
+      return { ok: false, reason: "funds" };
+    }
+
+    const cashLeft = money - price;
+    const balance = Math.min(
+      MAX_MONEY,
+      Math.max(0, Math.floor(Number(bizRow.balance))) + businessGain
+    );
+
+    const [userUpdate] = await conn.query<ResultSetHeader>(
+      "UPDATE users SET money = ? WHERE id = ? AND money >= ?",
+      [cashLeft, payerId, price]
+    );
+    if (userUpdate.affectedRows !== 1) {
+      await conn.rollback();
+      return { ok: false, reason: "funds" };
+    }
+
+    const [bizUpdate] = await conn.query<ResultSetHeader>(
+      "UPDATE businesses SET balance = ? WHERE id = ?",
+      [balance, businessId]
+    );
+    if (bizUpdate.affectedRows !== 1) {
+      await conn.rollback();
+      return { ok: false, reason: "db" };
+    }
+
+    await conn.commit();
+    return { ok: true, cashLeft, balance, businessGain, amount: price };
   } catch {
     await conn.rollback();
     return { ok: false, reason: "db" };
