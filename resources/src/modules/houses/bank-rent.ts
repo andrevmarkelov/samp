@@ -1,6 +1,7 @@
 import { Dialog, omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { SERVER_TAG } from "../../shared/brand";
+import { formatMoney } from "../../shared/money";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { saveUserMoney } from "../auth/repository";
 import { applyWallet, getAccount, patchAccount } from "../auth/session";
@@ -68,7 +69,7 @@ export function showHouseRentMenu(player: Player): void {
   const lines = [
     `Дом №${house.id} (${houseClassLabel(house.classId)})`,
     `Оплачено до: ${formatRentDate(house.rentPaidUntil)}`,
-    `Ежедневная плата: $${daily}`,
+    `Ежедневная плата: ${formatMoney(daily)}`,
   ];
 
   if (isRentLastDay(house)) {
@@ -108,8 +109,8 @@ function showDaysInputDialog(player: Player): void {
   const bank = Math.max(0, Math.floor(account.bank));
   const body = [
     `Дом №${house.id}`,
-    `Ежедневная плата: $${daily}`,
-    `Банковский счёт: $${bank}`,
+    `Ежедневная плата: ${formatMoney(daily)}`,
+    `Банковский счёт: ${formatMoney(bank)}`,
     "",
     "Введите количество дней:",
   ].join("\n");
@@ -209,7 +210,7 @@ export function handleHouseRentDialog(
         "Подтверждение",
         [
           `Дом №${house.id}`,
-          `Оплата: ${days} ${dayLabel(days)} — $${amount}`,
+          `Оплата: ${days} ${dayLabel(days)} — ${formatMoney(amount)}`,
           `Новая дата оплаты: ${formatRentDate(paidUntil)}`,
           "",
           "Списание с банковского счёта.",
@@ -309,7 +310,7 @@ async function confirmHouseRent(player: Player): Promise<void> {
   );
   player.sendClientMessage(
     Color.info,
-    `С банковского счёта списано $${result.amount}. Баланс: $${result.bankLeft}.`
+    `С банковского счёта списано ${formatMoney(result.amount)}. Баланс: ${formatMoney(result.bankLeft)}.`
   );
 }
 

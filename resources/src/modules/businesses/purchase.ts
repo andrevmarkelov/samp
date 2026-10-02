@@ -1,6 +1,7 @@
 import { Dialog, omp, type Player } from "@omp-node/core";
 import { SERVER_TAG } from "../../shared/brand";
 import { Color } from "../../shared/colors";
+import { formatMoney } from "../../shared/money";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { saveUserMoney } from "../auth/repository";
 import { applyWallet, getAccount, isAuthenticated, patchAccount } from "../auth/session";
@@ -110,7 +111,7 @@ async function openBuyBusinessDialog(player: Player): Promise<void> {
     "",
     `${LABEL}Название:\t\t${VALUE}${business.name}`,
     `${LABEL}Номер:\t\t${VALUE}${business.id}`,
-    `${LABEL}Стоимость:\t\t${VALUE}${business.price}$`,
+    `${LABEL}Стоимость:\t\t${VALUE}${formatMoney(business.price)}`,
   ].join("\n");
 
   try {
@@ -232,6 +233,6 @@ async function tryPurchaseBusiness(player: Player, businessId: number): Promise<
 
   player.sendClientMessage(
     Color.info,
-    `Поздравляем с покупкой бизнеса «${owned.name}» (#${owned.id}) за $${owned.price}!`
+    `Поздравляем с покупкой бизнеса «${owned.name}» (#${owned.id}) за ${formatMoney(owned.price)}!`
   );
 }

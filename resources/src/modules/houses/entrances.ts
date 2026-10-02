@@ -1,5 +1,6 @@
 import { Dialog, omp, Pickup, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
+import { formatMoney } from "../../shared/money";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { isAuthenticated } from "../auth/session";
 import { STREET_WORLD } from "../spawn/point";
@@ -190,8 +191,8 @@ function showFreeHouseDialog(player: Player, house: HouseRecord): void {
   const body = [
     `${LABEL}Тип:\t\t\t${VALUE}${houseClassLabel(house.classId)}`,
     `${LABEL}Номер дома:\t\t${VALUE}${house.id}`,
-    `${LABEL}Стоимость:\t\t${VALUE}${house.price}$`,
-    `${LABEL}Аренда:\t\t${VALUE}$${dailyHouseRent(house.price)}/день`,
+    `${LABEL}Стоимость:\t\t${VALUE}${formatMoney(house.price)}`,
+    `${LABEL}Аренда:\t\t${VALUE}${formatMoney(dailyHouseRent(house.price))}/день`,
     "",
     `${LABEL}При покупке дом оплачен на сегодня.`,
     `${LABEL}Продление — в банке.`,
@@ -218,7 +219,7 @@ function showOccupiedHouseDialog(player: Player, house: HouseRecord): void {
     `${LABEL}Владелец:\t\t${OWNER_VALUE}${owner}`,
     `${LABEL}Тип:\t\t\t${VALUE}${houseClassLabel(house.classId)}`,
     `${LABEL}Номер дома:\t\t${VALUE}${house.id}`,
-    `${LABEL}Стоимость:\t\t${VALUE}${house.price}$`,
+    `${LABEL}Стоимость:\t\t${VALUE}${formatMoney(house.price)}`,
     `${LABEL}Статус:\t\t${VALUE}${houseLockStatusLabel(house.isLocked)}`,
   ].join("\n");
 

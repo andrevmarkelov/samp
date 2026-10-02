@@ -1,6 +1,7 @@
 import { Dialog, omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { SERVER_TAG } from "../../shared/brand";
+import { formatMoney } from "../../shared/money";
 import { saveUserMoney } from "../auth/repository";
 import { applyWallet, getAccount, patchAccount } from "../auth/session";
 import { houseClassLabel } from "./classes";
@@ -190,7 +191,7 @@ async function openMedkitFlow(player: Player, houseId: number): Promise<void> {
       HOUSE_MEDKIT_DIALOG_ID,
       DIALOG_STYLE_MSGBOX,
       "Аптечка",
-      `Купить аптечку за $${MEDKIT_PRICE}?`,
+      `Купить аптечку за ${formatMoney(MEDKIT_PRICE)}?`,
       "Купить",
       "Отмена"
     );
@@ -274,7 +275,7 @@ async function buyMedkit(player: Player, houseId: number): Promise<void> {
     omp.log(`[${SERVER_TAG}] не удалось сохранить деньги ${account.name}: ${message}`);
   });
 
-  player.sendClientMessage(Color.info, `Аптечка куплена за $${MEDKIT_PRICE}.`);
+  player.sendClientMessage(Color.info, `Аптечка куплена за ${formatMoney(MEDKIT_PRICE)}.`);
   showHouseMenu(player);
 }
 
@@ -288,7 +289,7 @@ function showHouseInfoDialog(player: Player, house: ReturnType<typeof findOwnedH
   const body = [
     `${MENU_LABEL}Номер дома:\t\t${MENU_VALUE}${house.id}`,
     `${MENU_LABEL}Класс:\t\t\t${MENU_VALUE}${houseClassLabel(house.classId)}`,
-    `${MENU_LABEL}Гос. стоимость:\t${MENU_VALUE}$${house.price}`,
+    `${MENU_LABEL}Гос. стоимость:\t${MENU_VALUE}${formatMoney(house.price)}`,
     ...rentLines,
   ].join("\n");
 

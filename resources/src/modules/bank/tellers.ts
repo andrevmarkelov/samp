@@ -1,6 +1,7 @@
 import { Dialog, omp, Pickup, TextLabel, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { SERVER_TAG } from "../../shared/brand";
+import { formatMoney } from "../../shared/money";
 import { isPlayerActive, playerChatName, playerId } from "../../shared/player";
 import { saveUserBankTransfer, saveUserMoney } from "../auth/repository";
 import {
@@ -338,8 +339,8 @@ function showBalance(player: Player): void {
   }
 
   const body = [
-    `Наличные: $${account.money}`,
-    `Банковский счёт: $${account.bank}`,
+    `Наличные: ${formatMoney(account.money)}`,
+    `Банковский счёт: ${formatMoney(account.bank)}`,
   ].join("\n");
 
   try {
@@ -367,8 +368,8 @@ function showAmountDialog(player: Player, mode: "deposit" | "withdraw"): void {
   const available = mode === "deposit" ? account.money : account.bank;
   const body =
     mode === "deposit"
-      ? `Наличные: $${available}\nВведите сумму пополнения:`
-      : `Банковский счёт: $${available}\nВведите сумму снятия:`;
+      ? `Наличные: ${formatMoney(available)}\nВведите сумму пополнения:`
+      : `Банковский счёт: ${formatMoney(available)}\nВведите сумму снятия:`;
 
   try {
     Dialog.show(
@@ -470,7 +471,7 @@ function showSendAmountDialog(player: Player): void {
       BANK_SEND_AMOUNT_DIALOG_ID,
       DIALOG_STYLE_INPUT,
       "Перевод",
-      `${pending.label}\nВаш счёт: $${account.bank}\nВведите сумму перевода:`,
+      `${pending.label}\nВаш счёт: ${formatMoney(account.bank)}\nВведите сумму перевода:`,
       "OK",
       "Назад"
     );
@@ -572,7 +573,7 @@ async function sendToPlayer(player: Player, inputText: string): Promise<void> {
     const next = keepBankExtra(player, senderBank, nextSenderBank);
     player.sendClientMessage(
       Color.tryOk,
-      `Вы перевели $${amount} игроку ${pending.label}. Баланс: $${next}.`
+      `Вы перевели ${formatMoney(amount)} игроку ${pending.label}. Баланс: ${formatMoney(next)}.`
     );
   }
 
@@ -580,7 +581,7 @@ async function sendToPlayer(player: Player, inputText: string): Promise<void> {
     keepBankExtra(target, targetBank, nextTargetBank);
     target.sendClientMessage(
       Color.info,
-      `Игрок ${senderAccount.name}[${senderId}] перевёл вам $${amount}.`
+      `Игрок ${senderAccount.name}[${senderId}] перевёл вам ${formatMoney(amount)}.`
     );
   }
 
@@ -746,12 +747,12 @@ async function transfer(
   if (mode === "deposit") {
     player.sendClientMessage(
       Color.tryOk,
-      `Счёт пополнен на $${amount}. Баланс: $${bankNow}.`
+      `Счёт пополнен на ${formatMoney(amount)}. Баланс: ${formatMoney(bankNow)}.`
     );
   } else {
     player.sendClientMessage(
       Color.tryOk,
-      `Вы сняли $${amount}. Наличные: $${cashNow}.`
+      `Вы сняли ${formatMoney(amount)}. Наличные: ${formatMoney(cashNow)}.`
     );
   }
 

@@ -1,6 +1,7 @@
 import { Dialog, omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { SERVER_TAG } from "../../shared/brand";
+import { formatMoney } from "../../shared/money";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { applyWallet, getAccount, patchAccount } from "../auth/session";
 import {
@@ -118,7 +119,7 @@ export function showBusinessTaxMenu(player: Player): void {
   const lines = [
     `${business.name} (#${business.id})`,
     `Оплачено до: ${formatRentDate(business.taxPaidUntil)}`,
-    `Ежедневный налог: $${daily}`,
+    `Ежедневный налог: ${formatMoney(daily)}`,
   ];
 
   if (isTaxLastDay(business)) {
@@ -158,8 +159,8 @@ function showDaysInputDialog(player: Player): void {
   const bank = Math.max(0, Math.floor(account.bank));
   const body = [
     `${business.name} (#${business.id})`,
-    `Ежедневный налог: $${daily}`,
-    `Банковский счёт: $${bank}`,
+    `Ежедневный налог: ${formatMoney(daily)}`,
+    `Банковский счёт: ${formatMoney(bank)}`,
     "",
     "Введите количество дней:",
   ].join("\n");
@@ -193,7 +194,7 @@ function showWithdrawInputDialog(player: Player): void {
 
   const body = [
     `${business.name} (#${business.id})`,
-    `Прибыль на счёте: $${business.balance}`,
+    `Прибыль на счёте: ${formatMoney(business.balance)}`,
     "",
     "Введите сумму снятия:",
   ].join("\n");
@@ -317,7 +318,7 @@ export function handleBusinessTaxDialog(
         "Подтверждение",
         [
           `${business.name} (#${business.id})`,
-          `Оплата: ${days} ${dayLabel(days)} — $${amount}`,
+          `Оплата: ${days} ${dayLabel(days)} — ${formatMoney(amount)}`,
           `Новая дата оплаты: ${formatRentDate(paidUntil)}`,
           "",
           "Списание с банковского счёта.",
@@ -386,8 +387,8 @@ export function handleBusinessTaxDialog(
         "Подтверждение",
         [
           `${business.name} (#${business.id})`,
-          `Снять: $${amount}`,
-          `Останется на счёте: $${business.balance - amount}`,
+          `Снять: ${formatMoney(amount)}`,
+          `Останется на счёте: ${formatMoney(business.balance - amount)}`,
           "",
           "Деньги будут выданы наличными.",
         ].join("\n"),
@@ -486,7 +487,7 @@ async function confirmBusinessTax(player: Player): Promise<void> {
   );
   player.sendClientMessage(
     Color.info,
-    `С банковского счёта списано $${result.amount}. Баланс: $${result.bankLeft}.`
+    `С банковского счёта списано ${formatMoney(result.amount)}. Баланс: ${formatMoney(result.bankLeft)}.`
   );
 }
 
@@ -557,11 +558,11 @@ async function confirmBusinessWithdraw(player: Player): Promise<void> {
 
   player.sendClientMessage(
     Color.tryOk,
-    `Вы сняли $${result.amount} с бизнеса #${business.id}. Наличные: $${result.cashLeft}.`
+    `Вы сняли ${formatMoney(result.amount)} с бизнеса #${business.id}. Наличные: ${formatMoney(result.cashLeft)}.`
   );
   player.sendClientMessage(
     Color.info,
-    `На счёте бизнеса осталось $${result.balanceLeft}.`
+    `На счёте бизнеса осталось ${formatMoney(result.balanceLeft)}.`
   );
 }
 

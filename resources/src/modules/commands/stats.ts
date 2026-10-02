@@ -1,5 +1,6 @@
 import { Dialog, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
+import { formatMoney } from "../../shared/money";
 import { formatBirthDate } from "../auth/validation";
 import { genderLabel } from "../auth/gender";
 import { getAccount } from "../auth/session";
@@ -51,8 +52,8 @@ export function showStatsDialog(player: Player): void {
     statsRow("Скин", String(resolvePlayerSkin(account))),
     statsRow("Дата рождения", formatBirthDate(account.birthDate)),
     statsRow("Почта", account.email),
-    statsRow("Деньги", `$${account.money}`),
-    statsRow("Банк", `$${account.bank}`),
+    statsRow("Деньги", formatMoney(account.money)),
+    statsRow("Банк", formatMoney(account.bank)),
     statsRow("Донат-счёт", String(account.donate)),
     statsRow("Наркотики", `${account.drugs} шт.`),
     statsRow("Патроны", `${account.ammo} шт.`),

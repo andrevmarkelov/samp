@@ -1,6 +1,7 @@
 import { Dialog, omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { SERVER_TAG } from "../../shared/brand";
+import { formatMoney } from "../../shared/money";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { saveUserMoney } from "../auth/repository";
 import { applyWallet, getAccount, patchAccount } from "../auth/session";
@@ -59,7 +60,7 @@ export function showSellHouseDialog(player: Player): void {
       HOUSE_SELL_DIALOG_ID,
       DIALOG_STYLE_MSGBOX,
       "Продажа дома",
-      `Вы хотите продать дом (№${house.id}) государству за: $${house.price}?`,
+      `Вы хотите продать дом (№${house.id}) государству за: ${formatMoney(house.price)}?`,
       "Продать",
       "Отмена"
     );
@@ -144,6 +145,6 @@ async function confirmSellHouse(player: Player): Promise<void> {
   const sold = getHouse(house.id);
   player.sendClientMessage(
     Color.info,
-    `Вы продали дом №${house.id} государству за $${sold?.price ?? result.price}.`
+    `Вы продали дом №${house.id} государству за ${formatMoney(sold?.price ?? result.price)}.`
   );
 }

@@ -1,5 +1,6 @@
 import { Pickup, TextLabel } from "@omp-node/core";
 import { Color } from "../../shared/colors";
+import { formatMoney } from "../../shared/money";
 import { STREET_WORLD } from "../spawn/point";
 import type { BusinessRecord } from "./repository";
 import { businessHasInterior, getBusiness, listBusinesses } from "./repository";
@@ -29,7 +30,7 @@ const C_PRICE = "{FFFFFF}";
 export function businessLabelText(business: BusinessRecord): string {
   const lines = [
     `${C_NAME}${business.name} (#${business.id})`,
-    `${C_LABEL}Стоимость: ${C_PRICE}${business.price}$`,
+    `${C_LABEL}Стоимость: ${C_PRICE}${formatMoney(business.price)}`,
   ];
 
   if (business.ownerName !== null) {
@@ -41,7 +42,7 @@ export function businessLabelText(business: BusinessRecord): string {
   if (businessHasInterior(business)) {
     lines.push(
       business.entranceFee > 0
-        ? `${C_LABEL}Вход: ${C_PRICE}${business.entranceFee}$`
+        ? `${C_LABEL}Вход: ${C_PRICE}${formatMoney(business.entranceFee)}`
         : `${C_FREE}Вход бесплатный`
     );
   }

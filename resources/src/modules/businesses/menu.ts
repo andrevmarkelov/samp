@@ -1,6 +1,7 @@
 import { Dialog, omp, type Player } from "@omp-node/core";
 import { SERVER_TAG } from "../../shared/brand";
 import { Color } from "../../shared/colors";
+import { formatMoney } from "../../shared/money";
 import { WHISPER_RADIUS, arePlayersNearby } from "../../shared/nearby";
 import { isPlayerActive, playerId, playerName } from "../../shared/player";
 import { saveUserMoney } from "../auth/repository";
@@ -244,9 +245,9 @@ function showBusinessStats(player: Player, business: BusinessRecord): void {
     `${LABEL}Название:\t\t${VALUE}${business.name}`,
     `${LABEL}Номер:\t\t${VALUE}${business.id}`,
     `${LABEL}Тип:\t\t${VALUE}${businessTypeLabel(business.typeId)}`,
-    `${LABEL}Стоимость:\t\t${VALUE}$${business.price}`,
-    `${LABEL}Прибыль:\t\t${VALUE}$${business.balance}`,
-    `${LABEL}Налог/день:\t\t${VALUE}$${daily}`,
+    `${LABEL}Стоимость:\t\t${VALUE}${formatMoney(business.price)}`,
+    `${LABEL}Прибыль:\t\t${VALUE}${formatMoney(business.balance)}`,
+    `${LABEL}Налог/день:\t\t${VALUE}${formatMoney(daily)}`,
     `${LABEL}Оплачено до:\t\t${VALUE}${formatRentDate(business.taxPaidUntil)}`,
     `${LABEL}Владелец:\t\t${VALUE}${business.ownerName ?? "—"}`,
   ].join("\n");
@@ -276,7 +277,7 @@ function showSellStateConfirm(player: Player, business: BusinessRecord): void {
       [
         `Вы хотите продать бизнес «${business.name}» (#${business.id}) государству?`,
         "",
-        `Возврат: $${business.price}`,
+        `Возврат: ${formatMoney(business.price)}`,
         "Прибыль бизнеса не будет возвращена.",
       ].join("\n"),
       "Продать",
@@ -402,7 +403,7 @@ function prepareSellToPlayer(player: Player, inputText: string): void {
       [
         `Бизнес: ${business.name} (#${business.id})`,
         `Покупатель: ${playerName(buyer)}[${parsed.slot}]`,
-        `Цена: $${parsed.price}`,
+        `Цена: ${formatMoney(parsed.price)}`,
         "",
         "Отправить предложение игроку?",
       ].join("\n"),
@@ -473,11 +474,11 @@ function sendSellOfferToPlayer(player: Player): void {
 
   player.sendClientMessage(
     Color.info,
-    `Вы предложили бизнес «${business.name}» игроку ${playerName(buyer)} за $${pending.price}.`
+    `Вы предложили бизнес «${business.name}» игроку ${playerName(buyer)} за ${formatMoney(pending.price)}.`
   );
   buyer.sendClientMessage(
     Color.white,
-    `${playerName(player)} предлагает купить бизнес «${business.name}» (#${business.id}) за $${pending.price}.`
+    `${playerName(player)} предлагает купить бизнес «${business.name}» (#${business.id}) за ${formatMoney(pending.price)}.`
   );
   buyer.sendClientMessage(
     Color.white,
@@ -547,7 +548,7 @@ async function confirmSellToState(player: Player): Promise<void> {
   refreshBusinessLabel(business.id);
   player.sendClientMessage(
     Color.info,
-    `Вы продали бизнес «${business.name}» (#${business.id}) государству за $${result.price}.`
+    `Вы продали бизнес «${business.name}» (#${business.id}) государству за ${formatMoney(result.price)}.`
   );
 }
 
@@ -613,7 +614,7 @@ async function acceptBizOffer(
     buyer.sendClientMessage(Color.error, "Недостаточно наличных.");
     seller.sendClientMessage(
       Color.error,
-      `${playerName(buyer)} не смог оплатить бизнес ($${offer.price}).`
+      `${playerName(buyer)} не смог оплатить бизнес (${formatMoney(offer.price)}).`
     );
     return;
   }
@@ -679,7 +680,7 @@ async function acceptBizOffer(
     });
     buyer.sendClientMessage(
       Color.info,
-      `Вы купили бизнес «${owned.name}» (#${owned.id}) за $${offer.price}.`
+      `Вы купили бизнес «${owned.name}» (#${owned.id}) за ${formatMoney(offer.price)}.`
     );
   }
 
@@ -694,7 +695,7 @@ async function acceptBizOffer(
     });
     seller.sendClientMessage(
       Color.info,
-      `Игрок ${playerName(buyer)} купил ваш бизнес «${owned.name}» за $${offer.price}.`
+      `Игрок ${playerName(buyer)} купил ваш бизнес «${owned.name}» за ${formatMoney(offer.price)}.`
     );
   }
 

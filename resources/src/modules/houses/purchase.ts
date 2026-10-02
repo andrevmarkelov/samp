@@ -1,5 +1,6 @@
 import { omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
+import { formatMoney } from "../../shared/money";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { saveUserMoney } from "../auth/repository";
 import { applyWallet, getAccount, patchAccount } from "../auth/session";
@@ -133,7 +134,7 @@ export async function tryPurchaseHouse(player: Player, houseId: number): Promise
 
   player.sendClientMessage(
     Color.info,
-    `Поздравляем с покупкой дома №${owned.id} за $${owned.price}!`
+    `Поздравляем с покупкой дома №${owned.id} за ${formatMoney(owned.price)}!`
   );
   player.sendClientMessage(
     Color.info,
