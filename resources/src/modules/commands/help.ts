@@ -70,6 +70,7 @@ const CATEGORIES: readonly HelpCategory[] = [
       "r",
       "d",
       "gov",
+      "clear",
       "selllic",
       "givemedcard",
       "givevbilet",

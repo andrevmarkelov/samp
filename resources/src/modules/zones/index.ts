@@ -4,6 +4,7 @@ import { isAuthenticated } from "../auth/session";
 import type { GameModule } from "../types";
 import { startSafeZones } from "./safe";
 import { startCapture, refreshCaptureView } from "./capture";
+import { startMurderReports } from "./murder";
 import { showGangTurf, startGangTurf } from "./turf";
 
 /** Чёрный, альфа FF — без прозрачности. */
@@ -51,6 +52,7 @@ export const zonesModule: GameModule = {
     startSafeZones();
     await startGangTurf();
     startCapture();
+    startMurderReports();
   },
 };
 

@@ -459,24 +459,12 @@ function scoreCaptureKill(victim: Player, killer: Player): void {
     return;
   }
 
-  if (!isPlayable(victim) || !isPlayable(killer)) {
-    return;
-  }
-
-  if (playerId(victim) === playerId(killer)) {
-    return;
-  }
-
-  const turf = getTurf(current.zoneId);
-  if (!turf || !playerOnTurf(victim, turf) || !playerOnTurf(killer, turf)) {
+  if (!isCaptureCombatKill(victim, killer)) {
     return;
   }
 
   const killerOrg = playerOrgId(killer);
   const victimOrg = playerOrgId(victim);
-  if (killerOrg === victimOrg) {
-    return;
-  }
 
   if (killerOrg === current.attackerId && victimOrg === current.defenderId) {
     current.attackerKills += 1;
@@ -488,6 +476,38 @@ function scoreCaptureKill(victim: Player, killer: Player): void {
     current.defenderKills += 1;
     paintHud(current);
   }
+}
+
+/** Убийство на зоне активного капта между атакующей и защищающейся бандой. */
+export function isCaptureCombatKill(victim: Player, killer: Player): boolean {
+  const current = state;
+  if (!current || ending) {
+    return false;
+  }
+
+  if (!isPlayable(victim) || !isPlayable(killer)) {
+    return false;
+  }
+
+  if (playerId(victim) === playerId(killer)) {
+    return false;
+  }
+
+  const turf = getTurf(current.zoneId);
+  if (!turf || !playerOnTurf(victim, turf) || !playerOnTurf(killer, turf)) {
+    return false;
+  }
+
+  const killerOrg = playerOrgId(killer);
+  const victimOrg = playerOrgId(victim);
+  if (killerOrg === 0 || victimOrg === 0 || killerOrg === victimOrg) {
+    return false;
+  }
+
+  return (
+    (killerOrg === current.attackerId && victimOrg === current.defenderId) ||
+    (killerOrg === current.defenderId && victimOrg === current.attackerId)
+  );
 }
 
 export function startCapture(): void {

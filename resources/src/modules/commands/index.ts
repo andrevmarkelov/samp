@@ -23,6 +23,7 @@ import "./f";
 import "./capture";
 import "./d";
 import "./gov";
+import "./clear";
 import "./limit";
 import "./report";
 import "./ads";

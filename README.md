@@ -24,7 +24,7 @@ resources/src/
     hud/                   логотип textdraw «Los Santos RP»
     session/               лог входа / выхода
     chat/                  локальный чат
-    commands/              /help /mn /me /do /try /todo /b /s /w /stats /pass /hospital /gps /leaders /r
+    commands/              /help /mn /me /do /try /todo /b /s /w /stats /pass /hospital /gps /leaders /r /clear /ad …
     admin/                 /alogin и админ-команды
     org/                   организации (армия), ворота
     mapping/               maps/*.txt
