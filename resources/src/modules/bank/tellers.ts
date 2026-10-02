@@ -18,6 +18,18 @@ import {
   handleHouseRentDialog,
   showHouseRentMenu,
 } from "../houses/bank-rent";
+import {
+  BANK_BIZ_TAX_CONFIRM_DIALOG_ID,
+  BANK_BIZ_TAX_DAYS_DIALOG_ID,
+  BANK_BIZ_EMPTY_DIALOG_ID,
+  BANK_BIZ_TAX_INFO_DIALOG_ID,
+  BANK_BIZ_MENU_DIALOG_ID,
+  BANK_BIZ_WITHDRAW_INPUT_DIALOG_ID,
+  BANK_BIZ_WITHDRAW_CONFIRM_DIALOG_ID,
+  clearBusinessTaxPending,
+  handleBusinessTaxDialog,
+  showBusinessBankMenu,
+} from "../businesses/bank-tax";
 
 export const BANK_MENU_DIALOG_ID = 13;
 export const BANK_BALANCE_DIALOG_ID = 14;
@@ -44,6 +56,7 @@ const MENU_ITEMS = [
   "Снять со счёта",
   "Перевести на счёт",
   "Оплатить дом",
+  "Бизнес",
 ] as const;
 
 type PendingSend = {
@@ -102,6 +115,7 @@ export function startTellers(world: number): void {
       busy.delete(id);
       pendingSend.delete(id);
       clearHouseRentPending(player);
+      clearBusinessTaxPending(player);
     }
   });
 }
@@ -159,7 +173,14 @@ function handleDialog(
     dialogId !== BANK_HOUSE_RENT_INFO_DIALOG_ID &&
     dialogId !== BANK_HOUSE_RENT_DAYS_DIALOG_ID &&
     dialogId !== BANK_HOUSE_RENT_CONFIRM_DIALOG_ID &&
-    dialogId !== BANK_HOUSE_RENT_EMPTY_DIALOG_ID
+    dialogId !== BANK_HOUSE_RENT_EMPTY_DIALOG_ID &&
+    dialogId !== BANK_BIZ_TAX_INFO_DIALOG_ID &&
+    dialogId !== BANK_BIZ_TAX_DAYS_DIALOG_ID &&
+    dialogId !== BANK_BIZ_TAX_CONFIRM_DIALOG_ID &&
+    dialogId !== BANK_BIZ_EMPTY_DIALOG_ID &&
+    dialogId !== BANK_BIZ_MENU_DIALOG_ID &&
+    dialogId !== BANK_BIZ_WITHDRAW_INPUT_DIALOG_ID &&
+    dialogId !== BANK_BIZ_WITHDRAW_CONFIRM_DIALOG_ID
   ) {
     return;
   }
@@ -182,10 +203,22 @@ function handleDialog(
     return;
   }
 
+  if (handleBusinessTaxDialog(player, dialogId, ok, listItem, inputText)) {
+    if (
+      isAtTeller(player) &&
+      (dialogId === BANK_BIZ_EMPTY_DIALOG_ID ||
+        (dialogId === BANK_BIZ_MENU_DIALOG_ID && !ok))
+    ) {
+      showMenu(player);
+    }
+    return;
+  }
+
   if (dialogId === BANK_MENU_DIALOG_ID) {
     if (!ok) {
       clearPending(player);
       clearHouseRentPending(player);
+      clearBusinessTaxPending(player);
       return;
     }
 
@@ -208,6 +241,10 @@ function handleDialog(
     }
     if (item === 4) {
       showHouseRentMenu(player);
+      return;
+    }
+    if (item === 5) {
+      showBusinessBankMenu(player);
       return;
     }
 

@@ -4,6 +4,7 @@ import { formatBirthDate } from "../auth/validation";
 import { genderLabel } from "../auth/gender";
 import { getAccount } from "../auth/session";
 import { residenceLabel } from "../houses/residence";
+import { businessOwnershipLabel } from "../businesses/ownership";
 import { getMembership, resolvePlayerSkin } from "../org";
 import { expForNextLevel } from "../payday/progress";
 import { registerCommand } from "./registry";
@@ -42,6 +43,7 @@ export function showStatsDialog(player: Player): void {
   const body = [
     statsRow("Имя", account.name),
     statsRow("Проживание", residenceLabel(account.id)),
+    statsRow("Бизнес", businessOwnershipLabel(account.id)),
     statsRow("Пол", genderLabel(account.gender)),
     statsRow("Уровень", String(account.level)),
     statsRow("Опыт", `${account.exp}/${expForNextLevel(account.level)}`),

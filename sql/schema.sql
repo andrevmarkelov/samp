@@ -214,3 +214,33 @@ INSERT IGNORE INTO warehouses (org_id, ammo, meds, metal, drugs, is_locked) VALU
 (14, 0, 0, 0, 0, 1),
 (15, 0, 0, 0, 0, 1),
 (16, 0, 0, 0, 0, 1);
+
+-- Бизнесы: type_id TINYINT (маппинг в коде, не MySQL ENUM).
+-- 1=24/7 2=Ammu 3=Car elite 4=Car economy 5=Moto 6=Gas 7=Fastfood 8=Gym
+-- 9=Clothes 10=Bar 11=Club 12=Workshop 13=Street food 14=Vehicle rent 15=Casino
+-- Полный сид: sql/businesses_seed.sql
+CREATE TABLE IF NOT EXISTS businesses (
+  id SMALLINT UNSIGNED NOT NULL,
+  name VARCHAR(64) NOT NULL,
+  owner_id INT UNSIGNED NULL DEFAULT NULL,
+  type_id TINYINT UNSIGNED NOT NULL,
+  entrance_x FLOAT NOT NULL,
+  entrance_y FLOAT NOT NULL,
+  entrance_z FLOAT NOT NULL,
+  interior_id SMALLINT UNSIGNED NULL DEFAULT NULL,
+  interior_x FLOAT NULL DEFAULT NULL,
+  interior_y FLOAT NULL DEFAULT NULL,
+  interior_z FLOAT NULL DEFAULT NULL,
+  buy_pickup_x FLOAT NULL DEFAULT NULL,
+  buy_pickup_y FLOAT NULL DEFAULT NULL,
+  buy_pickup_z FLOAT NULL DEFAULT NULL,
+  price INT UNSIGNED NOT NULL,
+  entrance_fee INT UNSIGNED NOT NULL DEFAULT 0,
+  balance INT NOT NULL DEFAULT 0,
+  tax_paid_until DATE NULL DEFAULT NULL,
+  is_locked TINYINT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (id),
+  KEY idx_businesses_owner_id (owner_id),
+  KEY idx_businesses_type_id (type_id),
+  CONSTRAINT fk_businesses_owner FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

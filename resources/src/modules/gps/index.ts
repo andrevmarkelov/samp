@@ -2,6 +2,8 @@ import { Checkpoint, Dialog, omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { isAuthenticated } from "../auth/session";
+import { listBusinesses } from "../businesses/repository";
+import { BusinessType } from "../businesses/types";
 import { isLoaderOnShift } from "../loader";
 import { isMinerOnShift } from "../miner";
 import { isAutoschoolExamOnRoute } from "../autoschool/session";
@@ -19,6 +21,8 @@ const MAPICON_GLOBAL = 1;
 const ARRIVE_RADIUS = 8;
 const CHECKPOINT_RADIUS = 4;
 const TICK_MS = 200;
+/** Светло-оранжевый для пунктов «ближайший бизнес». */
+const GPS_ORANGE = "{FFAA55}";
 
 type GpsTarget = {
   key: string;
@@ -26,6 +30,12 @@ type GpsTarget = {
   x: number;
   y: number;
   z: number;
+};
+
+type NearestBizItem = {
+  key: string;
+  label: string;
+  typeId: number;
 };
 
 const TARGETS: readonly GpsTarget[] = [
@@ -158,6 +168,11 @@ const TARGETS: readonly GpsTarget[] = [
   },
 ];
 
+const NEAREST_BIZ: readonly NearestBizItem[] = [
+  { key: "nearest_247", label: "Ближайшая 24/7", typeId: BusinessType.SHOP_247 },
+  { key: "nearest_gas", label: "Ближайшая АЗС", typeId: BusinessType.GAS },
+];
+
 const activeByPlayer = new Map<number, GpsTarget>();
 
 export const gpsModule: GameModule = {
@@ -182,14 +197,23 @@ export function showGpsMenu(player: Player): void {
     return;
   }
 
-  const body = TARGETS.map((target, index) => `${index + 1}. ${target.label}`).join("\n");
+  const lines = TARGETS.map((target, index) => `${index + 1}. ${target.label}`);
+  const offset = TARGETS.length;
+  for (let i = 0; i < NEAREST_BIZ.length; i += 1) {
+    const item = NEAREST_BIZ[i];
+    if (!item) {
+      continue;
+    }
+    lines.push(`${GPS_ORANGE}${offset + i + 1}. ${item.label}`);
+  }
+
   try {
     Dialog.show(
       player,
       GPS_DIALOG_ID,
       DIALOG_STYLE_LIST,
       "GPS",
-      body,
+      lines.join("\n"),
       "Выбрать",
       "Закрыть"
     );
@@ -208,9 +232,8 @@ export function bindGpsDialogs(): void {
       return;
     }
 
-    const target = pickTarget(Number(listItem), String(inputText ?? ""));
+    const target = resolveGpsSelection(player, Number(listItem), String(inputText ?? ""));
     if (!target) {
-      showGpsMenu(player);
       return;
     }
 
@@ -218,14 +241,96 @@ export function bindGpsDialogs(): void {
   });
 }
 
-function pickTarget(listItem: number, inputText: string): GpsTarget | null {
-  const raw = inputText.trim().toLowerCase();
+function resolveGpsSelection(
+  player: Player,
+  listItem: number,
+  inputText: string
+): GpsTarget | null {
+  const raw = stripColorCodes(inputText).trim().toLowerCase();
+
+  for (const item of NEAREST_BIZ) {
+    if (raw === item.label.toLowerCase() || raw.endsWith(item.label.toLowerCase())) {
+      return nearestBusinessTarget(player, item);
+    }
+  }
+
   const byLabel = TARGETS.find((target) => target.label.toLowerCase() === raw);
   if (byLabel) {
     return byLabel;
   }
 
-  return TARGETS[listItem] ?? null;
+  if (listItem >= 0 && listItem < TARGETS.length) {
+    return TARGETS[listItem] ?? null;
+  }
+
+  const nearestIndex = listItem - TARGETS.length;
+  if (nearestIndex >= 0 && nearestIndex < NEAREST_BIZ.length) {
+    const item = NEAREST_BIZ[nearestIndex];
+    if (!item) {
+      return null;
+    }
+    return nearestBusinessTarget(player, item);
+  }
+
+  player.sendClientMessage(Color.error, "Не удалось выбрать пункт GPS.");
+  showGpsMenu(player);
+  return null;
+}
+
+function nearestBusinessTarget(player: Player, item: NearestBizItem): GpsTarget | null {
+  let pos;
+  try {
+    pos = player.getPos();
+  } catch {
+    player.sendClientMessage(Color.error, "Не удалось определить вашу позицию.");
+    return null;
+  }
+
+  let bestId: number | null = null;
+  let bestName = "";
+  let bestX = 0;
+  let bestY = 0;
+  let bestZ = 0;
+  let bestDistance = Number.POSITIVE_INFINITY;
+
+  for (const business of listBusinesses()) {
+    if (business.typeId !== item.typeId) {
+      continue;
+    }
+
+    const distance = Math.hypot(
+      pos.x - business.entranceX,
+      pos.y - business.entranceY,
+      pos.z - business.entranceZ
+    );
+    if (distance >= bestDistance) {
+      continue;
+    }
+
+    bestDistance = distance;
+    bestId = business.id;
+    bestName = business.name;
+    bestX = business.entranceX;
+    bestY = business.entranceY;
+    bestZ = business.entranceZ;
+  }
+
+  if (bestId === null) {
+    player.sendClientMessage(Color.error, `${item.label}: ничего не найдено.`);
+    return null;
+  }
+
+  return {
+    key: `biz_${bestId}`,
+    label: `${item.label}: ${bestName}`,
+    x: bestX,
+    y: bestY,
+    z: bestZ,
+  };
+}
+
+function stripColorCodes(text: string): string {
+  return text.replace(/\{[0-9A-Fa-f]{6}\}/g, "");
 }
 
 function setRoute(player: Player, target: GpsTarget): void {

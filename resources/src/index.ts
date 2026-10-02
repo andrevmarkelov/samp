@@ -26,6 +26,7 @@ import { adminModule } from "./modules/admin";
 import { orgModule } from "./modules/org";
 import { autoschoolModule } from "./modules/autoschool";
 import { housesModule } from "./modules/houses";
+import { businessesModule } from "./modules/businesses";
 import { warehouseModule } from "./modules/warehouse";
 import { ghettoModule } from "./modules/ghetto";
 import { anticheatModule } from "./modules/anticheat";
@@ -41,6 +42,7 @@ const modules: GameModule[] = [
   cityHallModule,
   bankModule,
   housesModule,
+  businessesModule,
   warehouseModule,
   ghettoModule,
   minerModule,

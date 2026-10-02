@@ -25,6 +25,7 @@ import { bindAdminMapTeleport } from "./map";
 import { bindAdminRespcar } from "./respcar";
 import { bindAdminTpcor } from "./tpcor";
 import { bindAdminTpint } from "./tpint";
+import { bindAdminTpbiz } from "./tpbiz";
 import { bindAdminVeh } from "./veh";
 import { bindAdminWarehouse } from "./warehouse";
 
@@ -47,6 +48,7 @@ export const adminModule: GameModule = {
     bindAdminAo();
     bindAdminTpcor();
     bindAdminTpint();
+    bindAdminTpbiz();
     bindAdminVeh();
     bindAdminSethp();
     bindAdminSetskin();

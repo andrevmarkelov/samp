@@ -2,21 +2,20 @@ import { omp, type Player } from "@omp-node/core";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { isAuthenticated } from "../auth/session";
 import { STREET_WORLD } from "../spawn/point";
-import type { HouseRecord } from "./repository";
-import { listHouses } from "./repository";
+import type { BusinessRecord } from "./repository";
+import { listBusinesses } from "./repository";
+import { businessMapIconType } from "./types";
 
-/** Слоты 50–99 заняты маркерами бизнесов. */
-const MAP_ICON_SLOT_MIN = 11;
-const MAP_ICON_SLOT_MAX = 49;
-const ICON_FOR_SALE = 31;
-const ICON_OWNED = 32;
+/** Слоты 11–49 заняты домами. */
+const MAP_ICON_SLOT_MIN = 50;
+const MAP_ICON_SLOT_MAX = 99;
 const MAPICON_LOCAL = 0;
 const ICON_RADIUS = 300;
 const TICK_MS = 200;
 
 type ActiveIcon = {
   slot: number;
-  owned: boolean;
+  typeId: number;
 };
 
 type PlayerIconState = {
@@ -46,8 +45,8 @@ function getState(id: number): PlayerIconState {
   return state;
 }
 
-export function bindHouseMapIcons(): void {
-  setInterval(tickHouseIcons, TICK_MS);
+export function bindBusinessMapIcons(): void {
+  setInterval(tickBusinessIcons, TICK_MS);
 
   omp.on("playerDisconnect", (player) => {
     const id = playerId(player);
@@ -60,13 +59,7 @@ export function bindHouseMapIcons(): void {
   });
 }
 
-export function refreshAllHouseMapIcons(): void {
-  omp.players.forEach((player) => {
-    refreshHouseMapIcons(player);
-  });
-}
-
-export function refreshHouseMapIcons(player: Player): void {
+export function refreshBusinessMapIcons(player: Player): void {
   const id = playerId(player);
   if (id === null || !isPlayerActive(player) || !isAuthenticated(player)) {
     return;
@@ -82,9 +75,9 @@ export function refreshHouseMapIcons(player: Player): void {
   }
 }
 
-function tickHouseIcons(): void {
-  const houses = listHouses();
-  if (houses.length === 0) {
+function tickBusinessIcons(): void {
+  const businesses = listBusinesses();
+  if (businesses.length === 0) {
     return;
   }
 
@@ -102,9 +95,9 @@ function tickHouseIcons(): void {
       const pos = player.getPos();
       const world = player.getVirtualWorld();
       const interior = player.getInterior();
-      updatePlayerIcons(player, id, pos.x, pos.y, world, interior, houses);
+      updatePlayerIcons(player, id, pos.x, pos.y, world, interior, businesses);
     } catch {
-      // Слот пустой или игрок уже вышел.
+      // Игрок уже вышел.
     }
   });
 }
@@ -116,7 +109,7 @@ function updatePlayerIcons(
   y: number,
   world: number,
   interior: number,
-  houses: readonly HouseRecord[] = listHouses()
+  businesses: readonly BusinessRecord[] = listBusinesses()
 ): void {
   const state = getState(id);
 
@@ -127,25 +120,24 @@ function updatePlayerIcons(
     return;
   }
 
-  const nearby = collectNearbyHouses(houses, x, y);
-  const nearbyIds = new Set(nearby.map((house) => house.id));
+  const nearby = collectNearbyBusinesses(businesses, x, y);
+  const nearbyIds = new Set(nearby.map((item) => item.id));
 
-  for (const [houseId, icon] of state.active) {
-    if (nearbyIds.has(houseId)) {
+  for (const [businessId, icon] of state.active) {
+    if (nearbyIds.has(businessId)) {
       continue;
     }
 
-    hideHouseIcon(player, state, houseId, icon.slot);
+    hideBusinessIcon(player, state, businessId, icon.slot);
   }
 
-  for (const house of nearby) {
-    const owned = house.ownerId !== null;
-    const current = state.active.get(house.id);
+  for (const business of nearby) {
+    const current = state.active.get(business.id);
 
     if (current) {
-      if (current.owned !== owned) {
-        showHouseIcon(player, house, current.slot, owned);
-        state.active.set(house.id, { slot: current.slot, owned });
+      if (current.typeId !== business.typeId) {
+        showBusinessIcon(player, business, current.slot);
+        state.active.set(business.id, { slot: current.slot, typeId: business.typeId });
       }
       continue;
     }
@@ -155,30 +147,30 @@ function updatePlayerIcons(
       break;
     }
 
-    showHouseIcon(player, house, slot, owned);
-    state.active.set(house.id, { slot, owned });
+    showBusinessIcon(player, business, slot);
+    state.active.set(business.id, { slot, typeId: business.typeId });
   }
 }
 
-function collectNearbyHouses(
-  houses: readonly HouseRecord[],
+function collectNearbyBusinesses(
+  businesses: readonly BusinessRecord[],
   x: number,
   y: number
-): HouseRecord[] {
-  const nearby: Array<{ house: HouseRecord; distance: number }> = [];
+): BusinessRecord[] {
+  const nearby: Array<{ business: BusinessRecord; distance: number }> = [];
 
-  for (const house of houses) {
-    const distance = Math.hypot(x - house.entranceX, y - house.entranceY);
+  for (const business of businesses) {
+    const distance = Math.hypot(x - business.entranceX, y - business.entranceY);
     if (distance > ICON_RADIUS) {
       continue;
     }
 
-    nearby.push({ house, distance });
+    nearby.push({ business, distance });
   }
 
   nearby.sort((left, right) => left.distance - right.distance);
   const maxIcons = MAP_ICON_SLOT_MAX - MAP_ICON_SLOT_MIN + 1;
-  return nearby.slice(0, maxIcons).map((item) => item.house);
+  return nearby.slice(0, maxIcons).map((item) => item.business);
 }
 
 function takeSlot(state: PlayerIconState): number | null {
@@ -189,19 +181,14 @@ function releaseSlot(state: PlayerIconState, slot: number): void {
   state.freeSlots.push(slot);
 }
 
-function showHouseIcon(
-  player: Player,
-  house: HouseRecord,
-  slot: number,
-  owned: boolean
-): void {
+function showBusinessIcon(player: Player, business: BusinessRecord, slot: number): void {
   try {
     player.setMapIcon(
       slot,
-      house.entranceX,
-      house.entranceY,
-      house.entranceZ,
-      owned ? ICON_OWNED : ICON_FOR_SALE,
+      business.entranceX,
+      business.entranceY,
+      business.entranceZ,
+      businessMapIconType(business.typeId),
       0,
       MAPICON_LOCAL
     );
@@ -210,10 +197,10 @@ function showHouseIcon(
   }
 }
 
-function hideHouseIcon(
+function hideBusinessIcon(
   player: Player,
   state: PlayerIconState,
-  houseId: number,
+  businessId: number,
   slot: number
 ): void {
   try {
@@ -222,7 +209,7 @@ function hideHouseIcon(
     // Иконки не было.
   }
 
-  state.active.delete(houseId);
+  state.active.delete(businessId);
   releaseSlot(state, slot);
 }
 
@@ -232,7 +219,7 @@ function clearPlayerIcons(player: Player, id: number): void {
     return;
   }
 
-  for (const [houseId, icon] of state.active) {
-    hideHouseIcon(player, state, houseId, icon.slot);
+  for (const [businessId, icon] of state.active) {
+    hideBusinessIcon(player, state, businessId, icon.slot);
   }
 }
