@@ -2,6 +2,8 @@ import type { OrganizationDef, OrgRankDef } from "./types";
 import { MAX_ORG_RANK } from "./types";
 
 export const ORG_MERIYA_ID = 3;
+/** Ранг «Адвокат» в мэрии (для `/advokats`). */
+export const MERIYA_ADVOKAT_RANK = 5;
 
 const MERIYA_COLOR = 0xffff00ff;
 /** Кастомный интерьер мэрии (`maps/cityhall.txt`): interior 0, VW = org id. */
@@ -49,4 +51,8 @@ export const MERIYA: OrganizationDef = {
 
 if (MERIYA.ranks.length !== MAX_ORG_RANK) {
   throw new Error("Мэрия: нужно 10 рангов");
+}
+
+if (MERIYA.ranks[MERIYA_ADVOKAT_RANK - 1]?.title !== "Адвокат") {
+  throw new Error("Мэрия: MERIYA_ADVOKAT_RANK должен указывать на ранг «Адвокат»");
 }

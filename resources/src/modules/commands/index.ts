@@ -18,6 +18,7 @@ import "./selllic";
 import "./hospital";
 import "./gps";
 import "./leaders";
+import "./advokats";
 import "./members";
 import "./r";
 import "./f";

@@ -237,6 +237,7 @@ rent_paid_until = база + N дней
 | `/findidbiz [id]` | Метка/чекпоинт на бизнес по ID (повтор с тем же id снимает; сбрасывает GPS) |
 | `/members` | Онлайн-состав своей организации (диалог **125**) |
 | `/leaders` | Лидеры online (диалог **126**) |
+| `/advokats` | Адвокаты мэрии online (ранг 5; диалог **129**); для всех игроков |
 | `/wanted` | Law: список розыскных → Найти / Снять розыск (диалоги **127** / **128**) |
 | `/pursuit` | Law: прекратить слежку |
 | `/clear [id]` | Law: снять розыск |
@@ -314,6 +315,7 @@ rent_paid_until = база + N дней
 | 126 | `commands/leaders` | `/leaders` — лидеры online |
 | 127 | `commands/wanted` | `/wanted` — список розыскных |
 | 128 | `commands/wanted` | `/wanted` — Найти / Снять розыск |
+| 129 | `commands/advokats` | `/advokats` — адвокаты мэрии online |
 
 ---
 
