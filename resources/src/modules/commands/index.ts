@@ -25,6 +25,7 @@ import "./capture";
 import "./d";
 import "./gov";
 import "./clear";
+import "./wanted";
 import "./limit";
 import "./report";
 import "./ads";
@@ -39,6 +40,7 @@ import { bindOrgStaff } from "./org-staff";
 import { bindSellLic } from "./selllic";
 import { bindTimeLabels } from "./time";
 import { bindPayLabels } from "./pay";
+import { bindWantedDialogs } from "./wanted";
 import { bindAds } from "./ads";
 import { bindMedcardOffers } from "./medcard";
 import { bindHelpDialogs } from "./help";
@@ -55,6 +57,7 @@ export const commandsModule: GameModule = {
     bindSellLic();
     bindTimeLabels();
     bindPayLabels();
+    bindWantedDialogs();
     bindAds();
     bindMedcardOffers();
   },
