@@ -1,5 +1,6 @@
 import { TextDraw, omp, type Player, type Vehicle } from "@omp-node/core";
 import { isPlayerActive, playerId } from "../../shared/player";
+import { getVehicleFuel, vehicleUsesFuel } from "../vehicles/fuel";
 import { isEngineOn, isLightsOn } from "../vehicles/spawn";
 import { getVehicleLimit } from "../vehicles/limit";
 import { isPersonalVehicleLocked } from "../vehicles/personal";
@@ -7,9 +8,7 @@ import { isPersonalVehicleLocked } from "../vehicles/personal";
 const PLAYER_STATE_DRIVER = 2;
 const UPDATE_MS = 500;
 const SPEED_FACTOR = 120.666667;
-
-/** Статика: топливо и буквы кроме M. Живые: скорость, HP кузова, мотор. */
-const STATIC_FUEL = "Fuel 100";
+const LOW_FUEL = 15;
 
 type SpeedoDraws = {
   speed: TextDraw;
@@ -56,7 +55,7 @@ function createPlayerDraws(): SpeedoDraws | null {
     return draw;
   });
   const fuel = tryDraw(() => {
-    const draw = new TextDraw(502.6, 401.5, STATIC_FUEL);
+    const draw = new TextDraw(502.6, 401.5, "Fuel 100");
     draw.setColor(0x00e1ffc8);
     styleLine(draw);
     return draw;
@@ -68,7 +67,11 @@ function createPlayerDraws(): SpeedoDraws | null {
     return draw;
   });
   const status = tryDraw(() => {
-    const draw = new TextDraw(425.0, 416.5, statusLine(false, false, null, null));
+    const draw = new TextDraw(
+      425.0,
+      416.5,
+      statusLine(false, false, null, null, false)
+    );
     styleLine(draw);
     return draw;
   });
@@ -141,7 +144,8 @@ function statusLine(
   engineOn: boolean,
   lightsOn: boolean,
   limitKmh: number | null,
-  locked: boolean | null
+  locked: boolean | null,
+  lowFuel: boolean
 ): string {
   // Зелёный Open — открыта; красный Open — закрыта. Для чужого ТС — белый.
   const open =
@@ -149,7 +153,8 @@ function statusLine(
   const motor = engineOn ? "~g~M" : "~w~M";
   const lights = lightsOn ? "~g~L" : "~w~L";
   const limiter = limitKmh ? `~r~${limitKmh}` : "~w~max";
-  return `${open}    ${limiter}   ~w~E ~w~S   ${motor} ${lights} ~w~B`;
+  const fuelLetter = lowFuel ? "~r~E" : "~w~E";
+  return `${open}    ${limiter}   ${fuelLetter} ~w~S   ${motor} ${lights} ~w~B`;
 }
 
 function driverVehicle(player: Player): Vehicle | null {
@@ -211,14 +216,29 @@ function updateSpeed(player: Player, id: number): void {
   }
 
   try {
+    let model = 0;
+    try {
+      model = vehicle.getModel();
+    } catch {
+      model = 0;
+    }
+
+    const fuel = vehicleUsesFuel(model)
+      ? Math.round(getVehicleFuel(vehicle))
+      : 100;
+    const lowFuel = vehicleUsesFuel(model) && fuel <= LOW_FUEL;
+
     hud.speed.setString(`${vehicleSpeedKmh(vehicle)} km/h`);
+    hud.fuel.setString(`Fuel ${fuel}`);
+    hud.fuel.setColor(lowFuel ? 0xff6347aa : 0x00e1ffc8);
     hud.health.setString(`${vehicleHealth(vehicle)}`);
     hud.status.setString(
       statusLine(
         isEngineOn(vehicle),
         isLightsOn(vehicle),
         getVehicleLimit(vehicle),
-        isPersonalVehicleLocked(vehicle)
+        isPersonalVehicleLocked(vehicle),
+        lowFuel
       )
     );
   } catch {

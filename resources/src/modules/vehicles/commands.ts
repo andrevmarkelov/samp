@@ -5,6 +5,7 @@ import { isPlayerActive, playerId } from "../../shared/player";
 import { getAccount, isAuthenticated } from "../auth/session";
 import { registerCommand } from "../commands/registry";
 import { findOwnedHouse } from "../houses/repository";
+import { getVehicleFuel } from "./fuel";
 import { findOwnedPlayerVehicle } from "./player-vehicles";
 import {
   findRuntimeIdByDbId,
@@ -132,6 +133,7 @@ async function handleCarMenuChoice(player: Player, listItem: number): Promise<vo
 
   if (listItem === 0) {
     let health = vehicle.health;
+    let fuel = vehicle.fuel;
     let locked = vehicle.isLocked;
     const runtimeId = findRuntimeIdByDbId(vehicle.id);
     if (runtimeId !== undefined) {
@@ -143,6 +145,7 @@ async function handleCarMenuChoice(player: Player, listItem: number): Promise<vo
         const live = omp.vehicles.at(runtimeId);
         if (live) {
           health = live.getHealth();
+          fuel = getVehicleFuel(live);
         }
       } catch {
         // Машины уже нет в мире.
@@ -151,7 +154,7 @@ async function handleCarMenuChoice(player: Player, listItem: number): Promise<vo
     showCarInfo(
       player,
       vehicle.id,
-      vehicle.fuel,
+      fuel,
       health,
       locked,
       vehicle.purchasePrice

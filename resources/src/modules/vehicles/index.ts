@@ -22,6 +22,7 @@ import { bindPersonalVehicleCommands } from "./commands";
 import { spawnRentalVehicles } from "./rental";
 import { startSpeedLimiter } from "./limit";
 import { bindLightBarRespawn } from "./light-bar";
+import { startFuelSystem } from "./fuel";
 import { createServerVehicle, startEngineControl } from "./spawn";
 
 export {
@@ -38,6 +39,7 @@ export {
   getPlayerVehicle,
   listPlayerVehicles,
   purchasePlayerVehicle,
+  updatePlayerVehicleFuel,
   updatePlayerVehicleHealth,
   updatePlayerVehicleLock,
   addPlayerVehicleTrunk,
@@ -102,6 +104,7 @@ export const vehiclesModule: GameModule = {
     }
 
     startEngineControl();
+    startFuelSystem();
     bindLightBarRespawn();
     startSpeedLimiter();
     bindOrgVehicleAccess();

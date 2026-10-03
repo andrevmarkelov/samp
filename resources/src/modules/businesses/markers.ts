@@ -47,6 +47,10 @@ export function businessLabelText(business: BusinessRecord): string {
     );
   }
 
+  if (isGasStationType(business.typeId)) {
+    lines.push(`${C_FREE}Сигнал (H) — заправка`);
+  }
+
   return lines.join("\n");
 }
 

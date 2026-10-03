@@ -88,6 +88,26 @@ export function createServerVehicle(def: ServerVehicleDef): Vehicle | null {
   return vehicle;
 }
 
+/** Публичная установка двигателя (и опционально фар). */
+export function setVehicleEngine(
+  vehicle: Vehicle,
+  on: boolean,
+  lights?: boolean
+): void {
+  setEngine(vehicle, on, lights);
+}
+
+type EngineStartBlocker = (player: Player, vehicle: Vehicle) => string | null;
+
+let engineStartBlocker: EngineStartBlocker | null = null;
+
+/** Блокировка запуска (например пустой бак). */
+export function setEngineStartBlocker(
+  blocker: EngineStartBlocker | null
+): void {
+  engineStartBlocker = blocker;
+}
+
 function setEngine(vehicle: Vehicle, on: boolean, lights?: boolean): void {
   try {
     const params = vehicle.getParamsEx();
@@ -145,6 +165,18 @@ function toggleEngine(player: Player): void {
   }
 
   const running = isEngineOn(vehicle);
+  if (!running) {
+    const deny = engineStartBlocker?.(player, vehicle);
+    if (deny) {
+      try {
+        player.sendClientMessage(Color.error, deny);
+      } catch {
+        // Уже вышел.
+      }
+      return;
+    }
+  }
+
   setEngine(vehicle, !running, !running);
   try {
     player.sendClientMessage(

@@ -12,10 +12,12 @@ import type { RowDataPacket } from "mysql2/promise";
 import { STREET_WORLD } from "../spawn/point";
 import {
   findOwnedPlayerVehicle,
+  updatePlayerVehicleFuel,
   updatePlayerVehicleHealth,
   updatePlayerVehicleLock,
   type PlayerVehicleRecord,
 } from "./player-vehicles";
+import { clearVehicleFuel, getVehicleFuel, setVehicleFuel } from "./fuel";
 import { createServerVehicle } from "./spawn";
 
 const PERSONAL_RESPAWN_SEC = 999_999;
@@ -209,6 +211,7 @@ export function spawnPersonalVehicle(
     trunkAmmo: record.trunkAmmo,
     trunkDrugs: record.trunkDrugs,
   });
+  setVehicleFuel(vehicle, record.fuel);
   refreshPersonalDoorLocks(runtimeId);
   return vehicle;
 }
@@ -224,6 +227,7 @@ export function destroyPersonalVehicleByDbId(dbId: number, saveState: boolean): 
   if (saveState && vehicle) {
     try {
       void updatePlayerVehicleHealth(dbId, vehicle.getHealth());
+      void updatePlayerVehicleFuel(dbId, getVehicleFuel(vehicle));
     } catch {
       // Уже уничтожена.
     }
@@ -231,6 +235,7 @@ export function destroyPersonalVehicleByDbId(dbId: number, saveState: boolean): 
 
   runtimeByDbId.delete(dbId);
   personalByRuntime.delete(runtimeId);
+  clearVehicleFuel(runtimeId);
 
   if (!vehicle) {
     return;
@@ -395,8 +400,12 @@ export async function parkPersonalVehicleAtHouse(
     const existing = omp.vehicles.at(runtimeId);
     if (existing) {
       try {
-        await updatePlayerVehicleHealth(record.id, existing.getHealth());
-        record.health = existing.getHealth();
+        const hp = existing.getHealth();
+        const fuel = getVehicleFuel(existing);
+        await updatePlayerVehicleHealth(record.id, hp);
+        await updatePlayerVehicleFuel(record.id, fuel);
+        record.health = hp;
+        record.fuel = Math.round(fuel);
       } catch {
         // Игнор.
       }
@@ -443,6 +452,7 @@ async function saveDriverVehicleState(player: Player): Promise<void> {
     }
     try {
       await updatePlayerVehicleHealth(personal.dbId, vehicle.getHealth());
+      await updatePlayerVehicleFuel(personal.dbId, getVehicleFuel(vehicle));
     } catch {
       // Игнор.
     }

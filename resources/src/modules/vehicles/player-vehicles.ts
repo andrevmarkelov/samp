@@ -178,6 +178,18 @@ export async function updatePlayerVehicleHealth(
   return result.affectedRows === 1;
 }
 
+export async function updatePlayerVehicleFuel(
+  vehicleId: number,
+  fuel: number
+): Promise<boolean> {
+  const value = Math.max(0, Math.min(DEFAULT_VEHICLE_FUEL, Math.round(fuel)));
+  const [result] = await getPool().query<ResultSetHeader>(
+    "UPDATE player_vehicles SET fuel = ? WHERE id = ?",
+    [value, vehicleId]
+  );
+  return result.affectedRows === 1;
+}
+
 export type TrunkItem = "ammo" | "metal" | "drugs";
 
 function trunkColumn(item: TrunkItem): string {
