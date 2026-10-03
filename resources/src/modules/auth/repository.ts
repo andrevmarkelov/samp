@@ -12,6 +12,7 @@ import {
   normalizeWantedLevel,
   type Account,
 } from "./session";
+import { parseFamilyId, parseFamilyRank } from "../family/types";
 import { parseOrgId, parseOrgRank } from "../org/membership";
 import { EMPTY_LICENSES, licenseFlag, type Licenses } from "./licenses";
 
@@ -46,6 +47,8 @@ type UserRow = RowDataPacket & {
   admin_level: number;
   org_id: number;
   org_rank: number;
+  family_id: number;
+  family_rank: number;
   muted_until: number | null;
   jail_seconds: number;
   license_car: number | boolean;
@@ -81,6 +84,8 @@ CREATE TABLE IF NOT EXISTS users (
   admin_password_hash VARCHAR(255) NULL DEFAULT NULL,
   org_id SMALLINT UNSIGNED NOT NULL DEFAULT 0,
   org_rank TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  family_id INT UNSIGNED NOT NULL DEFAULT 0,
+  family_rank TINYINT UNSIGNED NOT NULL DEFAULT 0,
   muted_until INT UNSIGNED NULL DEFAULT NULL,
   jail_seconds INT UNSIGNED NOT NULL DEFAULT 0,
   license_car TINYINT(1) NOT NULL DEFAULT 0,
@@ -173,8 +178,16 @@ const COLUMN_MIGRATIONS = [
     sql: "org_rank TINYINT UNSIGNED NOT NULL DEFAULT 0 AFTER org_id",
   },
   {
+    name: "family_id",
+    sql: "family_id INT UNSIGNED NOT NULL DEFAULT 0 AFTER org_rank",
+  },
+  {
+    name: "family_rank",
+    sql: "family_rank TINYINT UNSIGNED NOT NULL DEFAULT 0 AFTER family_id",
+  },
+  {
     name: "muted_until",
-    sql: "muted_until INT UNSIGNED NULL DEFAULT NULL AFTER org_rank",
+    sql: "muted_until INT UNSIGNED NULL DEFAULT NULL AFTER family_rank",
   },
   {
     name: "jail_seconds",
@@ -331,7 +344,7 @@ async function migrateBannedUntilDatetime(): Promise<void> {
 
 export async function findUserByName(name: string): Promise<UserRow | null> {
   const rows = await query<UserRow>(
-    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, bank, donate, lawfulness, health, drugs, ammo, metal, passport, hospitalized, wanted_level, military_id, medcard, hunger, phone, invited_by, birth_date, admin_level, org_id, org_rank, muted_until, jail_seconds, license_car, license_moto, license_fly, license_boat, license_gun, banned_until, ban_reason FROM users WHERE name = ? LIMIT 1",
+    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, bank, donate, lawfulness, health, drugs, ammo, metal, passport, hospitalized, wanted_level, military_id, medcard, hunger, phone, invited_by, birth_date, admin_level, org_id, org_rank, family_id, family_rank, muted_until, jail_seconds, license_car, license_moto, license_fly, license_boat, license_gun, banned_until, ban_reason FROM users WHERE name = ? LIMIT 1",
     [name]
   );
   return rows[0] ?? null;
@@ -399,6 +412,8 @@ export async function createUser(input: {
     adminLevel: 0,
     orgId: 0,
     orgRank: 0,
+    familyId: 0,
+    familyRank: 0,
     mutedUntil: null,
     jailSeconds: 0,
     licenses: { ...EMPTY_LICENSES },
@@ -690,6 +705,18 @@ export async function saveUserOrg(
   ]);
 }
 
+export async function saveUserFamily(
+  userId: number,
+  familyId: number,
+  familyRank: number
+): Promise<void> {
+  await execute("UPDATE users SET family_id = ?, family_rank = ? WHERE id = ?", [
+    familyId,
+    familyRank,
+    userId,
+  ]);
+}
+
 export async function saveUserMutedUntil(
   userId: number,
   untilUnix: number | null
@@ -764,6 +791,8 @@ export function accountFromRow(row: UserRow): Account {
     adminLevel: parseAdminLevel(row.admin_level),
     orgId: parseOrgId(row.org_id),
     orgRank: parseOrgRank(row.org_rank),
+    familyId: parseFamilyId(row.family_id),
+    familyRank: parseFamilyRank(row.family_rank),
     mutedUntil: parseMutedUntil(row.muted_until),
     jailSeconds: parseJailSeconds(row.jail_seconds),
     licenses: licensesFromRow(row),

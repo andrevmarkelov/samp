@@ -1,12 +1,14 @@
-/** VW бизнесов: 2000 + id (не пересекается с органами 1–16 и домами 1000+). */
+/** VW бизнесов: 2000–99999 (не пересекается с домами 1000–1999 и семьями 100000+). */
 export const BUSINESS_WORLD_OFFSET = 2000;
+/** Верхняя граница VW бизнесов (начало диапазона семей). */
+const BUSINESS_WORLD_END = 100_000;
 
 export function businessVirtualWorld(businessId: number): number {
   return BUSINESS_WORLD_OFFSET + businessId;
 }
 
 export function isBusinessVirtualWorld(world: number): boolean {
-  return world >= BUSINESS_WORLD_OFFSET;
+  return world >= BUSINESS_WORLD_OFFSET && world < BUSINESS_WORLD_END;
 }
 
 export function businessIdFromVirtualWorld(world: number): number | null {

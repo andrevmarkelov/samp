@@ -99,6 +99,8 @@ export type Account = {
   adminLevel: number;
   orgId: number;
   orgRank: number;
+  familyId: number;
+  familyRank: number;
   mutedUntil: number | null;
   jailSeconds: number;
   licenses: Licenses;
@@ -212,6 +214,8 @@ export function patchAccount(
       | "adminLevel"
       | "orgId"
       | "orgRank"
+      | "familyId"
+      | "familyRank"
       | "skin"
       | "mutedUntil"
       | "jailSeconds"

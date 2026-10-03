@@ -28,6 +28,7 @@ import { autoschoolModule } from "./modules/autoschool";
 import { housesModule } from "./modules/houses";
 import { businessesModule } from "./modules/businesses";
 import { warehouseModule } from "./modules/warehouse";
+import { familyModule } from "./modules/family";
 import { ghettoModule } from "./modules/ghetto";
 import { anticheatModule } from "./modules/anticheat";
 import type { GameModule } from "./modules/types";
@@ -44,6 +45,7 @@ const modules: GameModule[] = [
   housesModule,
   businessesModule,
   warehouseModule,
+  familyModule,
   ghettoModule,
   minerModule,
   loaderModule,

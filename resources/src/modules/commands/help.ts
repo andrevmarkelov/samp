@@ -86,6 +86,18 @@ const CATEGORIES: readonly HelpCategory[] = [
     label: "Лидерам",
     commands: ["invite", "uninvite", "rang"],
   },
+  {
+    key: "family",
+    label: "Семья",
+    commands: [
+      "family",
+      "fam",
+      "fmembers",
+      "finvite",
+      "funinvite",
+      "frang",
+    ],
+  },
 ];
 
 const menuState = new Map<number, string>();

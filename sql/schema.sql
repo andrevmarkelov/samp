@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS users (
   admin_password_hash VARCHAR(255) NULL DEFAULT NULL,
   org_id SMALLINT UNSIGNED NOT NULL DEFAULT 0,
   org_rank TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  family_id INT UNSIGNED NOT NULL DEFAULT 0,
+  family_rank TINYINT UNSIGNED NOT NULL DEFAULT 0,
   muted_until INT UNSIGNED NULL DEFAULT NULL,
   jail_seconds INT UNSIGNED NOT NULL DEFAULT 0,
   license_car TINYINT(1) NOT NULL DEFAULT 0,
@@ -190,6 +192,25 @@ ON DUPLICATE KEY UPDATE
   min_y = VALUES(min_y),
   max_x = VALUES(max_x),
   max_y = VALUES(max_y);
+
+-- Игровые семьи (не путать с мафиями org 14–16).
+CREATE TABLE IF NOT EXISTS families (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name VARCHAR(24) NOT NULL,
+  description VARCHAR(128) NOT NULL DEFAULT '',
+  level SMALLINT UNSIGNED NOT NULL DEFAULT 1,
+  exp INT UNSIGNED NOT NULL DEFAULT 0,
+  owner_id INT UNSIGNED NOT NULL,
+  ammo INT UNSIGNED NOT NULL DEFAULT 0,
+  metal INT UNSIGNED NOT NULL DEFAULT 0,
+  drugs INT UNSIGNED NOT NULL DEFAULT 0,
+  money INT UNSIGNED NOT NULL DEFAULT 0,
+  is_locked TINYINT(1) NOT NULL DEFAULT 1,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_families_name (name),
+  KEY idx_families_owner (owner_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Склады: org_id органа или 0 = склад шахты (не орган игрока).
 CREATE TABLE IF NOT EXISTS warehouses (
