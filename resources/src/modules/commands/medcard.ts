@@ -1,5 +1,6 @@
 import { Dialog, omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
+import { offerDocShow, registerDocShowHandler } from "../../shared/doc-show-offer";
 import { WHISPER_RADIUS, arePlayersNearby } from "../../shared/nearby";
 import { isPlayerActive, playerId, playerName } from "../../shared/player";
 import {
@@ -51,6 +52,19 @@ type MedcardOffer = {
 /** Предложения медкарты: slot цели → оффер. */
 const pendingOffers = new Map<number, MedcardOffer>();
 
+registerDocShowHandler("show_medcard", (viewer, owner) => {
+  const account = getAccount(owner);
+  if (!account?.medcard) {
+    viewer.sendClientMessage(Color.error, "У игрока нет медицинской карты.");
+    return;
+  }
+
+  showMedcard(viewer, account);
+  const verb = byGender(account.gender, "показал", "показала");
+  owner.sendClientMessage(Color.gray, `Вы ${verb} медкарту: ${playerName(viewer)}.`);
+  viewer.sendClientMessage(Color.gray, `${account.name} ${verb} вам медкарту.`);
+});
+
 registerCommand("medcard", "Медкарта: посмотреть или показать по id", (player, args) => {
   const account = getAccount(player);
   if (!account) {
@@ -91,10 +105,7 @@ registerCommand("medcard", "Медкарта: посмотреть или пок
     return;
   }
 
-  showMedcard(target, account);
-  const verb = byGender(account.gender, "показал", "показала");
-  player.sendClientMessage(Color.gray, `Вы ${verb} медкарту: ${playerName(target)}.`);
-  target.sendClientMessage(Color.gray, `${account.name} ${verb} вам медкарту.`);
+  offerDocShow(player, target, "show_medcard", account.id);
 });
 
 registerCommand(

@@ -1,4 +1,4 @@
-import { Dialog, omp, type Player } from "@omp-node/core";
+import { omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import {
   CHAT_MAX_LENGTH,
@@ -7,6 +7,11 @@ import {
   sanitizeChatText,
 } from "../../shared/nearby";
 import { isPlayerActive, playerChatName, playerId } from "../../shared/player";
+import {
+  claimYnOffer,
+  getYnOfferKind,
+  releaseYnOffer,
+} from "../../shared/yn-offer";
 import { saveUserOrg } from "../auth/repository";
 import { byGender } from "../auth/gender";
 import { getAccount, patchAccount } from "../auth/session";
@@ -22,9 +27,11 @@ import { syncOrgVehicleAccess } from "../vehicles/access";
 import { refreshCaptureView } from "../zones/capture";
 import { registerCommand } from "./registry";
 
+/** @deprecated Диалог больше не используется — приглашение через Y/N. */
 export const ORG_INVITE_DIALOG_ID = 21;
 
-const DIALOG_STYLE_MSGBOX = 0;
+const KEY_YES = 65536;
+const KEY_NO = 131072;
 const STAFF_MIN_RANK = 9;
 const MANAGE_MAX_RANK = 9;
 const INVITE_TTL_MS = 60_000;
@@ -36,6 +43,7 @@ type PendingInvite = {
   targetAccountId: number;
   orgId: number;
   orgRank: number;
+  expiresAt: number;
   timer: ReturnType<typeof setTimeout>;
 };
 
@@ -61,6 +69,7 @@ function clearInvite(player: Player): void {
   if (pending) {
     clearTimeout(pending.timer);
     pendingInvite.delete(id);
+    releaseYnOffer(id, "invite");
   }
 }
 
@@ -70,7 +79,10 @@ function expireInvite(slot: number, accountId: number): void {
     return;
   }
 
+  clearTimeout(pending.timer);
   pendingInvite.delete(slot);
+  releaseYnOffer(slot, "invite");
+
   const target = findTarget(slot);
   if (target && getAccount(target)?.id === accountId) {
     tell(target, Color.error, "Приглашение истекло.");
@@ -242,37 +254,14 @@ registerCommand("invite", "Пригласить в организацию", (pla
     return;
   }
 
-  if (pendingInvite.has(targetId)) {
-    const previous = pendingInvite.get(targetId);
-    const oldInviter = previous ? findTarget(previous.inviterSlot) : null;
-    clearInvite(target);
-    if (oldInviter && previous && getAccount(oldInviter)?.id === previous.inviterAccountId) {
-      tell(oldInviter, Color.info, `Приглашение ${playerChatName(target)} отменено.`);
-    }
+  if (!claimYnOffer(targetId, "invite")) {
+    tell(player, Color.error, "У игрока уже есть активное предложение.");
+    return;
   }
 
   const rank = getOrgRank(staff.membership.org, MIN_ORG_RANK);
   if (!rank) {
-    tell(player, Color.error, "Не удалось отправить приглашение.");
-    return;
-  }
-
-  const body =
-    `Вас приглашают в организацию ${staff.membership.org.name}.\n` +
-    `Должность: ${rank.title}.\n\n` +
-    `Принять приглашение?`;
-
-  try {
-    Dialog.show(
-      target,
-      ORG_INVITE_DIALOG_ID,
-      DIALOG_STYLE_MSGBOX,
-      "Приглашение",
-      body,
-      "Принять",
-      "Отклонить"
-    );
-  } catch {
+    releaseYnOffer(targetId, "invite");
     tell(player, Color.error, "Не удалось отправить приглашение.");
     return;
   }
@@ -283,12 +272,23 @@ registerCommand("invite", "Пригласить в организацию", (pla
     targetAccountId: targetAccount.id,
     orgId: staff.membership.org.id,
     orgRank: rank.id,
+    expiresAt: Date.now() + INVITE_TTL_MS,
     timer: setTimeout(() => {
       expireInvite(targetId, targetAccount.id);
     }, INVITE_TTL_MS),
   });
 
   tell(player, Color.info, `Вы отправили приглашение: ${playerChatName(target)}.`);
+  tell(
+    target,
+    Color.white,
+    `${playerChatName(player)} приглашает вас в организацию ${staff.membership.org.name} (${rank.title}).`
+  );
+  tell(
+    target,
+    Color.white,
+    "Нажмите {00CC00}Y {FFFFFF}чтобы принять или {FF6600}N {FFFFFF}для отказа"
+  );
 });
 
 registerCommand("uninvite", "Уволить из организации", (player, args) => {
@@ -471,26 +471,34 @@ registerCommand("rang", "Изменить ранг в организации", (
 });
 
 export function bindOrgStaff(): void {
-  omp.on("dialogResponse", (player, dialogId, response) => {
-    if (Number(dialogId) !== ORG_INVITE_DIALOG_ID) {
+  omp.on("playerKeyStateChange", (player, newKeys, oldKeys) => {
+    const pressed = Number(newKeys) & ~Number(oldKeys);
+    if ((pressed & KEY_YES) === 0 && (pressed & KEY_NO) === 0) {
       return;
     }
 
     const targetId = playerId(player);
-    const pending = targetId === null ? undefined : pendingInvite.get(targetId);
-    if (pending) {
-      clearTimeout(pending.timer);
-    }
-    if (targetId !== null) {
-      pendingInvite.delete(targetId);
-    }
-
-    if (!pending) {
-      tell(player, Color.error, "Приглашение уже неактуально.");
+    if (targetId === null || getYnOfferKind(targetId) !== "invite") {
       return;
     }
 
+    const pending = pendingInvite.get(targetId);
+    if (!pending) {
+      releaseYnOffer(targetId, "invite");
+      return;
+    }
+
+    if (Date.now() > pending.expiresAt) {
+      expireInvite(targetId, pending.targetAccountId);
+      return;
+    }
+
+    // Снимаем pending сразу (анти-даблклик), yn-слот держим до конца обработки.
+    clearTimeout(pending.timer);
+    pendingInvite.delete(targetId);
+
     if (!getAccount(player) || getAccount(player)?.id !== pending.targetAccountId) {
+      releaseYnOffer(targetId, "invite");
       return;
     }
 
@@ -500,7 +508,7 @@ export function bindOrgStaff(): void {
     const org = getOrganization(pending.orgId);
     const rank = org ? getOrgRank(org, pending.orgRank) : null;
     const targetTag = playerChatName(player);
-    const accepted = Number(response) !== 0;
+    const accepted = (pressed & KEY_YES) !== 0;
     const verb = byGender(
       getAccount(player)?.gender ?? null,
       accepted ? "принял" : "отклонил",
@@ -508,6 +516,7 @@ export function bindOrgStaff(): void {
     );
 
     if (!accepted) {
+      releaseYnOffer(targetId, "invite");
       tell(player, Color.info, "Вы отклонили приглашение.");
       if (inviterOk && inviter) {
         tell(inviter, Color.info, `${targetTag} ${verb} приглашение.`);
@@ -517,11 +526,13 @@ export function bindOrgStaff(): void {
 
     const live = getAccount(player);
     if (!live || !org || !rank) {
+      releaseYnOffer(targetId, "invite");
       tell(player, Color.error, "Приглашение уже неактуально.");
       return;
     }
 
     if (!live.passport) {
+      releaseYnOffer(targetId, "invite");
       tell(player, Color.error, "У вас нет паспорта.");
       if (inviterOk && inviter) {
         tell(inviter, Color.error, `${targetTag} не может вступить: нет паспорта.`);
@@ -530,6 +541,7 @@ export function bindOrgStaff(): void {
     }
 
     if (live.orgId !== ORG_NONE || getMembership(live)) {
+      releaseYnOffer(targetId, "invite");
       tell(player, Color.error, "Вы уже состоите в организации.");
       if (inviterOk && inviter) {
         tell(inviter, Color.error, `${targetTag} уже состоит в организации.`);
@@ -538,39 +550,69 @@ export function bindOrgStaff(): void {
     }
 
     if (!inviterOk || !inviter) {
+      releaseYnOffer(targetId, "invite");
+      tell(player, Color.error, "Приглашение уже неактуально.");
+      return;
+    }
+
+    const liveStaff = staffOf(inviter);
+    if (!liveStaff || liveStaff.membership.org.id !== pending.orgId) {
+      releaseYnOffer(targetId, "invite");
       tell(player, Color.error, "Приглашение уже неактуально.");
       return;
     }
 
     if (!arePlayersNearby(player, inviter, INVITE_RADIUS)) {
+      releaseYnOffer(targetId, "invite");
       tell(player, Color.error, "Вы слишком далеко от того, кто пригласил.");
       tell(inviter, Color.error, `${targetTag} не смог принять: слишком далеко.`);
       return;
     }
 
     void (async () => {
-      if (!arePlayersNearby(player, inviter, INVITE_RADIUS)) {
-        tell(player, Color.error, "Вы слишком далеко от того, кто пригласил.");
-        tell(inviter, Color.error, `${targetTag} не смог принять: слишком далеко.`);
-        return;
-      }
-
-      const ok = await setOrg(player, pending.orgId, pending.orgRank);
-      if (!ok) {
-        tell(player, Color.error, "Не удалось сохранить в базу.");
-        if (inviterOk && inviter) {
-          tell(inviter, Color.error, "Не удалось принять игрока.");
+      try {
+        if (!arePlayersNearby(player, inviter, INVITE_RADIUS)) {
+          tell(player, Color.error, "Вы слишком далеко от того, кто пригласил.");
+          tell(inviter, Color.error, `${targetTag} не смог принять: слишком далеко.`);
+          return;
         }
-        return;
-      }
 
-      tell(
-        player,
-        Color.info,
-        `Вы вступили в организацию ${org.name}. Должность: ${rank.title}.`
-      );
-      if (inviterOk && inviter) {
-        tell(inviter, Color.info, `${targetTag} ${verb} приглашение в ${org.name}.`);
+        const again = getAccount(player);
+        if (
+          !again ||
+          again.id !== pending.targetAccountId ||
+          again.orgId !== ORG_NONE ||
+          getMembership(again)
+        ) {
+          tell(player, Color.error, "Вы уже состоите в организации.");
+          return;
+        }
+
+        const stillStaff = staffOf(inviter);
+        if (!stillStaff || stillStaff.membership.org.id !== pending.orgId) {
+          tell(player, Color.error, "Приглашение уже неактуально.");
+          return;
+        }
+
+        const ok = await setOrg(player, pending.orgId, pending.orgRank);
+        if (!ok) {
+          tell(player, Color.error, "Не удалось сохранить в базу.");
+          if (inviterOk && inviter) {
+            tell(inviter, Color.error, "Не удалось принять игрока.");
+          }
+          return;
+        }
+
+        tell(
+          player,
+          Color.info,
+          `Вы вступили в организацию ${org.name}. Должность: ${rank.title}.`
+        );
+        if (inviterOk && inviter) {
+          tell(inviter, Color.info, `${targetTag} ${verb} приглашение в ${org.name}.`);
+        }
+      } finally {
+        releaseYnOffer(targetId, "invite");
       }
     })();
   });
@@ -580,6 +622,22 @@ export function bindOrgStaff(): void {
   });
 
   omp.on("playerDisconnect", (player) => {
+    const slot = playerId(player);
     clearInvite(player);
+    if (slot === null) {
+      return;
+    }
+
+    for (const [targetSlot, offer] of pendingInvite) {
+      if (offer.inviterSlot === slot) {
+        const target = findTarget(targetSlot);
+        clearTimeout(offer.timer);
+        pendingInvite.delete(targetSlot);
+        releaseYnOffer(targetSlot, "invite");
+        if (target) {
+          tell(target, Color.error, "Приглашение отменено.");
+        }
+      }
+    }
   });
 }

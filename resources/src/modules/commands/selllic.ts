@@ -3,6 +3,11 @@ import { Color } from "../../shared/colors";
 import { SERVER_TAG } from "../../shared/brand";
 import { arePlayersNearby } from "../../shared/nearby";
 import { isPlayerActive, playerChatName, playerId } from "../../shared/player";
+import {
+  claimYnOffer,
+  getYnOfferKind,
+  releaseYnOffer,
+} from "../../shared/yn-offer";
 import { byGender } from "../auth/gender";
 import { saveLicenseSale } from "../auth/repository";
 import {
@@ -23,11 +28,13 @@ import { registerCommand } from "./registry";
 
 export const SELL_LIC_LIST_DIALOG_ID = 29;
 export const SELL_LIC_PRICE_DIALOG_ID = 30;
+/** @deprecated Предложение покупателю теперь через Y/N. */
 export const SELL_LIC_OFFER_DIALOG_ID = 31;
 
-const DIALOG_STYLE_MSGBOX = 0;
 const DIALOG_STYLE_INPUT = 1;
 const DIALOG_STYLE_LIST = 2;
+const KEY_YES = 65536;
+const KEY_NO = 131072;
 const DESK = { x: -2031.8607, y: -116.9832, z: 1035.1719 };
 const DESK_RADIUS = 8;
 const BUYER_RADIUS = 10;
@@ -48,6 +55,7 @@ type PendingOffer = {
   buyerAccountId: number;
   license: LicenseKey;
   price: number;
+  expiresAt: number;
   timer: ReturnType<typeof setTimeout>;
 };
 
@@ -154,6 +162,7 @@ function clearBuyerOffer(player: Player, notify: boolean): void {
 
   clearTimeout(offer.timer);
   pendingOfferByBuyer.delete(id);
+  releaseYnOffer(id, "selllic");
 
   if (!notify) {
     return;
@@ -176,7 +185,9 @@ function expireOffer(buyerSlot: number, buyerAccountId: number): void {
     return;
   }
 
+  clearTimeout(offer.timer);
   pendingOfferByBuyer.delete(buyerSlot);
+  releaseYnOffer(buyerSlot, "selllic");
 
   const buyer = findPlayer(buyerSlot);
   if (buyer && getAccount(buyer)?.id === buyerAccountId) {
@@ -201,6 +212,7 @@ function cancelOffersFromSeller(sellerSlot: number, sellerAccountId?: number): v
 
     clearTimeout(offer.timer);
     pendingOfferByBuyer.delete(buyerSlot);
+    releaseYnOffer(buyerSlot, "selllic");
 
     const buyer = findPlayer(buyerSlot);
     if (buyer && getAccount(buyer)?.id === offer.buyerAccountId) {
@@ -287,7 +299,13 @@ registerCommand("selllic", "Продать лицензию ученику", (pl
 
   const targetAccount = getAccount(target);
   const sellerId = playerId(player);
-  if (!targetAccount || sellerId === null) {
+  const buyerId = playerId(target);
+  if (!targetAccount || sellerId === null || buyerId === null) {
+    return;
+  }
+
+  if (pendingOfferByBuyer.has(buyerId) || getYnOfferKind(buyerId) !== undefined) {
+    tell(player, Color.error, "У игрока уже есть активное предложение.");
     return;
   }
 
@@ -302,7 +320,6 @@ registerCommand("selllic", "Продать лицензию ученику", (pl
     cancelOffersFromSeller(sellerId, sellerAccount.id);
   }
 
-  clearBuyerOffer(target, true);
   pendingSelect.set(sellerId, {
     targetSlot: slot,
     targetAccountId: targetAccount.id,
@@ -317,14 +334,6 @@ registerCommand("selllic", "Продать лицензию ученику", (pl
 export function bindSellLic(): void {
   omp.on("dialogResponse", (player, dialogId, response, listItem, inputText) => {
     const id = Number(dialogId);
-    if (
-      id !== SELL_LIC_LIST_DIALOG_ID &&
-      id !== SELL_LIC_PRICE_DIALOG_ID &&
-      id !== SELL_LIC_OFFER_DIALOG_ID
-    ) {
-      return;
-    }
-
     if (id === SELL_LIC_LIST_DIALOG_ID) {
       onLicensePicked(player, Number(response), Number(listItem), String(inputText ?? ""));
       return;
@@ -332,10 +341,81 @@ export function bindSellLic(): void {
 
     if (id === SELL_LIC_PRICE_DIALOG_ID) {
       onPriceEntered(player, Number(response), String(inputText ?? ""));
+    }
+  });
+
+  omp.on("playerKeyStateChange", (player, newKeys, oldKeys) => {
+    const pressed = Number(newKeys) & ~Number(oldKeys);
+    if ((pressed & KEY_YES) === 0 && (pressed & KEY_NO) === 0) {
       return;
     }
 
-    onOfferAnswer(player, Number(response));
+    const buyerId = playerId(player);
+    if (buyerId === null || getYnOfferKind(buyerId) !== "selllic") {
+      return;
+    }
+
+    const offer = pendingOfferByBuyer.get(buyerId);
+    if (!offer) {
+      releaseYnOffer(buyerId, "selllic");
+      return;
+    }
+
+    if (Date.now() > offer.expiresAt) {
+      expireOffer(buyerId, offer.buyerAccountId);
+      return;
+    }
+
+    clearTimeout(offer.timer);
+    pendingOfferByBuyer.delete(buyerId);
+
+    if (!getAccount(player) || getAccount(player)?.id !== offer.buyerAccountId) {
+      releaseYnOffer(buyerId, "selllic");
+      return;
+    }
+
+    const seller = findPlayer(offer.sellerSlot);
+    const sellerOk =
+      !!seller && getAccount(seller)?.id === offer.sellerAccountId && isPlayerActive(seller);
+    const license = findLicense(offer.license);
+    const buyerTag = playerChatName(player);
+    const accepted = (pressed & KEY_YES) !== 0;
+
+    if (!accepted) {
+      releaseYnOffer(buyerId, "selllic");
+      tell(player, Color.info, "Вы отклонили предложение.");
+      if (sellerOk && seller) {
+        const verb = byGender(
+          getAccount(player)?.gender ?? null,
+          "отклонил",
+          "отклонила"
+        );
+        tell(seller, Color.info, `${buyerTag} ${verb} предложение лицензии.`);
+      }
+      return;
+    }
+
+    if (!sellerOk || !seller || !license) {
+      releaseYnOffer(buyerId, "selllic");
+      tell(player, Color.error, "Предложение уже неактуально.");
+      return;
+    }
+
+    const blocked = saleReady(seller, player);
+    if (blocked) {
+      releaseYnOffer(buyerId, "selllic");
+      tell(player, Color.error, blocked);
+      tell(seller, Color.error, blocked);
+      return;
+    }
+
+    void (async () => {
+      try {
+        await completeSale(seller, player, license, offer.price);
+      } finally {
+        releaseYnOffer(buyerId, "selllic");
+      }
+    })();
   });
 
   omp.on("playerConnect", (player) => {
@@ -478,7 +558,11 @@ function onPriceEntered(seller: Player, response: number, inputText: string): vo
   }
 
   cancelOffersFromSeller(sellerId, sellerAccount.id);
-  clearBuyerOffer(target, true);
+
+  if (!claimYnOffer(buyerId, "selllic")) {
+    tell(seller, Color.error, "У игрока уже есть активное предложение.");
+    return;
+  }
 
   const offer: PendingOffer = {
     sellerSlot: sellerId,
@@ -487,82 +571,28 @@ function onPriceEntered(seller: Player, response: number, inputText: string): vo
     buyerAccountId: live.id,
     license: license.key,
     price,
+    expiresAt: Date.now() + OFFER_TTL_MS,
     timer: setTimeout(() => {
       expireOffer(buyerId, live.id);
     }, OFFER_TTL_MS),
   };
   pendingOfferByBuyer.set(buyerId, offer);
 
-  try {
-    Dialog.show(
-      target,
-      SELL_LIC_OFFER_DIALOG_ID,
-      DIALOG_STYLE_MSGBOX,
-      "Покупка лицензии",
-      `Сотрудник ${sellerAccount.name} предлагает вам купить лицензию ${license.offer} за $${price}.`,
-      "Согласиться",
-      "Отказаться"
-    );
-  } catch {
-    clearTimeout(offer.timer);
-    pendingOfferByBuyer.delete(buyerId);
-    tell(seller, Color.error, "Не удалось отправить предложение.");
-    return;
-  }
-
   tell(
     seller,
     Color.info,
     `Вы предложили ${playerChatName(target)} лицензию ${license.label} за $${price}.`
   );
-}
-
-function onOfferAnswer(buyer: Player, response: number): void {
-  const buyerId = playerId(buyer);
-  const offer = buyerId === null ? undefined : pendingOfferByBuyer.get(buyerId);
-  if (buyerId !== null) {
-    pendingOfferByBuyer.delete(buyerId);
-  }
-
-  if (!offer) {
-    tell(buyer, Color.error, "Предложение уже неактуально.");
-    return;
-  }
-
-  clearTimeout(offer.timer);
-
-  const seller = findPlayer(offer.sellerSlot);
-  const sellerOk =
-    !!seller && getAccount(seller)?.id === offer.sellerAccountId && isPlayerActive(seller);
-  const license = findLicense(offer.license);
-  const buyerTag = playerChatName(buyer);
-
-  if (response === 0) {
-    tell(buyer, Color.info, "Вы отклонили предложение.");
-    if (sellerOk && seller) {
-      const verb = byGender(
-        getAccount(buyer)?.gender ?? null,
-        "отклонил",
-        "отклонила"
-      );
-      tell(seller, Color.info, `${buyerTag} ${verb} предложение лицензии.`);
-    }
-    return;
-  }
-
-  if (!sellerOk || !seller || !license) {
-    tell(buyer, Color.error, "Предложение уже неактуально.");
-    return;
-  }
-
-  const blocked = saleReady(seller, buyer);
-  if (blocked) {
-    tell(buyer, Color.error, blocked);
-    tell(seller, Color.error, blocked);
-    return;
-  }
-
-  void completeSale(seller, buyer, license, offer.price);
+  tell(
+    target,
+    Color.white,
+    `${sellerAccount.name} предлагает купить лицензию ${license.offer} за $${price}.`
+  );
+  tell(
+    target,
+    Color.white,
+    "Нажмите {00CC00}Y {FFFFFF}чтобы купить или {FF6600}N {FFFFFF}для отказа"
+  );
 }
 
 async function completeSale(

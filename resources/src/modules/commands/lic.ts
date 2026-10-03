@@ -1,5 +1,6 @@
 import { Dialog, omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
+import { offerDocShow, registerDocShowHandler } from "../../shared/doc-show-offer";
 import { WHISPER_RADIUS, arePlayersNearby } from "../../shared/nearby";
 import { isPlayerActive, playerId, playerName } from "../../shared/player";
 import { byGender } from "../auth/gender";
@@ -13,6 +14,19 @@ const DIALOG_STYLE_MSGBOX = 0;
 const TITLE = "{FFCC00}";
 const LABEL = "{FFFFFF}";
 const VALUE = "{33CCFF}";
+
+registerDocShowHandler("lic", (viewer, owner) => {
+  const account = getAccount(owner);
+  if (!account) {
+    viewer.sendClientMessage(Color.error, "Игрок уже не в сети.");
+    return;
+  }
+
+  showLicenses(viewer, account);
+  const verb = byGender(account.gender, "показал", "показала");
+  owner.sendClientMessage(Color.gray, `Вы ${verb} лицензии: ${playerName(viewer)}.`);
+  viewer.sendClientMessage(Color.gray, `${account.name} ${verb} вам лицензии.`);
+});
 
 registerCommand("lic", "Лицензии: посмотреть или показать по id", (player, args) => {
   const account = getAccount(player);
@@ -54,11 +68,7 @@ registerCommand("lic", "Лицензии: посмотреть или показ
     return;
   }
 
-  showLicenses(target, account);
-  const shownTo = playerName(target);
-  const verb = byGender(account.gender, "показал", "показала");
-  player.sendClientMessage(Color.gray, `Вы ${verb} лицензии: ${shownTo}.`);
-  target.sendClientMessage(Color.gray, `${account.name} ${verb} вам лицензии.`);
+  offerDocShow(player, target, "lic", account.id);
 });
 
 function licRow(label: string, value: string): string {

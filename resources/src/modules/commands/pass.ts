@@ -1,5 +1,6 @@
 import { Dialog, omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
+import { offerDocShow, registerDocShowHandler } from "../../shared/doc-show-offer";
 import { WHISPER_RADIUS, arePlayersNearby } from "../../shared/nearby";
 import { isPlayerActive, playerId, playerName } from "../../shared/player";
 import { byGender, genderLabel } from "../auth/gender";
@@ -14,6 +15,19 @@ const DIALOG_STYLE_MSGBOX = 0;
 const TITLE = "{FFCC00}";
 const LABEL = "{FFFFFF}";
 const VALUE = "{33CCFF}";
+
+registerDocShowHandler("pass", (viewer, owner) => {
+  const account = getAccount(owner);
+  if (!account?.passport) {
+    viewer.sendClientMessage(Color.error, "У игрока нет паспорта.");
+    return;
+  }
+
+  showPassport(viewer, account);
+  const verb = byGender(account.gender, "показал", "показала");
+  owner.sendClientMessage(Color.gray, `Вы ${verb} паспорт: ${playerName(viewer)}.`);
+  viewer.sendClientMessage(Color.gray, `${account.name} ${verb} вам паспорт.`);
+});
 
 registerCommand("pass", "Паспорт: посмотреть или показать по id", (player, args) => {
   const account = getAccount(player);
@@ -53,7 +67,7 @@ registerCommand("pass", "Паспорт: посмотреть или показ�
     return;
   }
 
-  if (!isAuthenticatedTarget(target)) {
+  if (!getAccount(target)) {
     player.sendClientMessage(Color.error, "Игрок не найден.");
     return;
   }
@@ -63,16 +77,8 @@ registerCommand("pass", "Паспорт: посмотреть или показ�
     return;
   }
 
-  showPassport(target, account);
-  const shownTo = playerName(target);
-  const verb = byGender(account.gender, "показал", "показала");
-  player.sendClientMessage(Color.gray, `Вы ${verb} паспорт: ${shownTo}.`);
-  target.sendClientMessage(Color.gray, `${account.name} ${verb} вам паспорт.`);
+  offerDocShow(player, target, "pass", account.id);
 });
-
-function isAuthenticatedTarget(player: Player): boolean {
-  return getAccount(player) !== null;
-}
 
 function passRow(label: string, value: string): string {
   return `${LABEL}${label}:\t\t${VALUE}${value}`;

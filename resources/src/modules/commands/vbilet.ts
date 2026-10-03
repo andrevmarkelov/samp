@@ -1,5 +1,6 @@
 import { Dialog, omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
+import { offerDocShow, registerDocShowHandler } from "../../shared/doc-show-offer";
 import { WHISPER_RADIUS, arePlayersNearby } from "../../shared/nearby";
 import { isPlayerActive, playerId, playerName } from "../../shared/player";
 import { byGender } from "../auth/gender";
@@ -15,6 +16,25 @@ const ISSUE_MIN_RANK = 8;
 const TITLE = "{FFCC00}";
 const LABEL = "{FFFFFF}";
 const VALUE = "{33CCFF}";
+
+registerDocShowHandler("vbilet", (viewer, owner) => {
+  const account = getAccount(owner);
+  if (!account?.militaryId) {
+    viewer.sendClientMessage(Color.error, "У игрока нет военного билета.");
+    return;
+  }
+
+  showMilitaryId(viewer, account);
+  const verb = byGender(account.gender, "показал", "показала");
+  owner.sendClientMessage(
+    Color.gray,
+    `Вы ${verb} военный билет: ${playerName(viewer)}.`
+  );
+  viewer.sendClientMessage(
+    Color.gray,
+    `${account.name} ${verb} вам военный билет.`
+  );
+});
 
 registerCommand("vbilet", "Военный билет: посмотреть или показать по id", (player, args) => {
   const account = getAccount(player);
@@ -56,10 +76,7 @@ registerCommand("vbilet", "Военный билет: посмотреть ил�
     return;
   }
 
-  showMilitaryId(target, account);
-  const verb = byGender(account.gender, "показал", "показала");
-  player.sendClientMessage(Color.gray, `Вы ${verb} военный билет: ${playerName(target)}.`);
-  target.sendClientMessage(Color.gray, `${account.name} ${verb} вам военный билет.`);
+  offerDocShow(player, target, "vbilet", account.id);
 });
 
 registerCommand(
