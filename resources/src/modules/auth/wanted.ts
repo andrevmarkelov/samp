@@ -16,6 +16,15 @@ const TICK_MS = 5000;
 /** Слот → когда следующий −1 к розыску (только online). */
 const nextDecayAt = new Map<number, number>();
 
+type WantedClearedHook = (accountId: number, slot: number | null) => void;
+
+let onWantedCleared: WantedClearedHook | null = null;
+
+/** Подписка слежки `/wanted`: срыв checkpoint при розыске → 0. */
+export function setWantedClearedHook(hook: WantedClearedHook | null): void {
+  onWantedCleared = hook;
+}
+
 /** Выставить розыск 0–6: кэш, звёзды SA, БД. */
 export function setPlayerWantedLevel(player: Player, level: number): void {
   const wanted = normalizeWantedLevel(level);
@@ -24,12 +33,21 @@ export function setPlayerWantedLevel(player: Player, level: number): void {
     return;
   }
 
+  const prev = account.wantedLevel;
   patchAccount(player, { wantedLevel: wanted });
   applyWantedLevel(player, wanted);
   void saveUserWantedLevel(account.id, wanted).catch(() => {
     // Кэш и клиент уже обновлены.
   });
   syncWantedDecay(player);
+
+  if (prev > 0 && wanted === 0) {
+    try {
+      onWantedCleared?.(account.id, playerId(player));
+    } catch {
+      // Хук слежки не должен ломать снятие розыска.
+    }
+  }
 }
 
 /**
@@ -92,16 +110,33 @@ function tickWantedDecay(): void {
       return;
     }
 
-    const next = account.wantedLevel - 1;
-    // Сброс слота до set — syncWantedDecay заново поставит +20 мин, если розыск ещё есть.
+    let next = account.wantedLevel;
+    let cursor = due;
+    while (next > 0 && now >= cursor) {
+      next -= 1;
+      cursor += DECAY_MS;
+    }
+
+    const dropped = account.wantedLevel - next;
+    if (dropped <= 0) {
+      nextDecayAt.set(slot, now + DECAY_MS);
+      return;
+    }
+
+    // syncWantedDecay поставит now+20м; ниже поправим остаток периода при catch-up.
     nextDecayAt.delete(slot);
     setPlayerWantedLevel(player, next);
+    if (next > 0) {
+      nextDecayAt.set(slot, cursor);
+    }
 
     try {
       if (next > 0) {
         player.sendClientMessage(
           Color.info,
-          `Уровень розыска снижен: ${next}.`
+          dropped === 1
+            ? `Уровень розыска снижен: ${next}.`
+            : `Уровень розыска снижен: ${next} (−${dropped}).`
         );
       } else {
         player.sendClientMessage(Color.info, "Розыск снят: срок давности.");

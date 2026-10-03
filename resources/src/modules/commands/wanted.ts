@@ -4,7 +4,8 @@ import { isPlayerActive, playerChatName, playerId, playerName } from "../../shar
 import { getAccount, isAuthenticated } from "../auth/session";
 import { isLawOfficer } from "../org/law";
 import { STREET_WORLD } from "../spawn/point";
-import { clearWantedByOfficer, setWantedClearedHook } from "./clear";
+import { setWantedClearedHook } from "../auth/wanted";
+import { clearWantedByOfficer } from "./clear";
 import { registerCommand } from "./registry";
 
 export const WANTED_LIST_DIALOG_ID = 127;

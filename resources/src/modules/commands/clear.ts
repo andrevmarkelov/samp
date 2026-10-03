@@ -6,15 +6,6 @@ import { setPlayerWantedLevel } from "../auth/wanted";
 import { isLawOfficer, lawOfficerLabel, notifyLawStaff } from "../org/law";
 import { registerCommand } from "./registry";
 
-type WantedClearedHook = (accountId: number, slot: number | null) => void;
-
-let onWantedCleared: WantedClearedHook | null = null;
-
-/** Подписка слежки `/wanted`: срыв checkpoint при `/clear`. */
-export function setWantedClearedHook(hook: WantedClearedHook | null): void {
-  onWantedCleared = hook;
-}
-
 /**
  * Снять розыск с цели (логика /clear).
  * @returns текст ошибки или `null` при успехе.
@@ -49,13 +40,7 @@ export function clearWantedByOfficer(officer: Player, target: Player): string | 
     return "Этот игрок не в розыске.";
   }
 
-  const slot = playerId(target);
   setPlayerWantedLevel(target, 0);
-  try {
-    onWantedCleared?.(targetAccount.id, slot);
-  } catch {
-    // Хук слежки не должен ломать снятие розыска.
-  }
 
   notifyLawStaff(
     `${lawOfficerLabel(officer)} ${playerChatName(officer)} снял розыск у игрока ${playerChatName(target)}.`
