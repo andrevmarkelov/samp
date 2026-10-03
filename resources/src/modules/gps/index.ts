@@ -252,6 +252,25 @@ type MenuState =
 const activeByPlayer = new Map<number, GpsTarget>();
 const menuState = new Map<number, MenuState>();
 
+/** Сброс метки `/findid*` при установке GPS (без циклического импорта). */
+let clearFindIdMark: ((player: Player) => void) | null = null;
+
+export function setFindIdMarkClearer(
+  clearer: ((player: Player) => void) | null
+): void {
+  clearFindIdMark = clearer;
+}
+
+/** Снять GPS-маршрут (для `/findidhouse` / `/findidbiz`). */
+export function clearGpsRouteForPlayer(player: Player): void {
+  const id = playerId(player);
+  if (id === null || !activeByPlayer.has(id)) {
+    return;
+  }
+
+  clearRoute(player, id);
+}
+
 export const gpsModule: GameModule = {
   name: "gps",
   start() {
@@ -479,6 +498,12 @@ function setRoute(player: Player, target: GpsTarget): void {
   const id = playerId(player);
   if (id === null || !isAuthenticated(player)) {
     return;
+  }
+
+  try {
+    clearFindIdMark?.(player);
+  } catch {
+    // Метка findid опциональна.
   }
 
   let pos;

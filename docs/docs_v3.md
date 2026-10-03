@@ -233,6 +233,8 @@ rent_paid_until = база + N дней
 | `/heal` | Полное HP, если куплена аптечка ($7500), только в своём доме |
 | `/sellhouse` | Продажа государству за полную `price` на наличные; нужно стоять **в 4 м** от входа своего дома на улице |
 | `/pay [id] [1–5000]` | Передать наличные рядом (`WHISPER_RADIUS`); лейблы `-N$` / `+N$` |
+| `/findidhouse [id]` | Метка/чекпоинт на дом по ID (повтор с тем же id снимает; сбрасывает GPS) |
+| `/findidbiz [id]` | Метка/чекпоинт на бизнес по ID (повтор с тем же id снимает; сбрасывает GPS) |
 | `/members` | Онлайн-состав своей организации (диалог **125**) |
 | `/leaders` | Лидеры online (диалог **126**) |
 | `/wanted` | Law: список розыскных → Найти / Снять розыск (диалоги **127** / **128**) |
@@ -579,8 +581,6 @@ minX 2153.8, minY -2292.9, maxX 2237.8, maxY -2218.9
 | `/spawn [id]` | заспавнить игрока |
 
 Точка как после логина (`spawn/resolve.ts` → `resolveAccountSpawn`): **тюрьма** → **больница** (если `hospitalized`) → **спавн органа** → **обычный спавн**. Из машины выкидывает; если игрок мёртв/в спеке — `spawn()` + `placeAt`. Серый лог админам; цели — сообщение.
-
----
 
 ## Админка: /goto и /gethere
 
@@ -1260,6 +1260,7 @@ Staff (инвайт / увольнение / ранг): **≥ 9**. Управл�
 | /mn: нумерация | `commands/mn.ts` |
 | Сейф-зона склада | `zones/safe.ts` → `SAFE_ZONES` |
 | /spawn | `admin/spawn.ts`, `spawn/resolve.ts` |
+| /findidhouse /findidbiz | `commands/find-id.ts` |
 | /goto /gethere | `admin/goto.ts` |
 | /arang | `admin/arang.ts`, `auth/repository.ts` → `saveAdminLevel` |
 | Склады (таблица / seed) | `warehouse/repository.ts`, `sql/schema.sql` |

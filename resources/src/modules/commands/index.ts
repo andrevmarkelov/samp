@@ -33,6 +33,7 @@ import "./hmenu";
 import "./heal";
 import "./sellhouse";
 import "./pay";
+import "./find-id";
 import { bindMenuDialogs } from "./mn";
 import { bindGpsDialogs } from "../gps";
 import { bindReportDialogs } from "./report";
@@ -41,6 +42,7 @@ import { bindSellLic } from "./selllic";
 import { bindTimeLabels } from "./time";
 import { bindPayLabels } from "./pay";
 import { bindWantedDialogs } from "./wanted";
+import { bindFindIdMarks } from "./find-id";
 import { bindAds } from "./ads";
 import { bindMedcardOffers } from "./medcard";
 import { bindHelpDialogs } from "./help";
@@ -58,6 +60,7 @@ export const commandsModule: GameModule = {
     bindTimeLabels();
     bindPayLabels();
     bindWantedDialogs();
+    bindFindIdMarks();
     bindAds();
     bindMedcardOffers();
   },

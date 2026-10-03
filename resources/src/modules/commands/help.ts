@@ -28,6 +28,8 @@ const CATEGORIES: readonly HelpCategory[] = [
       "stats",
       "time",
       "gps",
+      "findidhouse",
+      "findidbiz",
       "report",
       "pass",
       "lic",
@@ -52,12 +54,12 @@ const CATEGORIES: readonly HelpCategory[] = [
   {
     key: "houses",
     label: "Дома",
-    commands: ["hmenu", "heal", "sellhouse"],
+    commands: ["hmenu", "heal", "sellhouse", "findidhouse"],
   },
   {
     key: "business",
     label: "Бизнес",
-    commands: ["buybiz", "biz"],
+    commands: ["buybiz", "biz", "findidbiz"],
   },
   {
     key: "gangs",
