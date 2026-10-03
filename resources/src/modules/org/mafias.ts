@@ -6,8 +6,8 @@ export const ORG_LCN_ID = 14;
 export const ORG_YAKUZA_ID = 15;
 export const ORG_RUSSIAN_MAFIA_ID = 16;
 
-/** Madd Dogg's Mansion — общий интерьер семей, разные VW. */
-export const MAFIA_INTERIOR = 5;
+/** Кастомный HQ (`maps/mafia.txt`): один interior 0, разные VW по семье. */
+export const MAFIA_INTERIOR = 0;
 export const LCN_WORLD = 14;
 export const YAKUZA_WORLD = 15;
 export const RUSSIAN_MAFIA_WORLD = 16;
@@ -30,10 +30,10 @@ function mafiaRanks(female: number, rows: MafiaRankRow[]): OrgRankDef[] {
 
 function mafiaHqSpawn(world: number): SpawnPoint {
   return {
-    x: 1291.5886,
-    y: -833.188,
-    z: 1085.6328,
-    angle: 89.5906,
+    x: 953.95,
+    y: 1755.9508,
+    z: 3001.0859,
+    angle: 90.9059,
     interior: MAFIA_INTERIOR,
     world,
   };

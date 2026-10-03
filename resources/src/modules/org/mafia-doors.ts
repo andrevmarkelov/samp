@@ -22,18 +22,18 @@ const LABEL_HEIGHT = 0.85;
 const LABEL_DRAW_DISTANCE = 12;
 
 const INTERIOR_ENTER: SpawnPoint = {
-  x: 1299.0159,
-  y: -793.9708,
-  z: 1084.0078,
-  angle: 359.6397,
+  x: 946.1957,
+  y: 1735.2639,
+  z: 3001.0859,
+  angle: 88.7125,
   interior: MAFIA_INTERIOR,
   world: STREET_WORLD,
 };
 
 const INTERIOR_EXIT_PICKUP = {
-  x: 1298.8882,
-  y: -796.6086,
-  z: 1084.0078,
+  x: 948.4404,
+  y: 1735.236,
+  z: 3001.0859,
 };
 
 type MafiaDoor = {

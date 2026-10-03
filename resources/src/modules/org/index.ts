@@ -3,7 +3,7 @@ export { HOSPITAL, HOSPITAL_GATES, ORG_HOSPITAL_ID } from "./hospital";
 export { MERIYA, MERIYA_CUSTOM_INTERIOR, MERIYA_WORLD, ORG_MERIYA_ID } from "./meriya";
 export { ORG_POLICE_ID, POLICE } from "./police";
 export { LSPD, LSPD_GATES, LSPD_INTERIOR, ORG_LSPD_ID, LAW_ORG_IDS } from "./lspd";
-export { FBI, FBI_INTERIOR, ORG_FBI_ID } from "./fbi";
+export { FBI, FBI_INTERIOR, FBI_WORLD, ORG_FBI_ID } from "./fbi";
 export { isLawOfficer, lawOfficerLabel, notifyLawStaff } from "./law";
 export { AUTOSCHOOL, AUTOSCHOOL_INTERIOR, ORG_AUTOSCHOOL_ID } from "./autoschool";
 export {

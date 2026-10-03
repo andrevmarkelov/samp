@@ -2,10 +2,10 @@ import { Dialog, omp, Pickup, TextLabel, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { getAccount, isAuthenticated } from "../auth/session";
-import { refreshStreamForPlayer } from "../mapping/stream";
+import { assignStreamWorld, refreshStreamForPlayer } from "../mapping/stream";
 import { STREET_WORLD, placeAt, type SpawnPoint } from "../spawn/point";
 import { AMMUNATION_INTERIOR } from "./ammunation-doors";
-import { FBI_INTERIOR, ORG_FBI_ID } from "./fbi";
+import { FBI_INTERIOR, FBI_WORLD, ORG_FBI_ID } from "./fbi";
 import { getMembership } from "./membership";
 
 export const FBI_SERVICE_DIALOG_ID = 56;
@@ -34,13 +34,14 @@ type FbiDoor = {
   options?: readonly { key: DestKey; label: string }[];
 };
 
+/** Возврат в HQ с крыши / аммунации. */
 const INTERIOR_FROM_ROOF: SpawnPoint = {
-  x: 288.7406,
-  y: 169.2468,
-  z: 1007.1719,
-  angle: 359.7101,
+  x: 681.4877,
+  y: 2544.3806,
+  z: -89.4532,
+  angle: 180.5051,
   interior: FBI_INTERIOR,
-  world: STREET_WORLD,
+  world: FBI_WORLD,
 };
 
 const ROOF: SpawnPoint = {
@@ -67,17 +68,27 @@ const DEST: Partial<Record<DestKey, SpawnPoint>> = {
   ammunation: AMMUNATION_ENTER,
 };
 
+/** Объекты кастомного HQ из `maps/fbi.txt` (улица там же — не трогаем). */
+const INTERIOR_MAP = {
+  minX: 640,
+  maxX: 700,
+  minY: 2515,
+  maxY: 2575,
+  minZ: -100,
+  maxZ: -75,
+} as const;
+
 const DOORS: readonly FbiDoor[] = [
   {
     kind: "streetIn",
     pickup: { x: 607.137, y: -1458.5026, z: 14.3807, interior: 0, world: STREET_WORLD },
     dest: {
-      x: 238.6755,
-      y: 140.5196,
-      z: 1003.0234,
-      angle: 0.3367,
+      x: 654.0995,
+      y: 2538.1475,
+      z: -89.4551,
+      angle: 270.354,
       interior: FBI_INTERIOR,
-      world: STREET_WORLD,
+      world: FBI_WORLD,
     },
     label: "FBI\nСлужебный вход",
     staffOnly: true,
@@ -85,11 +96,11 @@ const DOORS: readonly FbiDoor[] = [
   {
     kind: "streetOut",
     pickup: {
-      x: 238.5941,
-      y: 138.995,
-      z: 1003.0234,
+      x: 652.1891,
+      y: 2538.1926,
+      z: -89.4551,
       interior: FBI_INTERIOR,
-      world: STREET_WORLD,
+      world: FBI_WORLD,
     },
     dest: {
       x: 610.2761,
@@ -121,11 +132,11 @@ const DOORS: readonly FbiDoor[] = [
   {
     kind: "interiorMenu",
     pickup: {
-      x: 288.7181,
-      y: 167.32,
-      z: 1007.1719,
+      x: 681.5078,
+      y: 2545.593,
+      z: -89.4532,
       interior: FBI_INTERIOR,
-      world: STREET_WORLD,
+      world: FBI_WORLD,
     },
     label: "Крыша\nАммунация",
     staffOnly: true,
@@ -159,6 +170,8 @@ const onPickup = new Map<number, string>();
 const pending = new Map<number, string>();
 
 export function bindFbiDoors(): void {
+  assignStreamWorld(FBI_WORLD, isFbiInteriorObject);
+
   for (const door of DOORS) {
     new Pickup(
       PICKUP_MODEL,
@@ -401,6 +414,17 @@ function near(
   point: { x: number; y: number; z: number }
 ): boolean {
   return Math.hypot(pos.x - point.x, pos.y - point.y, pos.z - point.z) <= PICKUP_RADIUS;
+}
+
+function isFbiInteriorObject(object: { x: number; y: number; z: number }): boolean {
+  return (
+    object.x >= INTERIOR_MAP.minX &&
+    object.x <= INTERIOR_MAP.maxX &&
+    object.y >= INTERIOR_MAP.minY &&
+    object.y <= INTERIOR_MAP.maxY &&
+    object.z >= INTERIOR_MAP.minZ &&
+    object.z <= INTERIOR_MAP.maxZ
+  );
 }
 
 function clearPlayer(player: Player): void {

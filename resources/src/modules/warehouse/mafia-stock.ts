@@ -15,9 +15,9 @@ import { notifyOrgStockStanding } from "./stock-interact";
 import { clearOrgStockVisit } from "./stock-visit";
 
 const POINT = {
-  x: 1261.6088,
-  y: -782.0201,
-  z: 1084.0078,
+  x: 939.9721,
+  y: 1716.9532,
+  z: 3001.0859,
 } as const;
 
 const LABEL_HEIGHT = 2.2;
