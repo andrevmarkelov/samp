@@ -154,7 +154,7 @@ async function handleMakeGun(player: Player, args: string): Promise<void> {
   playCraftAnim(player);
   player.sendClientMessage(
     Color.info,
-    `Сборка: ${recipe.label} (${ammoCost} патр.)…`
+    `Сборка: ${recipe.label} (${ammoCost} патр.)...`
   );
 
   await sleep(CRAFT_MS);
@@ -241,13 +241,13 @@ async function handleMakeGun(player: Player, args: string): Promise<void> {
   finishCraft(player, slot, session);
   player.sendClientMessage(
     Color.info,
-    `Вы собрали ${recipe.label} (${ammoCost} патр.). −${ammoCost} патр., −${metalCost} металла.`
+    `Вы собрали ${recipe.label} (${ammoCost} патр.). -${ammoCost} патр., -${metalCost} металла.`
   );
   sendNearby(
     player,
     CHAT_RADIUS,
     Color.action,
-    `* ${playerName(player)} достал детали и собрал оружие.`
+    `${playerName(player)} достал детали и собрал оружие.`
   );
 }
 

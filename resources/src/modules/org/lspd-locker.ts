@@ -252,7 +252,7 @@ function giveItem(player: Player, item: LockerItem): void {
       tell(
         player,
         Color.info,
-        `Вы взяли: ${item.label} (−${cost} патр., склад: ${left}).`
+        `Вы взяли: ${item.label} (-${cost} патр., склад: ${left}).`
       );
       return;
     }

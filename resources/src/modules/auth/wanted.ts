@@ -136,7 +136,7 @@ function tickWantedDecay(): void {
           Color.info,
           dropped === 1
             ? `Уровень розыска снижен: ${next}.`
-            : `Уровень розыска снижен: ${next} (−${dropped}).`
+            : `Уровень розыска снижен: ${next} (-${dropped}).`
         );
       } else {
         player.sendClientMessage(Color.info, "Розыск снят: срок давности.");

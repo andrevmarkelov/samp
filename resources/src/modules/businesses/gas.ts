@@ -166,7 +166,7 @@ async function tryRefuel(player: Player): Promise<void> {
   setControllable(player, false);
   player.sendClientMessage(
     Color.info,
-    `Заправка… ${formatMoney(price)} (${missing} л). Подождите.`
+    `Заправка... ${formatMoney(price)} (${missing} л). Подождите.`
   );
 
   await sleep(REFUEL_MS);
