@@ -29,6 +29,7 @@ import { bindAdminTpint } from "./tpint";
 import { bindAdminTpbiz } from "./tpbiz";
 import { bindAdminVeh } from "./veh";
 import { bindAdminWarehouse } from "./warehouse";
+import { bindAdminAfamily } from "./afamily";
 
 export { isAdminLoggedIn } from "./session";
 
@@ -59,6 +60,7 @@ export const adminModule: GameModule = {
     bindAdminGzcolor();
     bindAdminAsellhouse();
     bindAdminWarehouse();
+    bindAdminAfamily();
     bindAdminGivemoney();
     bindAdminSetlevel();
     bindAdminMakeadmin();

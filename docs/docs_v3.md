@@ -284,6 +284,7 @@ rent_paid_until = база + N дней
 | 56 | `fbi-doors` | Крыша / служебный выход FBI |
 | 57 | `admin/warehouse` | Админ: список складов |
 | 58 | `admin/warehouse` | Админ: состояние склада |
+| 130–136 | `admin/afamily` | Админ: `/afamily` (семьи) |
 | 59 | `miner` | Шахта: покупка металла |
 | 60 | `army-factory` | Найм в цех патронов |
 | 61 | `army-factory` | Конец смены в цехе |
@@ -703,6 +704,8 @@ minX 2153.8, minY -2292.9, maxX 2237.8, maxY -2218.9
 Ресурсы у всех колонок общие; какие поля реально используются (у шахты — `metal`) — решает игровая логика.
 
 **Админ `/warehouse`** (уровень **5+**, `/alogin`): список складов → инфо по типу (шахта — металл; больница — медпрепараты; армия/полиция/LSPD/FBI — патроны; банды/мафии — патроны, металл, наркотики + открыт/закрыт). Диалоги **57** / **58**. `admin/warehouse.ts`.
+
+**Админ `/afamily`** (уровень **5+**, `/alogin`): пагинированный список всех семей → Информация (в т.ч. склад) / Управление (название, описание, удалить). Диалоги **130–136**. `admin/afamily.ts`.
 
 ---
 
@@ -1208,8 +1211,9 @@ Staff (инвайт / увольнение / ранг): **≥ 9**. Управл�
 | 113 / 114 | создание: подтверждение / имя |
 | 115–122 | меню `/family` (инфо, manage, leave, rename, desc, transfer, delete) |
 | 123 | `/fmembers` |
+| 130–136 | админ `/afamily` (список, hub, инфо, manage, rename, redesc, delete) |
 
-Файлы: `family/index.ts`, `repository.ts`, `create-office.ts`, `home.ts`, `stock.ts`, `stock-display.ts`, `heal.ts`, `commands.ts`, `menu.ts`, `ranks.ts`, `tags.ts`, `world.ts`.
+Файлы: `family/index.ts`, `repository.ts`, `create-office.ts`, `home.ts`, `stock.ts`, `stock-display.ts`, `heal.ts`, `commands.ts`, `menu.ts`, `ranks.ts`, `tags.ts`, `world.ts`. Админ: `admin/afamily.ts`.
 
 ---
 
@@ -1321,6 +1325,7 @@ Staff (инвайт / увольнение / ранг): **≥ 9**. Управл�
 | Армия: маскировка банд (форма у Смоки) | `org/army-disguise.ts`, `ghetto/index.ts` |
 | Армия: доставка патронов (Barracks) | `vehicles/army-ammo-delivery.ts` |
 | Админ: склады | `admin/warehouse.ts` |
+| Админ: семьи `/afamily` | `admin/afamily.ts` |
 | Список в /ahelp | `admin/catalog.ts` |
 | Порядок старта | `src/index.ts` |
 | Бизнесы: схема / кэш / БД | `businesses/repository.ts`, `sql/businesses_seed.sql` |
