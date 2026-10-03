@@ -26,6 +26,7 @@ import "./capture";
 import "./d";
 import "./gov";
 import "./clear";
+import "./su";
 import "./wanted";
 import "./limit";
 import "./report";

@@ -7,10 +7,7 @@ import {
   patchAccount,
 } from "./session";
 
-/**
- * Выставить розыск 0–6: кэш, звёзды SA, БД.
- * Пока без полицейских команд — для системы и будущего функционала.
- */
+/** Выставить розыск 0–6: кэш, звёзды SA, БД. */
 export function setPlayerWantedLevel(player: Player, level: number): void {
   const wanted = normalizeWantedLevel(level);
   const account = getAccount(player);

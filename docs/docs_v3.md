@@ -240,6 +240,7 @@ rent_paid_until = база + N дней
 | `/advokats` | Адвокаты мэрии online (ранг 5; диалог **129**); для всех игроков |
 | `/wanted` | Law: список розыскных → Найти / Снять розыск (диалоги **127** / **128**) |
 | `/pursuit` | Law: прекратить слежку |
+| `/su [id] [1-6] [причина]` | Law: выдать/добавить розыск (макс. 6; не на law / тюрьму) |
 | `/clear [id]` | Law: снять розыск |
 
 ---
@@ -1078,6 +1079,16 @@ resources/src/modules/businesses/
 
 Район: `districtNameAt` по координатам жертвы (`zones/district.ts`).
 
+### `/su [id] [1-6] [причина]`
+
+Law (LSPD / областная полиция / FBI). Уровень **плюсуется** к текущему, потолок **6**. Нельзя на сотрудников law и на заключённых. Файл: `commands/su.ts`.
+
+| | |
+|---|---|
+| С себя / на law / в тюрьме (`isJailed`) | нельзя |
+| У цели уже 6 | отказ |
+| Успех | `wanted += N` (≤6); в чате law — фактический прирост; цель получает уведомление |
+
 ### `/clear [id]`
 
 Только LSPD / областная полиция / FBI. Цель — любой онлайн, без проверки дистанции. Общая логика: `clearWantedByOfficer`.
@@ -1285,6 +1296,7 @@ Staff (инвайт / увольнение / ранг): **≥ 9**. Управл�
 | Гетто: барыга Смоки | `ghetto/index.ts` |
 | Розыск (звёзды / БД) | `auth/wanted.ts`, `auth/session.ts` → `applyWantedLevel` |
 | Розыск: убийства → law-чат | `zones/murder.ts`, `org/law.ts` |
+| Розыск: /su | `commands/su.ts` |
 | Розыск: /clear | `commands/clear.ts` → `clearWantedByOfficer` |
 | Розыск: /wanted /pursuit | `commands/wanted.ts` |
 | /pay | `commands/pay.ts`, `auth/repository.ts` → `transferUserCash` |
