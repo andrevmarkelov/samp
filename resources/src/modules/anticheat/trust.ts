@@ -125,35 +125,37 @@ export function markSpectating(player: Player, spectating: boolean): void {
   }
 }
 
-/** Выдать оружие и пометить как легитимное. */
-export function grantWeapon(player: Player, weaponId: number, ammo: number): void {
+/** Выдать оружие и пометить как легитимное. `false` — выдать не удалось. */
+export function grantWeapon(player: Player, weaponId: number, ammo: number): boolean {
   try {
     player.giveWeapon(weaponId, ammo);
   } catch {
-    return;
+    return false;
   }
   trustWeapon(player, weaponId, ammo);
   // Подтянуть факт с клиента после выдачи (если getWeaponData доступен).
   try {
     const slot = weaponSlot(weaponId);
-    if (slot < 0) return;
-    const data = player.getWeaponData(slot) as {
-      weapons?: number;
-      weapon?: number;
-      ammo?: number;
-    };
-    const gotId = Number(data.weapons ?? data.weapon ?? 0);
-    const gotAmmo = Number(data.ammo ?? 0);
-    const state = stateOf(player);
-    if (!state || !state.weapons[slot]) return;
-    if (gotId === weaponId && gotAmmo >= 0) {
-      state.weapons[slot].id = gotId;
-      state.weapons[slot].ammo = gotAmmo;
-      state.weaponTrustedUntil = nowMs() + getConfig().weaponGraceMs;
+    if (slot >= 0) {
+      const data = player.getWeaponData(slot) as {
+        weapons?: number;
+        weapon?: number;
+        ammo?: number;
+      };
+      const gotId = Number(data.weapons ?? data.weapon ?? 0);
+      const gotAmmo = Number(data.ammo ?? 0);
+      const state = stateOf(player);
+      if (state?.weapons[slot] && gotId === weaponId && gotAmmo >= 0) {
+        state.weapons[slot].id = gotId;
+        state.weapons[slot].ammo = gotAmmo;
+        state.weaponTrustedUntil = nowMs() + getConfig().weaponGraceMs;
+      }
     }
   } catch {
     // ignore
   }
+
+  return true;
 }
 
 export function grantArmour(player: Player, armour: number): void {

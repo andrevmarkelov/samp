@@ -1,11 +1,16 @@
 import { Dialog, omp, Pickup, TextLabel, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { isPlayerActive, playerId } from "../../shared/player";
-import { grantArmour, grantWeapon } from "../anticheat/trust";
+import { grantArmour } from "../anticheat/trust";
 import { getAccount, isAuthenticated } from "../auth/session";
 import { getWarehouse } from "../warehouse";
 import { AMMUNATION_INTERIOR } from "./ammunation-doors";
 import { ORG_FBI_ID } from "./fbi";
+import {
+  issueLockerWeapon,
+  lockerAmmoCost,
+  lockerItemLabel,
+} from "./locker-ammo";
 import { getMembership } from "./membership";
 
 export const FBI_LOCKER_DIALOG_ID = 24;
@@ -184,13 +189,16 @@ function canUseLocker(player: Player, tellDeny = false): boolean {
 }
 
 function showLocker(player: Player): void {
+  const stock = getWarehouse(ORG_FBI_ID)?.ammo ?? 0;
   try {
     Dialog.show(
       player,
       FBI_LOCKER_DIALOG_ID,
       DIALOG_STYLE_LIST,
-      "Оружейная",
-      ITEMS.map((item, index) => `${index + 1}. ${item.label}`).join("\n"),
+      `Оружейная | Патроны: ${stock}`,
+      ITEMS.map(
+        (item, index) => `${index + 1}. ${lockerItemLabel(item.label, item)}`
+      ).join("\n"),
       "Взять",
       "Закрыть"
     );
@@ -201,7 +209,10 @@ function showLocker(player: Player): void {
 
 function pickItem(listItem: number, inputText: string): LockerItem | null {
   const raw = inputText.replace(/^\d+\.\s*/, "").trim().toLowerCase();
-  const byLabel = ITEMS.find((item) => item.label.toLowerCase() === raw);
+  const byLabel = ITEMS.find((item) => {
+    const full = lockerItemLabel(item.label, item).toLowerCase();
+    return full === raw || item.label.toLowerCase() === raw;
+  });
   if (byLabel) {
     return byLabel;
   }
@@ -223,7 +234,30 @@ function giveItem(player: Player, item: LockerItem): void {
       return;
     }
 
-    grantWeapon(player, item.id, item.ammo ?? 1);
+    const cost = lockerAmmoCost(item);
+    const error = issueLockerWeapon(
+      player,
+      ORG_FBI_ID,
+      item.id,
+      item.ammo ?? 1,
+      cost,
+      refreshFbiAmmoStockLabel
+    );
+    if (error) {
+      tell(player, Color.error, error);
+      return;
+    }
+
+    if (cost > 0) {
+      const left = getWarehouse(ORG_FBI_ID)?.ammo ?? 0;
+      tell(
+        player,
+        Color.info,
+        `Вы взяли: ${item.label} (−${cost} патр., склад: ${left}).`
+      );
+      return;
+    }
+
     tell(player, Color.info, `Вы взяли: ${item.label}.`);
   } catch {
     tell(player, Color.error, "Не удалось выдать снаряжение.");
