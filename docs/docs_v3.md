@@ -783,6 +783,8 @@ minX 2153.8, minY -2292.9, maxX 2237.8, maxY -2218.9
 
 Звёзды GTA SA через `player.setWantedLevel`. Синхрон при логине/спавне (`applyWantedLevel`). Persist: `saveUserWantedLevel`. Хелпер: `auth/wanted.ts` → `setPlayerWantedLevel` (0–6).
 
+**Автоснижение:** пока игрок **online** и `wantedLevel > 0`, раз в **20 минут** −1 (сохранение в БД). Таймер стартует при логине с розыском или при первой выдаче; `/su` не сбрасывает текущий отсчёт. Оффлайн время не тикает. Файл: `auth/wanted.ts` → `bindWantedDecay`.
+
 Выдача за убийства, `/clear`, `/wanted` — см. [Розыск за убийства, /clear, /wanted](#розыск-за-убийства-clear-wanted).
 
 ### Военный билет
@@ -1298,7 +1300,7 @@ Staff (инвайт / увольнение / ранг): **≥ 9**. Управл�
 | Склады: патроны с завода | `warehouse` → `addWarehouseAmmo` |
 | Аммунация: оружейка Армии | `org/army-locker.ts` |
 | Гетто: барыга Смоки | `ghetto/index.ts` |
-| Розыск (звёзды / БД) | `auth/wanted.ts`, `auth/session.ts` → `applyWantedLevel` |
+| Розыск (звёзды / БД / автоснижение) | `auth/wanted.ts`, `auth/session.ts` → `applyWantedLevel` |
 | Розыск: убийства → law-чат | `zones/murder.ts`, `org/law.ts` |
 | Розыск: /su | `commands/su.ts` |
 | Розыск: /clear | `commands/clear.ts` → `clearWantedByOfficer` |

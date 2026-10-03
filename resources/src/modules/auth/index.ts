@@ -9,6 +9,7 @@ import { bindSkinPicker } from "./skin-picker";
 import { ensureUsersTable } from "./repository";
 import { getAccount, isAuthenticated } from "./session";
 import { resolvePlayerSkin } from "../org";
+import { bindWantedDecay } from "./wanted";
 
 export { isAuthenticated, getAccount, getGender } from "./session";
 export type { Gender } from "./gender";
@@ -26,6 +27,8 @@ export const authModule: GameModule = {
       const message = error instanceof Error ? error.message : String(error);
       omp.log(`[${SERVER_TAG}] не удалось подготовить users: ${message}`);
     }
+
+    bindWantedDecay();
 
     omp.on("playerConnect", (player) => {
       endAuth(player);

@@ -37,6 +37,7 @@ import {
   saveUserLastIp,
 } from "./repository";
 import { clearAccount, getAccount, isAuthenticated, setAccount, applyWallet, applyScore, applyWantedLevel } from "./session";
+import { syncWantedDecay } from "./wanted";
 import { genderFromList, genderLabel, type Gender } from "./gender";
 import {
   closeSkinPicker,
@@ -497,6 +498,7 @@ async function finishLogin(player: Player, name: string, password: string): Prom
   applyWallet(player, account);
   applyScore(player, account.level);
   applyWantedLevel(player, account.wantedLevel);
+  syncWantedDecay(player);
   welcome(player, account.name);
   const ip = playerIp(player);
   if (ip) {
@@ -583,6 +585,7 @@ async function finishRegister(
   applyWallet(player, account);
   applyScore(player, account.level);
   applyWantedLevel(player, account.wantedLevel);
+  syncWantedDecay(player);
   welcome(player, account.name);
   player.sendClientMessage(Color.gray, "Персонаж создан. /help — список команд.");
   omp.log(`[${SERVER_TAG}] ${account.name} зарегистрировался`);
