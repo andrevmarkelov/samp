@@ -1,4 +1,4 @@
-import type { RowDataPacket } from "mysql2/promise";
+import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { execute, getPool, query } from "../../shared/database";
 import { isGender, type Gender } from "./gender";
 import {
@@ -532,6 +532,46 @@ export async function saveUserBankTransfer(
     await conn.query("UPDATE users SET bank = ? WHERE id = ?", [fromBank, fromUserId]);
     await conn.query("UPDATE users SET bank = ? WHERE id = ?", [toBank, toUserId]);
     await conn.commit();
+  } catch (error) {
+    await conn.rollback();
+    throw error;
+  } finally {
+    conn.release();
+  }
+}
+
+/**
+ * Атомарная передача наличных (только `money`).
+ * @returns `false`, если у отправителя в БД не хватило средств.
+ */
+export async function transferUserCash(
+  fromUserId: number,
+  toUserId: number,
+  amount: number
+): Promise<boolean> {
+  const value = Math.floor(amount);
+  if (!Number.isFinite(value) || value < 1) {
+    return false;
+  }
+
+  const conn = await getPool().getConnection();
+  try {
+    await conn.beginTransaction();
+    const [debit] = await conn.query<ResultSetHeader>(
+      "UPDATE users SET money = money - ? WHERE id = ? AND money >= ?",
+      [value, fromUserId, value]
+    );
+    if (Number(debit.affectedRows) !== 1) {
+      await conn.rollback();
+      return false;
+    }
+
+    await conn.query<ResultSetHeader>(
+      "UPDATE users SET money = money + ? WHERE id = ?",
+      [value, toUserId]
+    );
+    await conn.commit();
+    return true;
   } catch (error) {
     await conn.rollback();
     throw error;
