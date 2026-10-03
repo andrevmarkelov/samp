@@ -1,9 +1,13 @@
-import { omp } from "@omp-node/core";
+import { Dialog, omp } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { isPlayerActive, playerChatName, playerId } from "../../shared/player";
 import { getAccount } from "../auth/session";
 import { MAX_ORG_RANK, getMembership } from "../org";
 import { registerCommand } from "./registry";
+
+export const LEADERS_DIALOG_ID = 126;
+
+const DIALOG_STYLE_MSGBOX = 0;
 
 type OnlineLeader = {
   line: string;
@@ -47,13 +51,27 @@ registerCommand("leaders", "Список лидеров online", (player) => {
 
   list.sort((a, b) => a.orgName.localeCompare(b.orgName) || a.slot - b.slot);
 
-  player.sendClientMessage(Color.info, "Лидеры online:");
   if (list.length === 0) {
     player.sendClientMessage(Color.white, "Сейчас нет лидеров в игре.");
     return;
   }
 
-  for (const row of list) {
-    player.sendClientMessage(Color.white, row.line);
+  const lines = list.map((row) => row.line);
+  const body = `В сети: ${list.length}\n\n${lines.join("\n")}`;
+
+  try {
+    Dialog.show(
+      player,
+      LEADERS_DIALOG_ID,
+      DIALOG_STYLE_MSGBOX,
+      "Лидеры online",
+      body,
+      "OK",
+      ""
+    );
+  } catch {
+    for (const line of lines) {
+      player.sendClientMessage(Color.white, line);
+    }
   }
 });
