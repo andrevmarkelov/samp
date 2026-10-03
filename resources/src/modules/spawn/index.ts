@@ -255,3 +255,11 @@ function takePendingHospital(player: Player): SpawnPoint | null {
   pendingHospital.delete(id);
   return hospital;
 }
+
+/** Сброс отложенного спавна в больницу после смерти (админ `/spawn` и т.п.). */
+export function clearPendingHospitalSpawn(player: Player): void {
+  const id = playerId(player);
+  if (id !== null) {
+    pendingHospital.delete(id);
+  }
+}

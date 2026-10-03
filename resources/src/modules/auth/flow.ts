@@ -4,9 +4,9 @@ import { Color } from "../../shared/colors";
 import { SERVER_NAME, SERVER_TAG } from "../../shared/brand";
 import { isDatabaseReady } from "../../shared/database";
 import { isPlayerActive, playerId, playerIp, playerName } from "../../shared/player";
-import { DEFAULT_SPAWN, pickHospitalSpawn, placeAt, writeSpawnInfo } from "../spawn/point";
-import { applyOrgVisuals, resolveOrgSpawn, resolvePlayerSkin } from "../org";
-import { isJailedAccount, pickJailCell } from "../prison/sentence";
+import { placeAt, writeSpawnInfo } from "../spawn/point";
+import { resolveAccountSpawn } from "../spawn/resolve";
+import { applyOrgVisuals, resolvePlayerSkin } from "../org";
 import { refreshStreamForPlayer } from "../mapping/stream";
 import {
   AUTH_DIALOG_ID,
@@ -120,7 +120,7 @@ export function spawnIntoWorld(player: Player, skin: number): void {
   const id = playerId(player);
   const account = getAccount(player);
   const useSkin = account ? resolvePlayerSkin(account) : skin;
-  const spawnPoint = resolveWorldSpawn(account);
+  const spawnPoint = resolveAccountSpawn(account);
 
   try {
     writeSpawnInfo(player, useSkin, spawnPoint);
@@ -158,25 +158,13 @@ export function spawnIntoWorld(player: Player, skin: number): void {
       if (!player.isSpawned()) {
         player.spawn();
       }
-      placeAt(player, resolveWorldSpawn(getAccount(player)));
+      placeAt(player, resolveAccountSpawn(getAccount(player)));
       refreshStreamForPlayer(player);
       player.setCameraBehind();
     } catch {
       // Спавн уже произошёл при выходе из спека.
     }
   }, 80);
-}
-
-function resolveWorldSpawn(account: ReturnType<typeof getAccount>): typeof DEFAULT_SPAWN {
-  if (account && isJailedAccount(account)) {
-    return pickJailCell();
-  }
-
-  if (account?.hospitalized) {
-    return pickHospitalSpawn();
-  }
-
-  return resolveOrgSpawn(account) ?? DEFAULT_SPAWN;
 }
 
 function restoreAuthDialog(player: Player, state: Pending): void {

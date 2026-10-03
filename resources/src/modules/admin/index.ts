@@ -23,6 +23,7 @@ import { bindAdminGoto } from "./goto";
 import { bindAdminGzcolor } from "./gzcolor";
 import { bindAdminMapTeleport } from "./map";
 import { bindAdminRespcar } from "./respcar";
+import { bindAdminSpawn } from "./spawn";
 import { bindAdminTpcor } from "./tpcor";
 import { bindAdminTpint } from "./tpint";
 import { bindAdminTpbiz } from "./tpbiz";
@@ -46,6 +47,7 @@ export const adminModule: GameModule = {
     bindAdminMute();
     bindAdminGoto();
     bindAdminAo();
+    bindAdminSpawn();
     bindAdminTpcor();
     bindAdminTpint();
     bindAdminTpbiz();

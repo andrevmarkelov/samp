@@ -255,6 +255,7 @@ GPS: **Bank**. В `/stats` виден банковский баланс.
 | 1 | `/slap [id]` | подкинуть вверх (из машины выкидывает); себя и админов можно; серый лог только админам |
 | 2 | `/mute [id] [min] [prichina]` | мут чата |
 | 3 | `/veh` `/delveh` | создать / удалить админ-машину |
+| 3 | `/spawn [id]` | заспавнить себя или игрока: тюрьма / больница / орган / дефолт |
 | 3 | `/jail [id] [min] [prichina]` | посадка в тюрьму, см. выше |
 | 3 | `/unjail [id]` | выпуск из тюрьмы на спавн органа / дефолт |
 | 3 | `/tpcor [x] [y] [z]` | телепорт, VW/interior не сбрасываются; за рулём едет машина |
@@ -634,6 +635,7 @@ GPS: **LCN** `1288.81, -2056.62, 58.63`, **Yakuza** `664.94, -1315.21, 13.45`, *
 | Тюрьма (иконка / вход) | `prison/index.ts` |
 | Срок / камеры | `prison/sentence.ts` |
 | `/jail` `/unjail` | `admin/jail.ts` + `admin/catalog.ts` |
+| `/spawn` | `admin/spawn.ts` + `spawn/resolve.ts` |
 | Оружейка тюрьмы | `prison/prison-locker.ts` |
 | Пульт тюрьмы `/pult` | `prison/control.ts` |
 | Схема БД | `sql/schema.sql` + `auth/repository.ts` |
