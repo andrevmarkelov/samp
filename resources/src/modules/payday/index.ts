@@ -1,6 +1,7 @@
 import { omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { SERVER_TAG } from "../../shared/brand";
+import { formatMoney } from "../../shared/money";
 import { isPlayerActive } from "../../shared/player";
 import { saveUserProgress } from "../auth/repository";
 import { getAccount, isAuthenticated, patchAccount, applyScore, MAX_LAWFULNESS, normalizeLawfulness } from "../auth/session";
@@ -8,11 +9,14 @@ import type { GameModule } from "../types";
 import { isPlayerAfk } from "../afk";
 import { queueSave } from "../persist";
 import { orgPaydayPay } from "../org";
-import { applyPaydayExp, expForNextLevel, formatClock, hourStamp } from "./progress";
+import { applyPaydayExp, formatClock, hourStamp } from "./progress";
 
 const TICK_MS = 1000;
 const MAX_MONEY = 2_147_483_647;
 const PAYDAY_SOUND_ID = 6400;
+const TAG_TIME = "{3399FF}";
+const TAG_SALARY = "{66CC00}";
+const TAG_BALANCE = "{00CC00}";
 
 let lastHour = "";
 
@@ -67,35 +71,33 @@ function payPlayer(player: Player, clock: string): void {
     omp.log(`[${SERVER_TAG}] не удалось сохранить payday ${account.name}: ${message}`);
   });
 
-  const need = expForNextLevel(next.level);
   playPaydaySound(player);
-  tell(player, Color.info, clock);
-  tell(player, Color.white, `Очки опыта ${next.exp}/${need}`);
 
   const salary = orgPaydayPay(account);
+  let credited = 0;
   if (salary) {
     const fresh = getAccount(player) ?? account;
     const current = Math.max(0, Math.floor(fresh.bank));
-    const credited = Math.min(salary.amount, Math.max(0, MAX_MONEY - current));
+    credited = Math.min(salary.amount, Math.max(0, MAX_MONEY - current));
     if (credited > 0) {
       patchAccount(player, { bank: current + credited });
       queueSave(player);
     }
-    tell(
-      player,
-      Color.tryOk,
-      credited > 0
-        ? `Зарплата ${salary.orgName} (${salary.rankTitle}): $${credited} на банковский счёт.`
-        : `Зарплата не начислена: банковский счёт заполнен.`
-    );
   }
 
+  const bank = Math.max(0, Math.floor((getAccount(player) ?? account).bank));
+
+  tell(player, Color.white, `Текущее время: ${TAG_TIME}${clock}`);
+  tell(player, Color.white, "     БАНКОВСКИЙ ЧЕК");
+  tell(player, Color.white, "______________________");
+  if (salary) {
+    tell(player, Color.white, `Зарплата: ${TAG_SALARY}${formatMoney(credited)}`);
+  }
+  tell(player, Color.white, `Текущий баланс счёта: ${TAG_BALANCE}${formatMoney(bank)}`);
+  tell(player, Color.white, "______________________");
+
   if (next.leveled) {
-    tell(
-      player,
-      Color.tryOk,
-      `Поздравляем, ваш игровой уровень был повышен до ${next.level}.`
-    );
+    tell(player, Color.scene, "Поздравляем! Ваш уровень был повышен.");
   }
 }
 

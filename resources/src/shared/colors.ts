@@ -13,7 +13,6 @@ export const Color = {
   whisper: 0xc8c8c8ff,
   adminChat: 0x00ffffff,
   radio: 0x33cc66ff,
-  /** Рация семьи /fam — лавандовый как на скрине. */
   familyChat: 0x8888ffff,
   ad: 0x33cc66ff,
   adChecked: 0x2a9955ff,
