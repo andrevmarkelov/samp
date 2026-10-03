@@ -25,6 +25,7 @@ import {
 } from "./repository";
 import {
   findFamilyStockAtPlayer,
+  isPlayerOnFamilyStockPickup,
   refreshFamilyWarehouseLabel,
 } from "./stock-display";
 
@@ -62,13 +63,14 @@ const ITEM_LABEL: Record<StockItem, string> = {
   money: "деньги",
 };
 
+const STANDING_TICK_MS = 200;
+
 const pendingByPlayer = new Map<number, PendingTransfer>();
 const dialogBusy = new Set<number>();
+const standingOn = new Set<number>();
 
 export function bindFamilyWarehouseInteract(): void {
-  omp.on("playerEnterCheckpoint", (player) => {
-    tryOpenStockMenu(player);
-  });
+  setInterval(tickFamilyStockStanding, STANDING_TICK_MS);
 
   omp.on("dialogResponse", (player, dialogId, response, listItem, inputText) => {
     const id = Number(dialogId);
@@ -105,6 +107,39 @@ export function bindFamilyWarehouseInteract(): void {
 
     pendingByPlayer.delete(id);
     dialogBusy.delete(id);
+    standingOn.delete(id);
+  });
+}
+
+/** Открыть меню один раз при наступлении на пикап. */
+function tickFamilyStockStanding(): void {
+  omp.players.forEach((player) => {
+    const id = playerId(player);
+    if (id === null || !isPlayerActive(player)) {
+      return;
+    }
+
+    try {
+      if (player.getState() !== PLAYER_STATE_ONFOOT) {
+        standingOn.delete(id);
+        return;
+      }
+    } catch {
+      standingOn.delete(id);
+      return;
+    }
+
+    if (!isPlayerOnFamilyStockPickup(player)) {
+      standingOn.delete(id);
+      return;
+    }
+
+    if (standingOn.has(id)) {
+      return;
+    }
+
+    standingOn.add(id);
+    tryOpenStockMenu(player);
   });
 }
 
