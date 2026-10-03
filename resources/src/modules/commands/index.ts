@@ -23,6 +23,7 @@ import "./members";
 import "./r";
 import "./f";
 import "./capture";
+import "./makegun";
 import "./d";
 import "./gov";
 import "./clear";

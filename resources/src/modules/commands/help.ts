@@ -65,7 +65,7 @@ const CATEGORIES: readonly HelpCategory[] = [
   {
     key: "gangs",
     label: "Банды и мафии",
-    commands: ["f", "capture"],
+    commands: ["f", "capture", "makegun"],
   },
   {
     key: "org",

@@ -243,6 +243,7 @@ rent_paid_until = база + N дней
 | `/pursuit` | Law: прекратить слежку |
 | `/su [id] [1-6] [причина]` | Law: выдать/добавить розыск (макс. 6; не на law / тюрьму) |
 | `/clear [id]` | Law: снять розыск |
+| `/makegun [1-7] [1-500]` | Банды: сборка оружия на своей территории (патроны + металл) |
 
 ---
 
@@ -1339,6 +1340,7 @@ Staff (инвайт / увольнение / ранг): **≥ 9**. Управл�
 | FBI: кастомный HQ | `org/fbi.ts`, `org/fbi-doors.ts`, `maps/fbi.txt` |
 | Мафии: кастомный HQ | `org/mafias.ts`, `org/mafia-doors.ts`, `maps/mafia.txt`, `warehouse/mafia-stock.ts` |
 | Капт: исключение убийств | `zones/capture.ts` → `isCaptureCombatKill` |
+| Банды: /makegun | `commands/makegun.ts` |
 | Военный билет | `commands/vbilet.ts` |
 | Медкарта | `commands/medcard.ts` |
 | Паспорт / лицензии (показ) | `commands/pass.ts`, `commands/lic.ts` |
