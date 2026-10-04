@@ -194,13 +194,21 @@ function spawnForPlayer(player: Player, def: MapObjectDef): PlayerObject | null 
   }
 }
 
+/**
+ * Привязать объекты к VW. Опционально выставить interior
+ * (например `-1`, если в карте ошибочно указан чужой interior).
+ */
 export function assignStreamWorld(
   world: number,
-  match: (object: Pick<MapObjectDef, "x" | "y" | "z">) => boolean
+  match: (object: Pick<MapObjectDef, "x" | "y" | "z">) => boolean,
+  interior: number | null = null
 ): void {
   for (const def of defs) {
     if (match(def)) {
       def.world = world;
+      if (interior !== null) {
+        def.interior = interior;
+      }
     }
   }
 }

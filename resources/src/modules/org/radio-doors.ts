@@ -130,7 +130,8 @@ const onPickup = new Map<number, DoorKind>();
 const pending = new Map<number, DoorKind>();
 
 export function bindRadioDoors(): void {
-  assignStreamWorld(RADIO_WORLD, isRadioInteriorObject);
+  // В radio.txt объекты с interior 18, игроки заходят в interior 0 — сбрасываем в -1.
+  assignStreamWorld(RADIO_WORLD, isRadioInteriorObject, -1);
 
   for (const door of DOORS) {
     new Pickup(
