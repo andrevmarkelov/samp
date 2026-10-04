@@ -86,6 +86,7 @@ const CATEGORIES: readonly HelpCategory[] = [
       "uncuff",
       "putpl",
       "arrest",
+      "demote",
       "selllic",
       "givemedcard",
       "medhelp",
