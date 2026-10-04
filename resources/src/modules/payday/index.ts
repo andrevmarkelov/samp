@@ -8,7 +8,8 @@ import { getAccount, isAuthenticated, patchAccount, applyScore, MAX_LAWFULNESS, 
 import type { GameModule } from "../types";
 import { isPlayerAfk } from "../afk";
 import { queueSave } from "../persist";
-import { orgPaydayPay } from "../org";
+import { GANG_TURF_PAY_BONUS, orgPaydayPay } from "../org";
+import { isGangOrgId, listTurfs } from "../zones/turf";
 import { applyPaydayExp, formatClock, hourStamp } from "./progress";
 
 const TICK_MS = 1000;
@@ -42,20 +43,28 @@ function runPayday(now: Date): void {
   const clock = formatClock(now);
   omp.log(`[${SERVER_TAG}] payday ${clock}`);
 
+  // Снимок на весь payday: у всех членов банды одинаковая надбавка,
+  // даже если капт сменит владельца зоны во время обхода игроков.
+  const gangTurfCounts = snapshotGangTurfCounts();
+
   omp.players.forEach((player) => {
     if (!isPlayerActive(player) || !isAuthenticated(player) || isPlayerAfk(player)) {
       return;
     }
 
     try {
-      payPlayer(player, clock);
+      payPlayer(player, clock, gangTurfCounts);
     } catch {
       // Один слот не должен рвать payday остальным.
     }
   });
 }
 
-function payPlayer(player: Player, clock: string): void {
+function payPlayer(
+  player: Player,
+  clock: string,
+  gangTurfCounts: ReadonlyMap<number, number>
+): void {
   const account = getAccount(player);
   if (!account) {
     return;
@@ -73,7 +82,7 @@ function payPlayer(player: Player, clock: string): void {
 
   playPaydaySound(player);
 
-  const salary = orgPaydayPay(account);
+  const salary = resolvePaydaySalary(account, gangTurfCounts);
   let credited = 0;
   if (salary) {
     const fresh = getAccount(player) ?? account;
@@ -99,6 +108,46 @@ function payPlayer(player: Player, clock: string): void {
   if (next.leveled) {
     tell(player, Color.scene, "Поздравляем! Ваш уровень был повышен.");
   }
+}
+
+function snapshotGangTurfCounts(): ReadonlyMap<number, number> {
+  const counts = new Map<number, number>();
+  if (GANG_TURF_PAY_BONUS <= 0) {
+    return counts;
+  }
+
+  for (const turf of listTurfs()) {
+    if (!isGangOrgId(turf.orgId)) {
+      continue;
+    }
+    counts.set(turf.orgId, (counts.get(turf.orgId) ?? 0) + 1);
+  }
+
+  return counts;
+}
+
+function resolvePaydaySalary(
+  account: { orgId: number; orgRank: number },
+  gangTurfCounts: ReadonlyMap<number, number>
+): { amount: number; orgName: string; rankTitle: string } | null {
+  const salary = orgPaydayPay(account);
+  if (!salary) {
+    return null;
+  }
+
+  if (!isGangOrgId(account.orgId) || GANG_TURF_PAY_BONUS <= 0) {
+    return salary;
+  }
+
+  const zones = gangTurfCounts.get(account.orgId) ?? 0;
+  if (zones <= 0) {
+    return salary;
+  }
+
+  return {
+    ...salary,
+    amount: Math.max(0, Math.floor(salary.amount + zones * GANG_TURF_PAY_BONUS)),
+  };
 }
 
 function tell(player: Player, color: number, text: string): void {

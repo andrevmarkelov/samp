@@ -17,6 +17,9 @@ export const AZTECAS_WORLD = 13;
 
 const GANG_PAY = [800, 1100, 1500, 2000, 2600, 3300, 4100, 5000, 6000, 7200];
 
+/** Payday: надбавка к зарплате ранга за каждую контролируемую гангзону. */
+export const GANG_TURF_PAY_BONUS = 100;
+
 type GangRankRow = {
   title: string;
   male: number;

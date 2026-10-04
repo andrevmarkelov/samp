@@ -45,6 +45,21 @@ export function getTurf(zoneId: number): LiveTurf | undefined {
   return turfs.find((item) => item.id === zoneId);
 }
 
+/** Сколько гангзон сейчас принадлежит org (включая спавн-зоны). */
+export function countTurfsOwnedBy(orgId: number): number {
+  if (!isGangOrgId(orgId)) {
+    return 0;
+  }
+
+  let total = 0;
+  for (const turf of turfs) {
+    if (turf.orgId === orgId) {
+      total += 1;
+    }
+  }
+  return total;
+}
+
 export function isPointInTurf(turf: LiveTurf, x: number, y: number): boolean {
   const minX = Math.min(turf.minX, turf.maxX);
   const maxX = Math.max(turf.minX, turf.maxX);
