@@ -2,7 +2,11 @@
 
 **Los Santos Role Play.** Игровой сервер [open.mp](https://open.mp), логика на **TypeScript** через **omp-node**. Клиент: SA-MP 0.3.7 или open.mp. Локально: `127.0.0.1:7777`.
 
-Краткий старт — [README.md](../README.md). Выкладка — [deploy.md](deploy.md). Шаблон пайплайна — [deploy.yml](../deploy.yml) (сейчас закомментирован). Здесь: архитектура, модули, база, команды, конфиг и результаты проверки перед публикацией.
+Краткий старт (стек, структура, запуск) — [README.md](../README.md).  
+Версии геймплея: [docs_v2.md](docs_v2.md), [docs_v3.md](docs_v3.md).  
+Выкладка — [deploy.md](deploy.md). Пайплайн — [deploy.yml](../deploy.yml).
+
+Здесь: архитектура, регистрация, модули, база, команды, конфиг.
 
 `npm run typecheck` на момент этой документации проходит без ошибок.
 
@@ -76,21 +80,18 @@ public/
   deploy.yml                     шаблон GitHub Actions (закомментирован)
   README.md
   docs/
-    docs.md                      эта документация
+    docs.md                      эта документация (архитектура, регистрация, команды)
+    docs_v2.md / docs_v3.md      геймплей по версиям
     deploy.md                    выкладка на VPS
   maps/                          CreateObject / CreateDynamicObject
-    jail.txt                     интерьер тюрьмы (в небе)
-    hospital_new.txt             интерьер больницы (холл/служебный блок)
-    hospitalMap.txt              экстерьер больницы (улица)
-    mine.txt
-    army.txt                     объекты армии; ворота gates в коде, не дублировать
-  sql/schema.sql                 эталон таблицы users
+  sql/                           эталон схемы (+ seed-файлы, читаются при старте)
   gamemodes/lsrp.amx             заглушка Pawn
   components/                    DLL open.mp
   resources/
     omp-node.json                { "name": "lsrp", "entry": "dist/index.js" }
     package.json
-    tsconfig.json                strict
+    vitest.config.ts
+    tests/                       unit-тесты
     src/
     dist/                        сборка (gitignore)
 ```
@@ -170,19 +171,21 @@ resources/src/
 
 `closeDatabase()` на стопе сервера не вызывается.
 
-### auth
+### auth — регистрация и вход
 
-Ник только с клиента: `Name_Surname`, 5–24, `^[A-Z][a-z]+_[A-Z][a-z]+$`.
+Ник только с клиента: `Name_Surname`, 5–24, `^[A-Z][a-z]+_[A-Z][a-z]+$` (пример: `John_Doe`).
 
-Нет аккаунта: правила → почта → пароль 6–32 → повтор → ДР 16–80 лет → пол → скин → подтверждение.
+**Нет аккаунта:** правила (принять / отказаться; отказ — кик; текст: `auth/rules.ts`) → почта → пароль 6–32 → повтор → дата рождения `ДД.ММ.ГГГГ` (16–80 лет) → пол → скин (стрелки, отдельно ♂/♀) → подтверждение.
 
-Есть аккаунт: пароль, 3 ошибки — кик. Отмена диалога — кик.
+**Есть аккаунт:** только пароль; 3 ошибки — кик. Отмена диалога — кик.
 
 До входа: спек, чат и команды закрыты.
 
-Пароль: `scrypt:salt:key`. Сессия: `Map<слот, Account>`. На **connect и disconnect** сессия сбрасывается (слот не наследует чужой аккаунт). После `await` — `isSamePlayer`.
+Пароль: `scrypt:salt:key` (не открытый текст). Сессия: `Map<слот, Account>`. На **connect и disconnect** сессия сбрасывается. После `await` — `isSamePlayer`.
 
-Диалоги: auth **1**, stats **2**, pass **3**, меню **4**, rules **5**, invite **6**, GPS **7**, шахта **8–10**, alogin **11**, makeleader **12**. Не занимать эти id новыми окнами без проверки.
+Пол — `users.gender` (`male` / `female`). Новому персонажу: деньги и HP по схеме БД; при входе полоска HP из БД.
+
+Диалоги раннего мода: auth **1**, stats **2**, pass **3**, меню **4**, rules **5**, invite **6**, GPS **7**, шахта **8–10**, alogin **11**, makeleader **12**. Новые id — в docs_v2 / docs_v3; не пересекать без проверки.
 
 ### spawn
 
@@ -194,7 +197,9 @@ resources/src/
 
 ### chat
 
-IC **20 м**, VW + interior. Формат `Name_Surname[ID]: text`. У членов органа цвет nametag. `{` в тексте вырезается. Лимит 128. `game.use_chat_radius: false`.
+IC **20 м**, VW + interior. Формат `Name_Surname[ID] сказал/сказала: text` (см. актуальный формат в коде). У членов органа цвет nametag. `{` в тексте вырезается (`sanitizeChatText` в `shared/chat-text.ts`). Лимит 128. Пузырь над головой. `/w` — 5 м, `/s` — 60 м. `game.use_chat_radius: false`.
+
+Эмоции скобками (`)` `))` и т.д.) — [docs_v3.md](docs_v3.md).
 
 ### mapping
 
@@ -228,7 +233,9 @@ IC **20 м**, VW + interior. Формат `Name_Surname[ID]: text`. У член�
 
 ## База данных
 
-Драйвер `mysql2`, плейсхолдеры `?`. Эталон: `sql/schema.sql`. Таблица и недостающие колонки — при старте (`ensureUsersTable`).
+Драйвер `mysql2`, плейсхолдеры `?`. Эталон: `sql/schema.sql`.  
+
+**Пустая база достаточна:** при старте создаются таблицы, колонки-миграции и seed (дома, бизнесы, гангзоны и т.д.). Вручную импортировать SQL не обязательно.
 
 | Колонка | Смысл |
 |---|---|
@@ -288,19 +295,20 @@ persist queueSave → auth clear → spawn/hospital/admin/chat cleanup
 
 Радиусы: чат /me /do /try /todo /b /r-пузырь — **20 м**; `/s` — **60 м**; `/w` — **5 м**.
 
+Команд **`/help` нет** — список команд и игровая статистика через **`/mn`**. Админский просмотр чужой статистики — `/stats [id]` (см. docs_v3). Полные списки команд v2/v3 — в соответствующих доках.
+
 | Команда | Что делает |
 |---|---|
-| `/help` | список игровых команд |
-| `/mn` | меню |
+| `/mn` | меню (статистика, список команд, правила, …) |
 | `/me` `/do` `/try` `/todo` | RP |
 | `/b` | OOC рядом; после `/alogin`: `Administrator` |
 | `/s` `/w` | крик / шёпот, в строке `[ID]` |
-| `/stats` | диалог персонажа (в т.ч. почта) |
-| `/pass` | паспорт рядом |
+| `/pass` | паспорт (по id — через Y/N, см. docs_v3) |
 | `/hospital` | занять койку |
 | `/gps` | метки |
-| `/leaders` | лидеры (ранг 10) онлайн |
+| `/leaders` | лидеры онлайн |
 | `/r` | рация органа |
+| `/id` | поиск онлайн по нику/id (docs_v3) |
 
 Неизвестная команда — сообщение. До логина — тишина.
 
@@ -356,14 +364,28 @@ persist queueSave → auth clear → spawn/hospital/admin/chat cleanup
 
 ## Сборка и запуск
 
+Кратко также в [README.md](../README.md).
+
 ```powershell
 copy .env.example .env
+cd resources
+npm install
+cd ..
 npm run build
 npm run typecheck
 npm start
 ```
 
+Unit-тесты (чистые функции: деньги, налоги, чат-текст, …):
+
+```powershell
+cd resources
+npm test
+```
+
 Клиент: `127.0.0.1:7777`, ник `Name_Surname`. После `build` **рестарт**. `dist/` в git нет. Прод: [deploy.md](deploy.md).
+
+Маппинг: `.txt` с `CreateObject` / `CreateDynamicObject` в `maps/` в корне, затем рестарт. Название сервера: `shared/brand.ts` = `config.json` (`name`, `game.mode`).
 
 ---
 
