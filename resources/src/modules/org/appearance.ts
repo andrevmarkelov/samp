@@ -2,6 +2,7 @@ import type { Player } from "@omp-node/core";
 import type { Account } from "../auth/session";
 import { getAccount } from "../auth/session";
 import { Color } from "../../shared/colors";
+import { applyMaskVisuals, isMasked } from "../mask";
 import {
   applyArmyDisguiseVisuals,
   syncArmyDisguise,
@@ -44,13 +45,17 @@ export function applyOrgVisuals(player: Player): void {
   // Маскировка армии (банды): скин/цвет как у армии, членство банды не меняется.
   if (syncArmyDisguise(player)) {
     applyArmyDisguiseVisuals(player, account);
-    return;
+  } else {
+    try {
+      player.setSkin(resolvePlayerSkin(account));
+      player.setColor(resolveNametagColor(account));
+    } catch {
+      // Слот ещё не в игре.
+    }
   }
 
-  try {
-    player.setSkin(resolvePlayerSkin(account));
-    player.setColor(resolveNametagColor(account));
-  } catch {
-    // Слот ещё не в игре.
+  // Маска перекрывает цвет (и alpha 0 — скрытие с мини-карты).
+  if (isMasked(player)) {
+    applyMaskVisuals(player);
   }
 }

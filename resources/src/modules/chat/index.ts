@@ -10,6 +10,7 @@ import {
 import { playerChatName } from "../../shared/player";
 import { byGender } from "../auth/gender";
 import { getAccount, isAuthenticated } from "../auth/session";
+import { isMasked, MASK_COLOR } from "../mask";
 import { getMembership, resolveChatColor } from "../org";
 import type { GameModule } from "../types";
 import { notifyIfMuted, clearMuteWatch, watchMute } from "./mute";
@@ -48,18 +49,19 @@ export const chatModule: GameModule = {
       }
 
       const account = getAccount(player);
+      const masked = isMasked(player);
       const inOrg = account ? getMembership(account) : null;
       const verb = byGender(account?.gender ?? null, "сказал", "сказала");
+      const nameColor = masked
+        ? MASK_COLOR
+        : account && inOrg
+          ? resolveChatColor(account)
+          : null;
       sendNearby(
         player,
         CHAT_RADIUS,
-        inOrg ? Color.white : Color.chat,
-        nearbyChatLine(
-          playerChatName(player),
-          text,
-          account && inOrg ? resolveChatColor(account) : null,
-          verb
-        )
+        masked || inOrg ? Color.white : Color.chat,
+        nearbyChatLine(playerChatName(player), text, nameColor, verb)
       );
       playLocalSpeech(player, text);
       return false;

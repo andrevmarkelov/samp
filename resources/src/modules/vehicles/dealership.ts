@@ -26,7 +26,7 @@ export const DEALERSHIP_CONFIRM_DIALOG_ID = 85;
 const PICKUP_RADIUS = 1.6;
 const TICK_MS = 200;
 const PLAYER_STATE_ONFOOT = 1;
-const DIALOG_STYLE_LIST = 2;
+const DIALOG_STYLE_TABLIST_HEADERS = 5;
 const DIALOG_STYLE_MSGBOX = 0;
 
 type CatalogItem = {
@@ -246,13 +246,16 @@ function openDealership(player: Player, shop: BusinessRecord): void {
   });
   pendingBuy.delete(slotId);
 
-  const lines = catalog.map((item) => `${item.name}\t${formatMoney(item.price)}`);
+  const lines = [
+    "Модель\tЦена",
+    ...catalog.map((item) => `${item.name}\t${formatMoney(item.price)}`),
+  ];
 
   try {
     Dialog.show(
       player,
       DEALERSHIP_LIST_DIALOG_ID,
-      DIALOG_STYLE_LIST,
+      DIALOG_STYLE_TABLIST_HEADERS,
       shopTitle(shop.typeId),
       lines.join("\n"),
       "Выбрать",

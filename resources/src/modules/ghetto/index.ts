@@ -1,5 +1,6 @@
 import { Actor, Dialog, omp, TextLabel, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
+import { formatMoney } from "../../shared/money";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { saveUserInventory, saveUserMoney } from "../auth/repository";
 import {
@@ -29,7 +30,7 @@ const DEALER_SKIN = 28;
 const DEALER_NAME = "Смоки";
 const KEY_WALK = 1024;
 const PLAYER_STATE_ONFOOT = 1;
-const DIALOG_STYLE_LIST = 2;
+const DIALOG_STYLE_TABLIST_HEADERS = 5;
 const DIALOG_STYLE_INPUT = 1;
 const INTERACT_RADIUS = 2.2;
 const DENY_COOLDOWN_MS = 2500;
@@ -189,13 +190,19 @@ function onInteract(player: Player): void {
 }
 
 function showMenu(player: Player): void {
+  const body = [
+    "Товар\tЦена",
+    `Наркотики\t${formatMoney(DRUG_PRICE)} / шт.`,
+    `Форма армии\t${formatMoney(FORM_PRICE)}`,
+  ].join("\n");
+
   try {
     Dialog.show(
       player,
       GHETTO_DEALER_MENU_DIALOG_ID,
-      DIALOG_STYLE_LIST,
+      DIALOG_STYLE_TABLIST_HEADERS,
       DEALER_NAME,
-      `Купить наркотики\nФорма армии ($${FORM_PRICE})`,
+      body,
       "Выбрать",
       "Отмена"
     );

@@ -10,6 +10,7 @@ import {
   isAuthenticated,
   patchAccount,
 } from "../auth/session";
+import { addOwnedMasks } from "../mask";
 import {
   getBusiness,
   listBusinesses,
@@ -27,18 +28,20 @@ export const SHOP_247_MENU_DIALOG_ID = 95;
 const PICKUP_RADIUS = 1.6;
 const TICK_MS = 200;
 const PLAYER_STATE_ONFOOT = 1;
-const DIALOG_STYLE_LIST = 2;
+const DIALOG_STYLE_TABLIST_HEADERS = 5;
 const BIZ_SHARE = 0.8;
 const WEAPON_CAMERA = 43;
 const CAMERA_AMMO = 36;
 
 type ShopItem =
   | { kind: "phone"; name: string; price: number }
-  | { kind: "weapon"; name: string; price: number; weaponId: number; ammo: number };
+  | { kind: "weapon"; name: string; price: number; weaponId: number; ammo: number }
+  | { kind: "mask"; name: string; price: number };
 
 const MENU: readonly ShopItem[] = [
   { kind: "phone", name: "Мобильный телефон", price: 2_000 },
   { kind: "weapon", name: "Фотоаппарат", price: 1_000, weaponId: WEAPON_CAMERA, ammo: CAMERA_AMMO },
+  { kind: "mask", name: "Маска", price: 500 },
 ];
 
 const standingOn = new Map<number, number>();
@@ -179,18 +182,16 @@ function openShopMenu(player: Player, shop: BusinessRecord): void {
 
   pendingMenu.set(slotId, shop.id);
 
-  const lines = MENU.map((item) => {
-    if (item.kind === "phone") {
-      return `${item.name}\t${formatMoney(item.price)}`;
-    }
-    return `${item.name}\t${formatMoney(item.price)} (${item.ammo} фото)`;
-  });
+  const lines = [
+    "Товар\tЦена",
+    ...MENU.map((item) => `${item.name}\t${formatMoney(item.price)}`),
+  ];
 
   try {
     Dialog.show(
       player,
       SHOP_247_MENU_DIALOG_ID,
-      DIALOG_STYLE_LIST,
+      DIALOG_STYLE_TABLIST_HEADERS,
       shop.name,
       lines.join("\n"),
       "Купить",
@@ -299,8 +300,10 @@ async function buyShopItem(
   try {
     if (item.kind === "phone") {
       await buyPhone(player, account.id, account.name, businessId, item.price);
-    } else {
+    } else if (item.kind === "weapon") {
       await buyCamera(player, account.id, account.name, businessId, item);
+    } else {
+      await buyMask(player, account.id, account.name, businessId, item.price);
     }
   } finally {
     buying.delete(account.id);
@@ -403,5 +406,55 @@ async function buyCamera(
   player.sendClientMessage(
     Color.tryOk,
     `Вы купили фотоаппарат (${item.ammo} фото) за ${formatMoney(item.price)}.`
+  );
+}
+
+async function buyMask(
+  player: Player,
+  userId: number,
+  userName: string,
+  businessId: number,
+  price: number
+): Promise<void> {
+  let result;
+  try {
+    result = await payBusinessCashShare(businessId, userId, price, BIZ_SHARE);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    omp.log(`[${SERVER_TAG}] 24/7 маска biz=${businessId} (${userName}): ${message}`);
+    player.sendClientMessage(Color.error, "Покупка не прошла. Попробуйте ещё раз.");
+    return;
+  }
+
+  if (!result.ok) {
+    if (result.reason === "funds") {
+      player.sendClientMessage(
+        Color.error,
+        `Недостаточно наличных. Нужно ${formatMoney(price)}.`
+      );
+      return;
+    }
+    player.sendClientMessage(Color.error, "Покупка не прошла. Попробуйте ещё раз.");
+    return;
+  }
+
+  setBusinessBalance(businessId, result.balance);
+
+  if (!isPlayerActive(player) || getAccount(player)?.id !== userId) {
+    return;
+  }
+
+  const live = getAccount(player);
+  if (!live) {
+    return;
+  }
+
+  patchAccount(player, { money: result.cashLeft });
+  applyWallet(player, getAccount(player) ?? live);
+  const nextMasks = addOwnedMasks(player, 1);
+
+  player.sendClientMessage(
+    Color.tryOk,
+    `Вы купили маску за ${formatMoney(price)}. Надеть: /mask. Всего масок: ${nextMasks}.`
   );
 }

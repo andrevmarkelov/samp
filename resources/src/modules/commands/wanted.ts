@@ -12,6 +12,7 @@ export const WANTED_LIST_DIALOG_ID = 127;
 export const WANTED_ACTION_DIALOG_ID = 128;
 
 const DIALOG_STYLE_LIST = 2;
+const DIALOG_STYLE_TABLIST_HEADERS = 5;
 const PLAYER_STATE_WASTED = 7;
 const CHECKPOINT_RADIUS = 3;
 const PURSUIT_TICK_MS = 5000;
@@ -62,13 +63,17 @@ registerCommand("wanted", "Список игроков в розыске", (play
     rows.map((row) => ({ slot: row.slot, accountId: row.accountId }))
   );
 
+  const body = ["Имя\tУровень розыска", ...rows.map((row) => row.line)].join(
+    "\n"
+  );
+
   try {
     Dialog.show(
       player,
       WANTED_LIST_DIALOG_ID,
-      DIALOG_STYLE_LIST,
+      DIALOG_STYLE_TABLIST_HEADERS,
       `В розыске: ${rows.length}`,
-      rows.map((row) => row.line).join("\n"),
+      body,
       "Выбрать",
       "Закрыть"
     );
@@ -253,7 +258,7 @@ function collectWantedOnline(): WantedRow[] {
       accountId: account.id,
       wanted: account.wantedLevel,
       name: playerName(other),
-      line: `${playerChatName(other)} | розыск: ${account.wantedLevel}`,
+      line: `${playerChatName(other)}\t${account.wantedLevel}`,
     });
   });
 

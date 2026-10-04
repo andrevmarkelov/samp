@@ -1,4 +1,6 @@
 import type { GameModule } from "../types";
+import { bindMaskVisualRestore } from "../mask";
+import { applyOrgVisuals } from "./appearance";
 import { bindArmyDisguise } from "./army-disguise";
 import { bindArmyLocker } from "./army-locker";
 import { bindArmyFactoryDoors } from "./army-factory-doors";
@@ -29,6 +31,7 @@ import { bindRadioLocker } from "./radio-locker";
 export const orgModule: GameModule = {
   name: "org",
   start() {
+    bindMaskVisualRestore(applyOrgVisuals);
     bindOrgGates();
     bindArmyDisguise();
     bindHospitalRoofAccess();

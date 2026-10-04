@@ -30,7 +30,7 @@ const KEY_WALK = 1024;
 const PLAYER_STATE_ONFOOT = 1;
 const PICKUP_RADIUS = 1.6;
 const TICK_MS = 200;
-const DIALOG_STYLE_LIST = 2;
+const DIALOG_STYLE_TABLIST_HEADERS = 5;
 const EAT_SOUND_ID = 32200;
 const ANIM_SYNC_ALL = 1;
 const EAT_ANIM_MS = 3000;
@@ -192,15 +192,16 @@ function tryOpenMenu(player: Player): void {
 
   pendingMenu.set(slotId, business.id);
 
-  const lines = MENU.map(
-    (item) => `${item.name}\t${formatMoney(item.price)} (+${item.hunger} сытости)`
-  );
+  const lines = [
+    "Товар\tЦена",
+    ...MENU.map((item) => `${item.name}\t${formatMoney(item.price)}`),
+  ];
 
   try {
     Dialog.show(
       player,
       STREET_FOOD_MENU_DIALOG_ID,
-      DIALOG_STYLE_LIST,
+      DIALOG_STYLE_TABLIST_HEADERS,
       business.name,
       lines.join("\n"),
       "Купить",
