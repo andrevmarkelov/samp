@@ -29,7 +29,7 @@ import { createServerVehicle } from "./spawn";
 
 export const HOSPITAL_MED_DELIVERY_DIALOG_ID = 62;
 
-const RESPAWN_SEC = 100;
+const RESPAWN_SEC = 1800;
 const DENY = "Вы не состоите в больнице.";
 const PLAYER_STATE_ONFOOT = 1;
 const PLAYER_STATE_DRIVER = 2;

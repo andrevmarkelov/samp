@@ -75,7 +75,7 @@ export type { ServerVehicleDef } from "./spawn";
 /** GTA SA Faggio. */
 const FAGGIO = 462;
 const GREEN = 191;
-const RESPAWN_SEC = 100;
+const RESPAWN_SEC = 1800;
 
 const STATION_SCOOTERS: ReadonlyArray<{ y: number }> = [
   { y: -1933.9576 },

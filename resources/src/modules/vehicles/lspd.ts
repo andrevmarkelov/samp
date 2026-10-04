@@ -3,7 +3,7 @@ import { ORG_LSPD_ID } from "../org";
 import { registerOrgVehicle } from "./access";
 import { createServerVehicle } from "./spawn";
 
-const RESPAWN_SEC = 100;
+const RESPAWN_SEC = 1800;
 const DENY = "Вы не состоите в LSPD.";
 
 function policeColors(model: number): { color1: number; color2: number } {

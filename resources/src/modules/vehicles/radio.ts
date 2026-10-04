@@ -4,7 +4,7 @@ import { registerOrgVehicle } from "./access";
 import { createServerVehicle } from "./spawn";
 import type { Vehicle } from "@omp-node/core";
 
-const RESPAWN_SEC = 100;
+const RESPAWN_SEC = 1800;
 const DENY = "Вы не состоите в радиоцентре.";
 
 const RADIO_VEHICLES: ReadonlyArray<{

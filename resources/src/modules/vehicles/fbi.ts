@@ -3,7 +3,7 @@ import { ORG_FBI_ID } from "../org";
 import { registerOrgVehicle } from "./access";
 import { createServerVehicle } from "./spawn";
 
-const RESPAWN_SEC = 100;
+const RESPAWN_SEC = 1800;
 const BLACK = 0;
 const DENY = "Вы не состоите в FBI.";
 

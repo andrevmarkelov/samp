@@ -9,7 +9,7 @@ import {
 import { registerOrgVehicle } from "./access";
 import { createServerVehicle } from "./spawn";
 
-const RESPAWN_SEC = 100;
+const RESPAWN_SEC = 1800;
 
 type GangCar = {
   model: number;

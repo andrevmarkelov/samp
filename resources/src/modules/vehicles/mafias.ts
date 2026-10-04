@@ -3,7 +3,7 @@ import { ORG_LCN_ID, ORG_RUSSIAN_MAFIA_ID, ORG_YAKUZA_ID } from "../org";
 import { registerOrgVehicle } from "./access";
 import { createServerVehicle } from "./spawn";
 
-const RESPAWN_SEC = 100;
+const RESPAWN_SEC = 1800;
 
 type MafiaCar = {
   model: number;

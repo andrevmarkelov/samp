@@ -5,7 +5,7 @@ import { createServerVehicle } from "../../vehicles/spawn";
 import { JOB_BUS_DRIVER } from "../catalog";
 
 const BUS_MODEL = 431;
-const RESPAWN_SEC = 100;
+const RESPAWN_SEC = 1800;
 const COLOR = -1;
 const DENY = "Этот автобус только для водителей автобуса.";
 

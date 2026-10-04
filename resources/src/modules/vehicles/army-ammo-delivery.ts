@@ -676,7 +676,7 @@ function giveCrate(player: Player): boolean {
       SLOT_CRATE,
       CRATE_MODEL,
       1,
-      -0.073,
+      0.04,
       0.358,
       -0.032,
       0,

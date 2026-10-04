@@ -4,7 +4,7 @@ import { registerOrgVehicle } from "./access";
 import { bindArmyAmmoDelivery, bindArmyAmmoTruck } from "./army-ammo-delivery";
 import { createServerVehicle } from "./spawn";
 
-const RESPAWN_SEC = 100;
+const RESPAWN_SEC = 1800;
 const RANDOM_COLOR = -1;
 const ARMY_CAR_COLOR = 173;
 const COLORED_MODELS = new Set([431, 445, 500]);
