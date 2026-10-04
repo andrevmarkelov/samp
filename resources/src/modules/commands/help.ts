@@ -41,6 +41,7 @@ const CATEGORIES: readonly HelpCategory[] = [
       "ad",
       "pay",
       "mask",
+      "anim",
     ],
   },
   {
