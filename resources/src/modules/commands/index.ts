@@ -1,6 +1,5 @@
 import type { GameModule } from "../types";
 import { bindCommandListener } from "./registry";
-import "./help";
 import "./me";
 import "./do";
 import "./try";
@@ -8,7 +7,6 @@ import "./todo";
 import "./b";
 import "./s";
 import "./w";
-import "./stats";
 import "./time";
 import "./pass";
 import "./lic";

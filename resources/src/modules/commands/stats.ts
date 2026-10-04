@@ -8,28 +8,25 @@ import { residenceLabel } from "../houses/residence";
 import { businessOwnershipLabel } from "../businesses/ownership";
 import { getMembership, resolvePlayerSkin } from "../org";
 import { expForNextLevel } from "../payday/progress";
-import { registerCommand } from "./registry";
 
-const STATS_DIALOG_ID = 2;
+export const STATS_DIALOG_ID = 2;
 const DIALOG_STYLE_MSGBOX = 0;
 const TITLE = "{FFCC00}";
 const LABEL = "{FFFFFF}";
 const VALUE = "{33CCFF}";
 
-registerCommand("stats", "Статистика персонажа", (player) => {
-  showStatsDialog(player);
-});
-
-export function showStatsDialog(player: Player): void {
-  const account = getAccount(player);
+/** Статистика: себе (из /mn) или цель (админ /stats). */
+export function showStatsDialog(viewer: Player, target?: Player): void {
+  const subject = target ?? viewer;
+  const account = getAccount(subject);
   if (!account) {
-    player.sendClientMessage(Color.error, "Сначала войди в аккаунт.");
+    viewer.sendClientMessage(Color.error, "Сначала войди в аккаунт.");
     return;
   }
 
   let health = Math.round(account.health);
   try {
-    const live = player.getHealth();
+    const live = subject.getHealth();
     if (live > 0) {
       health = Math.round(live);
     }
@@ -69,7 +66,7 @@ export function showStatsDialog(player: Player): void {
 
   try {
     Dialog.show(
-      player,
+      viewer,
       STATS_DIALOG_ID,
       DIALOG_STYLE_MSGBOX,
       `${TITLE}Статистика ${account.name}`,
@@ -78,7 +75,7 @@ export function showStatsDialog(player: Player): void {
       ""
     );
   } catch {
-    player.sendClientMessage(Color.error, "Не удалось открыть статистику.");
+    viewer.sendClientMessage(Color.error, "Не удалось открыть статистику.");
   }
 }
 

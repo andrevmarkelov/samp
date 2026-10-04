@@ -6,6 +6,7 @@ import { RULES_TITLE, SERVER_RULES } from "../auth/rules";
 import { findUserByName, saveUserInvitedBy } from "../auth/repository";
 import { getAccount, patchAccount } from "../auth/session";
 import { isRoleplayName } from "../auth/validation";
+import { showHelpMenu } from "./help";
 import { registerCommand } from "./registry";
 import { showReportDialog } from "./report";
 import { showStatsDialog } from "./stats";
@@ -18,16 +19,17 @@ const DIALOG_STYLE_MSGBOX = 0;
 const DIALOG_STYLE_INPUT = 1;
 const DIALOG_STYLE_LIST = 2;
 
-type MenuKey = "stats" | "rules" | "report" | "invite";
+type MenuKey = "stats" | "commands" | "rules" | "report" | "invite";
 
 const MENU_ITEMS: Record<MenuKey, string> = {
   stats: "Статистика",
+  commands: "Список команд",
   rules: "Правила сервера",
   report: "Связь с администрацией",
   invite: "Кто пригласил",
 };
 
-registerCommand("mn", "Меню: статистика, правила и связь с администрацией", (player) => {
+registerCommand("mn", "Меню: статистика, команды, правила", (player) => {
   showMenu(player);
 });
 
@@ -45,6 +47,11 @@ export function bindMenuDialogs(): void {
       const item = menuItem(player, Number(listItem), input);
       if (item === "stats") {
         showStatsDialog(player);
+        return;
+      }
+
+      if (item === "commands") {
+        showHelpMenu(player);
         return;
       }
 
@@ -75,7 +82,7 @@ export function bindMenuDialogs(): void {
 }
 
 function visibleMenuKeys(player: Player): MenuKey[] {
-  const keys: MenuKey[] = ["stats", "rules", "report"];
+  const keys: MenuKey[] = ["stats", "commands", "rules", "report"];
   const account = getAccount(player);
   if (account && !account.invitedBy) {
     keys.push("invite");

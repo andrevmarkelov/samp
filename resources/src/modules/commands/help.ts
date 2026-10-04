@@ -1,7 +1,7 @@
 import { Dialog, omp, type Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { isPlayerActive, playerId } from "../../shared/player";
-import { listCommands, registerCommand } from "./registry";
+import { listCommands } from "./registry";
 
 export const HELP_MENU_DIALOG_ID = 96;
 export const HELP_LIST_DIALOG_ID = 97;
@@ -23,9 +23,7 @@ const CATEGORIES: readonly HelpCategory[] = [
     key: "general",
     label: "Общие команды",
     commands: [
-      "help",
       "mn",
-      "stats",
       "time",
       "gps",
       "findidhouse",
@@ -120,10 +118,6 @@ const CATEGORIES: readonly HelpCategory[] = [
 
 const menuState = new Map<number, string>();
 
-registerCommand("help", "Список команд", (player) => {
-  showHelpMenu(player);
-});
-
 export function bindHelpDialogs(): void {
   omp.on("dialogResponse", (player, dialogId, response, listItem) => {
     const id = Number(dialogId);
@@ -162,7 +156,8 @@ export function bindHelpDialogs(): void {
   });
 }
 
-function showHelpMenu(player: Player): void {
+/** Меню категорий команд (из `/mn` → «Список команд»). */
+export function showHelpMenu(player: Player): void {
   if (!isPlayerActive(player)) {
     return;
   }
@@ -188,7 +183,7 @@ function showHelpMenu(player: Player): void {
     );
   } catch {
     menuState.delete(slotId);
-    player.sendClientMessage(Color.error, "Не удалось открыть /help.");
+    player.sendClientMessage(Color.error, "Не удалось открыть список команд.");
   }
 }
 
@@ -237,6 +232,6 @@ function showHelpCategory(player: Player, category: HelpCategory): void {
     );
   } catch {
     menuState.delete(slotId);
-    player.sendClientMessage(Color.error, "Не удалось открыть раздел /help.");
+    player.sendClientMessage(Color.error, "Не удалось открыть раздел команд.");
   }
 }

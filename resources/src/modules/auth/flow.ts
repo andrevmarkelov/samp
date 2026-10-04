@@ -587,7 +587,10 @@ async function finishRegister(
   applyWantedLevel(player, account.wantedLevel);
   syncWantedDecay(player);
   welcome(player, account.name);
-  player.sendClientMessage(Color.gray, "Персонаж создан. /help — список команд.");
+  player.sendClientMessage(
+    Color.gray,
+    "Персонаж создан. /mn — меню (статистика и список команд)."
+  );
   omp.log(`[${SERVER_TAG}] ${account.name} зарегистрировался`);
 }
 
