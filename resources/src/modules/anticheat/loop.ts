@@ -6,6 +6,7 @@ import {
   playerName,
 } from "../../shared/player";
 import { isAuthenticated, getAccount } from "../auth/session";
+import { isSafeZoneDamage } from "../zones/safe";
 import { AcCode } from "./codes";
 import { getConfig, isCodeEnabled } from "./config";
 import { checkMovement } from "./detectors/movement";
@@ -144,7 +145,11 @@ export function bindAnticheat(): void {
     checkVitals(player);
   });
 
-  omp.on("playerTakeDamage", (player, _issuer, amount, weaponId) => {
+  omp.on("playerTakeDamage", (player, issuer, amount, weaponId) => {
+    // Сейф-зона уже откатила HP/броню + trust; повторный вычет в зеркале → FP.
+    if (isSafeZoneDamage(player, issuer ?? undefined)) {
+      return;
+    }
     onTakeDamage(player, Number(amount) || 0, Number(weaponId) || 0);
   });
 

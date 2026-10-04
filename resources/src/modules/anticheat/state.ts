@@ -13,6 +13,9 @@ export type PlayerAcState = {
   x: number;
   y: number;
   z: number;
+  posTrustX: number;
+  posTrustY: number;
+  posTrustZ: number;
   interior: number;
   world: number;
   health: number;
@@ -78,6 +81,9 @@ export function createPlayerState(ip: string, name = ""): PlayerAcState {
     x: 0,
     y: 0,
     z: 0,
+    posTrustX: 0,
+    posTrustY: 0,
+    posTrustZ: 0,
     interior: 0,
     world: 0,
     health: 100,

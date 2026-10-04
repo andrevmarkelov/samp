@@ -7,6 +7,9 @@ import { nowMs } from "../math";
 import { reportCheat } from "../punish";
 import { getPlayerState } from "../state";
 
+/** Допуск на float HP/брони (не «бесплатный хил», а шум пакетов). */
+const VITALS_EPS = 1;
+
 export function checkVitals(player: Player): void {
   const id = playerId(player);
   if (id === null) return;
@@ -23,8 +26,10 @@ export function checkVitals(player: Player): void {
     return;
   }
 
+  // Grace: не кикаем, пока ждём применения серверного SetHealth/урона.
+  // Зеркало при этом не поднимаем с клиента — только trust/onTakeDamage.
   if (now >= state.healthTrustedUntil && isCodeEnabled(AcCode.HealthFoot)) {
-    if (health > state.health + 1.5 && health <= 255) {
+    if (health > state.health + VITALS_EPS && health <= 255) {
       reportCheat(
         player,
         AcCode.HealthFoot,
@@ -35,7 +40,7 @@ export function checkVitals(player: Player): void {
   }
 
   if (now >= state.armourTrustedUntil && isCodeEnabled(AcCode.Armour)) {
-    if (armour > state.armour + 1.5) {
+    if (armour > state.armour + VITALS_EPS) {
       reportCheat(
         player,
         AcCode.Armour,
@@ -51,6 +56,7 @@ export function checkMoney(player: Player): void {
   const state = getPlayerState(id);
   if (!state || !state.spawned) return;
   if (!isCodeEnabled(AcCode.Money)) return;
+  // Grace только откладывает кик; зеркало денег = account, клиент не «кормит» expected.
   if (nowMs() < state.moneyTrustedUntil) return;
 
   const account = getAccount(player);
@@ -63,7 +69,7 @@ export function checkMoney(player: Player): void {
     return;
   }
 
-  if (clientMoney > account.money + 1) {
+  if (clientMoney > account.money) {
     reportCheat(
       player,
       AcCode.Money,

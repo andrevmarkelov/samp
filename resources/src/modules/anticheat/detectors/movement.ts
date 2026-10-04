@@ -25,10 +25,32 @@ export function checkMovement(player: Player): void {
   if (now < state.posTrustedUntil) {
     try {
       const pos = player.getPos();
-      state.x = pos.x;
-      state.y = pos.y;
-      state.z = pos.z;
       const vel = player.getVelocity();
+      let pState = Number(PLAYER_STATE.onfoot);
+      try {
+        pState = player.getState();
+      } catch {
+        // ignore
+      }
+      const inVeh =
+        pState === PLAYER_STATE.driver || pState === PLAYER_STATE.passenger;
+      // Пешком 50 м за grace ок; в ТС за ~3 с легко уехать дальше → FP TeleportVeh.
+      const adoptBubble = inVeh
+        ? Math.max(cfg.teleportVehDist * 3, 180)
+        : cfg.teleportFootDist;
+      const fromAnchor = dist3(
+        state.posTrustX,
+        state.posTrustY,
+        state.posTrustZ,
+        pos.x,
+        pos.y,
+        pos.z
+      );
+      if (fromAnchor < adoptBubble) {
+        state.x = pos.x;
+        state.y = pos.y;
+        state.z = pos.z;
+      }
       state.speed = speedFromVelocity(vel.x, vel.y, vel.z);
       state.lastUpdateAt = now;
     } catch {

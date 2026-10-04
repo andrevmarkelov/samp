@@ -24,6 +24,9 @@ export function trustPosition(
   state.x = x;
   state.y = y;
   state.z = z;
+  state.posTrustX = x;
+  state.posTrustY = y;
+  state.posTrustZ = z;
   if (interior !== undefined) state.interior = interior;
   if (world !== undefined) state.world = world;
   state.posTrustedUntil = nowMs() + getConfig().posGraceMs;
@@ -104,6 +107,10 @@ export function markSpawned(player: Player, spawned: boolean): void {
   if (spawned) {
     const now = nowMs();
     state.dead = false;
+    // Якорь = текущее зеркало (синхрон с live pos сделает trustPosition следом).
+    state.posTrustX = state.x;
+    state.posTrustY = state.y;
+    state.posTrustZ = state.z;
     state.posTrustedUntil = now + getConfig().posGraceMs;
     state.healthTrustedUntil = now + getConfig().healthGraceMs;
     state.moneyTrustedUntil = now + getConfig().moneyGraceMs;

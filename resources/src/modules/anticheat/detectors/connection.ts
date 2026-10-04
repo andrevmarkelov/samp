@@ -8,6 +8,17 @@ import { getPlayerState } from "../state";
 
 const KEY_FIRE = 4;
 
+/** Урон, который в GTA SA идёт в HP, минуя броню. */
+const HEALTH_ONLY_WEAPONS = new Set([
+  37, // flamethrower
+  49, // vehicle collision
+  50, // heli blades
+  53, // drown
+  54, // fall / collision
+]);
+
+const DAMAGE_TRUST_MS = 800;
+
 export function noteFlood(player: Player, key: string): void {
   if (!isCodeEnabled(AcCode.CallbackFlood)) return;
   const id = playerId(player);
@@ -102,18 +113,40 @@ export function onTakeDamage(
   }
 
   if (amount > 0) {
-    // Сначала броня, потом HP — упрощённая модель.
-    let left = amount;
-    if (state.armour > 0) {
-      const soak = Math.min(state.armour, left);
-      state.armour -= soak;
-      left -= soak;
+    if (HEALTH_ONLY_WEAPONS.has(weaponId)) {
+      // Падение / коллизия / утопление — броня в игре не тратится.
+      state.health = Math.max(0, state.health - amount);
+    } else {
+      // Оружие / рукопашная: сначала броня, потом HP.
+      let left = amount;
+      if (state.armour > 0) {
+        const soak = Math.min(state.armour, left);
+        state.armour -= soak;
+        left -= soak;
+      }
+      if (left > 0) {
+        state.health = Math.max(0, state.health - left);
+      }
     }
-    if (left > 0) {
-      state.health = Math.max(0, state.health - left);
+
+    // Если клиент уже применил урон — подтянуть зеркало вниз (не вверх).
+    try {
+      const liveHp = player.getHealth();
+      const liveAr = player.getArmor();
+      if (Number.isFinite(liveHp) && liveHp >= 0 && liveHp < state.health) {
+        state.health = liveHp;
+      }
+      if (Number.isFinite(liveAr) && liveAr >= 0 && liveAr < state.armour) {
+        state.armour = liveAr;
+      }
+    } catch {
+      // Слот пуст.
     }
-    state.healthTrustedUntil = nowMs() + 800;
-    state.armourTrustedUntil = nowMs() + 800;
+
+    const until = nowMs() + DAMAGE_TRUST_MS;
+    // Не укорачивать более длинный trust (сейф-зона / лечение).
+    state.healthTrustedUntil = Math.max(state.healthTrustedUntil, until);
+    state.armourTrustedUntil = Math.max(state.armourTrustedUntil, until);
   }
 }
 
