@@ -2,6 +2,8 @@ import type { Player } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { getAccount } from "../auth/session";
+import { isLawOfficer } from "../org/law";
+import { isJailed } from "../prison/sentence";
 import { refreshStreamForPlayer } from "../mapping/stream";
 import { placeAt, type SpawnPoint } from "../spawn/point";
 import { isNearHouseEntrance } from "./access";
@@ -18,12 +20,22 @@ export function isHouseOwner(userId: number, house: HouseRecord): boolean {
   return house.ownerId === userId;
 }
 
-export function canEnterHouse(userId: number, house: HouseRecord): boolean {
+/** Владелец и law (LSPD / обл. полиция / FBI) — всегда; гости — только если открыт. */
+export function canEnterHouse(player: Player, house: HouseRecord): boolean {
   if (house.ownerId === null) {
     return false;
   }
 
-  if (isHouseOwner(userId, house)) {
+  const account = getAccount(player);
+  if (!account) {
+    return false;
+  }
+
+  if (isHouseOwner(account.id, house)) {
+    return true;
+  }
+
+  if (isLawOfficer(player)) {
     return true;
   }
 
@@ -64,6 +76,16 @@ export function tryEnterHouse(player: Player, houseId: number): void {
     return;
   }
 
+  if (isJailed(player)) {
+    player.sendClientMessage(Color.error, "В тюрьме нельзя заходить в дома.");
+    return;
+  }
+
+  if (account.hospitalized) {
+    player.sendClientMessage(Color.error, "Сначала пройдите лечение в больнице.");
+    return;
+  }
+
   const house = getHouse(houseId);
   if (!house || house.ownerId === null) {
     player.sendClientMessage(Color.error, "Этот дом свободен.");
@@ -75,7 +97,7 @@ export function tryEnterHouse(player: Player, houseId: number): void {
     return;
   }
 
-  if (!canEnterHouse(account.id, house)) {
+  if (!canEnterHouse(player, house)) {
     player.sendClientMessage(Color.error, "Дом закрыт.");
     return;
   }

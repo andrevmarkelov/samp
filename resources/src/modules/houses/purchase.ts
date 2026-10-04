@@ -142,6 +142,6 @@ export async function tryPurchaseHouse(player: Player, houseId: number): Promise
   );
   player.sendClientMessage(
     Color.info,
-    "Для управления домом используйте /hmenu внутри интерьера."
+    "Для управления домом используйте /home внутри интерьера."
   );
 }

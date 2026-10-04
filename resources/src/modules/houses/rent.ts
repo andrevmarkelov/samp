@@ -16,6 +16,7 @@ import {
   type HouseRecord,
 } from "./repository";
 import { clearInsideHouse, getInsideHouse } from "./session";
+import { onHouseStoreVacated } from "./store";
 import { houseVirtualWorld } from "./world";
 
 const RENT_CHECK_MS = 60_000;
@@ -138,6 +139,7 @@ function applyHouseVacated(houseId: number, messages: VacateHouseMessages): void
 
   const ownerId = house.ownerId;
   clearHouseForSale(houseId);
+  onHouseStoreVacated(houseId);
   updateEntrancePickup(houseId);
 
   if (ownerId !== null) {

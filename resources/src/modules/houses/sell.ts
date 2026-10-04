@@ -15,6 +15,7 @@ import {
   sellHouseToState,
 } from "./repository";
 import { clearInsideHouse } from "./session";
+import { onHouseStoreVacated } from "./store";
 
 export const HOUSE_SELL_DIALOG_ID = 46;
 
@@ -113,17 +114,27 @@ async function confirmSellHouse(player: Player): Promise<void> {
     return;
   }
 
-  if (
-    !isPlayerActive(player) ||
-    getAccount(player)?.id !== account.id ||
-    !isNearOwnHouse(player, house.id)
-  ) {
+  // БД уже продала дом — кэш/лейбл/шкаф чистим всегда (даже если игрок отошёл).
+  const cleared = clearHouseForSale(house.id);
+  updateEntrancePickup(house.id);
+  refreshAllHouseMapIcons();
+  onHouseStoreVacated(house.id);
+
+  if (!cleared) {
+    if (isPlayerActive(player) && getAccount(player)?.id === account.id) {
+      player.sendClientMessage(Color.error, "Продажа не прошла. Попробуйте ещё раз.");
+    }
     return;
   }
 
-  const cleared = clearHouseForSale(house.id);
-  if (!cleared) {
-    player.sendClientMessage(Color.error, "Продажа не прошла. Попробуйте ещё раз.");
+  if (slotId !== null) {
+    clearInsideHouse(slotId);
+  }
+
+  if (
+    !isPlayerActive(player) ||
+    getAccount(player)?.id !== account.id
+  ) {
     return;
   }
 
@@ -137,10 +148,6 @@ async function confirmSellHouse(player: Player): Promise<void> {
     const message = error instanceof Error ? error.message : String(error);
     omp.log(`[${SERVER_TAG}] не удалось сохранить деньги ${account.name}: ${message}`);
   });
-
-  updateEntrancePickup(house.id);
-  refreshAllHouseMapIcons();
-  clearInsideHouse(slotId);
 
   const sold = getHouse(house.id);
   player.sendClientMessage(

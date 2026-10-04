@@ -57,7 +57,7 @@ const CATEGORIES: readonly HelpCategory[] = [
   {
     key: "houses",
     label: "Дома",
-    commands: ["hmenu", "heal", "sellhouse", "findidhouse"],
+    commands: ["home", "heal", "sellhouse", "findidhouse", "makestore", "use"],
   },
   {
     key: "business",

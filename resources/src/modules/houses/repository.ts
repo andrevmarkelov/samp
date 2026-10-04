@@ -44,6 +44,13 @@ CREATE TABLE IF NOT EXISTS houses (
   is_locked TINYINT(1) NOT NULL DEFAULT 1,
   class_id TINYINT UNSIGNED NOT NULL DEFAULT 0,
   rent_paid_until DATE NULL DEFAULT NULL,
+  store_x FLOAT NULL DEFAULT NULL,
+  store_y FLOAT NULL DEFAULT NULL,
+  store_z FLOAT NULL DEFAULT NULL,
+  store_metal INT UNSIGNED NOT NULL DEFAULT 0,
+  store_ammo INT UNSIGNED NOT NULL DEFAULT 0,
+  store_money INT UNSIGNED NOT NULL DEFAULT 0,
+  store_drugs INT UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (id),
   KEY idx_houses_owner_id (owner_id),
   CONSTRAINT fk_houses_owner FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE SET NULL
@@ -70,6 +77,14 @@ export type HouseRecord = {
   isLocked: boolean;
   classId: number;
   rentPaidUntil: string | null;
+  /** null — шкаф ещё не установлен. */
+  storeX: number | null;
+  storeY: number | null;
+  storeZ: number | null;
+  storeMetal: number;
+  storeAmmo: number;
+  storeMoney: number;
+  storeDrugs: number;
 };
 
 type HouseRow = RowDataPacket & {
@@ -92,7 +107,19 @@ type HouseRow = RowDataPacket & {
   is_locked: number;
   class_id: number;
   rent_paid_until: Date | string | null;
+  store_x: number | null;
+  store_y: number | null;
+  store_z: number | null;
+  store_metal: number;
+  store_ammo: number;
+  store_money: number;
+  store_drugs: number;
 };
+
+const HOUSE_STORE_CLEAR_SQL = `
+  store_x = NULL, store_y = NULL, store_z = NULL,
+  store_metal = 0, store_ammo = 0, store_money = 0, store_drugs = 0
+`;
 
 let cachedHouses: HouseRecord[] = [];
 
@@ -152,7 +179,203 @@ export function clearHouseForSale(houseId: number): HouseRecord | null {
   house.hasMedkit = false;
   house.isLocked = true;
   house.rentPaidUntil = null;
+  clearHouseStoreInMemory(house);
   return house;
+}
+
+function clearHouseStoreInMemory(house: HouseRecord): void {
+  house.storeX = null;
+  house.storeY = null;
+  house.storeZ = null;
+  house.storeMetal = 0;
+  house.storeAmmo = 0;
+  house.storeMoney = 0;
+  house.storeDrugs = 0;
+}
+
+export function setHouseStorePosition(
+  houseId: number,
+  x: number,
+  y: number,
+  z: number
+): HouseRecord | null {
+  const house = cachedHouses.find((item) => item.id === houseId);
+  if (!house) {
+    return null;
+  }
+
+  house.storeX = x;
+  house.storeY = y;
+  house.storeZ = z;
+  return house;
+}
+
+export function patchHouseStoreStock(
+  houseId: number,
+  patch: Partial<
+    Pick<HouseRecord, "storeMetal" | "storeAmmo" | "storeMoney" | "storeDrugs">
+  >
+): HouseRecord | null {
+  const house = cachedHouses.find((item) => item.id === houseId);
+  if (!house) {
+    return null;
+  }
+
+  if (patch.storeMetal !== undefined) {
+    house.storeMetal = Math.max(0, Math.floor(patch.storeMetal));
+  }
+  if (patch.storeAmmo !== undefined) {
+    house.storeAmmo = Math.max(0, Math.floor(patch.storeAmmo));
+  }
+  if (patch.storeMoney !== undefined) {
+    house.storeMoney = Math.max(0, Math.floor(patch.storeMoney));
+  }
+  if (patch.storeDrugs !== undefined) {
+    house.storeDrugs = Math.max(0, Math.floor(patch.storeDrugs));
+  }
+  return house;
+}
+
+export function hasHouseStore(house: HouseRecord): boolean {
+  return (
+    house.storeX !== null &&
+    house.storeY !== null &&
+    house.storeZ !== null &&
+    Number.isFinite(house.storeX) &&
+    Number.isFinite(house.storeY) &&
+    Number.isFinite(house.storeZ)
+  );
+}
+
+export async function saveHouseStorePosition(
+  houseId: number,
+  ownerId: number,
+  x: number,
+  y: number,
+  z: number
+): Promise<boolean> {
+  const result = await execute(
+    `UPDATE houses
+     SET store_x = ?, store_y = ?, store_z = ?
+     WHERE id = ? AND owner_id = ?`,
+    [x, y, z, houseId, ownerId]
+  );
+  return result.affectedRows === 1;
+}
+
+/** Потолок содержимого шкафа (INT UNSIGNED / safe JS). */
+const MAX_STORE_AMOUNT = 2_147_483_647;
+
+export async function addHouseStoreItem(
+  houseId: number,
+  ownerId: number,
+  item: "metal" | "ammo" | "money" | "drugs",
+  amount: number
+): Promise<number | null> {
+  const value = Math.floor(amount);
+  if (!Number.isFinite(value) || value < 1) {
+    return null;
+  }
+
+  const column = storeColumn(item);
+  // Не даём переполнить INT: только если column + value помещается.
+  const result = await execute(
+    `UPDATE houses
+     SET ${column} = ${column} + ?
+     WHERE id = ? AND owner_id = ? AND ${column} <= ?`,
+    [value, houseId, ownerId, MAX_STORE_AMOUNT - value]
+  );
+  if (result.affectedRows !== 1) {
+    return null;
+  }
+
+  const house = getHouse(houseId);
+  if (house) {
+    writeStoreItem(house, item, Math.min(MAX_STORE_AMOUNT, readStoreItem(house, item) + value));
+    return readStoreItem(house, item);
+  }
+
+  // БД уже обновлена — не откатываем вызывающему «null» как полный fail.
+  return value;
+}
+
+export async function takeHouseStoreItem(
+  houseId: number,
+  ownerId: number,
+  item: "metal" | "ammo" | "money" | "drugs",
+  amount: number
+): Promise<boolean> {
+  const value = Math.floor(amount);
+  if (!Number.isFinite(value) || value < 1) {
+    return false;
+  }
+
+  const column = storeColumn(item);
+  const result = await execute(
+    `UPDATE houses
+     SET ${column} = ${column} - ?
+     WHERE id = ? AND owner_id = ? AND ${column} >= ?`,
+    [value, houseId, ownerId, value]
+  );
+  if (result.affectedRows !== 1) {
+    return false;
+  }
+
+  const house = getHouse(houseId);
+  if (house) {
+    writeStoreItem(house, item, Math.max(0, readStoreItem(house, item) - value));
+  }
+  return true;
+}
+
+function storeColumn(item: "metal" | "ammo" | "money" | "drugs"): string {
+  switch (item) {
+    case "metal":
+      return "store_metal";
+    case "ammo":
+      return "store_ammo";
+    case "money":
+      return "store_money";
+    case "drugs":
+      return "store_drugs";
+  }
+}
+
+function readStoreItem(
+  house: HouseRecord,
+  item: "metal" | "ammo" | "money" | "drugs"
+): number {
+  switch (item) {
+    case "metal":
+      return house.storeMetal;
+    case "ammo":
+      return house.storeAmmo;
+    case "money":
+      return house.storeMoney;
+    case "drugs":
+      return house.storeDrugs;
+  }
+}
+
+function writeStoreItem(
+  house: HouseRecord,
+  item: "metal" | "ammo" | "money" | "drugs",
+  value: number
+): void {
+  switch (item) {
+    case "metal":
+      house.storeMetal = value;
+      break;
+    case "ammo":
+      house.storeAmmo = value;
+      break;
+    case "money":
+      house.storeMoney = value;
+      break;
+    case "drugs":
+      house.storeDrugs = value;
+      break;
+  }
 }
 
 export function setHouseRentPaidUntil(houseId: number, paidUntil: string | null): void {
@@ -190,7 +413,8 @@ export async function sellHouseToState(
     const price = Math.max(0, Math.floor(Number(houseRow.price)));
     const [houseUpdate] = await conn.query<ResultSetHeader>(
       `UPDATE houses
-       SET owner_id = NULL, has_medkit = 0, is_locked = 1, rent_paid_until = NULL
+       SET owner_id = NULL, has_medkit = 0, is_locked = 1, rent_paid_until = NULL,
+           ${HOUSE_STORE_CLEAR_SQL}
        WHERE id = ? AND owner_id = ?`,
       [houseId, ownerId]
     );
@@ -444,7 +668,8 @@ export async function adminVacateHouse(houseId: number): Promise<AdminVacateHous
 
     await conn.query(
       `UPDATE houses
-       SET owner_id = NULL, has_medkit = 0, is_locked = 1, rent_paid_until = NULL
+       SET owner_id = NULL, has_medkit = 0, is_locked = 1, rent_paid_until = NULL,
+           ${HOUSE_STORE_CLEAR_SQL}
        WHERE id = ?`,
       [houseId]
     );
@@ -483,7 +708,8 @@ export async function forfeitExpiredHouses(): Promise<number[]> {
 
       const [houseUpdate] = await conn.query<ResultSetHeader>(
         `UPDATE houses
-         SET owner_id = NULL, has_medkit = 0, is_locked = 1, rent_paid_until = NULL
+         SET owner_id = NULL, has_medkit = 0, is_locked = 1, rent_paid_until = NULL,
+             ${HOUSE_STORE_CLEAR_SQL}
          WHERE id = ? AND owner_id = ?`,
         [houseId, ownerId]
       );
@@ -521,6 +747,43 @@ async function migrateHousesTable(): Promise<void> {
        WHERE owner_id IS NOT NULL
          AND rent_paid_until IS NULL`
     );
+  }
+
+  const storeColumns: Array<{ name: string; sql: string }> = [
+    {
+      name: "store_x",
+      sql: "ALTER TABLE houses ADD COLUMN store_x FLOAT NULL DEFAULT NULL AFTER rent_paid_until",
+    },
+    {
+      name: "store_y",
+      sql: "ALTER TABLE houses ADD COLUMN store_y FLOAT NULL DEFAULT NULL AFTER store_x",
+    },
+    {
+      name: "store_z",
+      sql: "ALTER TABLE houses ADD COLUMN store_z FLOAT NULL DEFAULT NULL AFTER store_y",
+    },
+    {
+      name: "store_metal",
+      sql: "ALTER TABLE houses ADD COLUMN store_metal INT UNSIGNED NOT NULL DEFAULT 0 AFTER store_z",
+    },
+    {
+      name: "store_ammo",
+      sql: "ALTER TABLE houses ADD COLUMN store_ammo INT UNSIGNED NOT NULL DEFAULT 0 AFTER store_metal",
+    },
+    {
+      name: "store_money",
+      sql: "ALTER TABLE houses ADD COLUMN store_money INT UNSIGNED NOT NULL DEFAULT 0 AFTER store_ammo",
+    },
+    {
+      name: "store_drugs",
+      sql: "ALTER TABLE houses ADD COLUMN store_drugs INT UNSIGNED NOT NULL DEFAULT 0 AFTER store_money",
+    },
+  ];
+
+  for (const column of storeColumns) {
+    if (!(await houseColumnExists(column.name))) {
+      await getPool().query(column.sql);
+    }
   }
 
   if (!(await houseIndexExists("uq_houses_owner_id"))) {
@@ -604,7 +867,14 @@ async function loadHouses(): Promise<HouseRecord[]> {
       h.has_medkit,
       h.is_locked,
       h.class_id,
-      h.rent_paid_until
+      h.rent_paid_until,
+      h.store_x,
+      h.store_y,
+      h.store_z,
+      h.store_metal,
+      h.store_ammo,
+      h.store_money,
+      h.store_drugs
     FROM houses h
     LEFT JOIN users u ON u.id = h.owner_id
     ORDER BY h.id`
@@ -646,6 +916,19 @@ async function loadHouses(): Promise<HouseRecord[]> {
       continue;
     }
 
+    const storeX =
+      row.store_x === null || row.store_x === undefined
+        ? null
+        : Number(row.store_x);
+    const storeY =
+      row.store_y === null || row.store_y === undefined
+        ? null
+        : Number(row.store_y);
+    const storeZ =
+      row.store_z === null || row.store_z === undefined
+        ? null
+        : Number(row.store_z);
+
     houses.push({
       id,
       ownerId,
@@ -666,6 +949,16 @@ async function loadHouses(): Promise<HouseRecord[]> {
       isLocked: Number(row.is_locked) !== 0,
       classId,
       rentPaidUntil: parseRentDate(row.rent_paid_until),
+      storeX:
+        storeX !== null && Number.isFinite(storeX) ? storeX : null,
+      storeY:
+        storeY !== null && Number.isFinite(storeY) ? storeY : null,
+      storeZ:
+        storeZ !== null && Number.isFinite(storeZ) ? storeZ : null,
+      storeMetal: Math.max(0, Math.floor(Number(row.store_metal ?? 0))),
+      storeAmmo: Math.max(0, Math.floor(Number(row.store_ammo ?? 0))),
+      storeMoney: Math.max(0, Math.floor(Number(row.store_money ?? 0))),
+      storeDrugs: Math.max(0, Math.floor(Number(row.store_drugs ?? 0))),
     });
   }
 

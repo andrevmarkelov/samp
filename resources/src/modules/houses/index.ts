@@ -11,6 +11,8 @@ import { bindHouseSellDialog } from "./sell";
 import { bindHouseMapIcons, refreshHouseMapIcons } from "./map-icons";
 import { notifyHouseRentReminder, startHouseRentScheduler } from "./rent";
 import { ensureHousesTable, listHouses } from "./repository";
+import { bindHouseStoreDialogs } from "./store";
+import { startHouseStoreDisplays } from "./store-display";
 
 const rentReminderShown = new Set<number>();
 
@@ -26,6 +28,8 @@ export const housesModule: GameModule = {
       await ensureHousesTable();
       startHouseEntrances();
       startHouseExits();
+      startHouseStoreDisplays();
+      bindHouseStoreDialogs();
       bindHouseMapIcons();
       bindHouseMenuDialogs();
       bindHouseSellDialog();

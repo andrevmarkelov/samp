@@ -22,6 +22,14 @@ export function isNearHouseEntrance(
       return false;
     }
 
+    // Вход/покупка только с улицы — не из чужого VW с теми же XYZ.
+    if (
+      player.getVirtualWorld() !== STREET_WORLD ||
+      player.getInterior() !== 0
+    ) {
+      return false;
+    }
+
     const pos = player.getPos();
     return (
       distance3d(
