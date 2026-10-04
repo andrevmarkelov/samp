@@ -24,6 +24,8 @@ import "./r";
 import "./f";
 import "./capture";
 import "./makegun";
+import "./sellgun";
+import "./selldrug";
 import "./d";
 import "./gov";
 import "./clear";
@@ -55,6 +57,8 @@ import { bindAds } from "./ads";
 import { bindMedcardOffers } from "./medcard";
 import { bindHelpDialogs } from "./help";
 import { bindTakeDialogs } from "./take";
+import { bindSellGunOffers } from "./sellgun";
+import { bindSellDrugOffers } from "./selldrug";
 
 export const commandsModule: GameModule = {
   name: "commands",
@@ -73,5 +77,7 @@ export const commandsModule: GameModule = {
     bindAds();
     bindMedcardOffers();
     bindTakeDialogs();
+    bindSellGunOffers();
+    bindSellDrugOffers();
   },
 };

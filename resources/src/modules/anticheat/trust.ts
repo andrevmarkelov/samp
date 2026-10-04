@@ -133,29 +133,53 @@ export function grantWeapon(player: Player, weaponId: number, ammo: number): boo
     return false;
   }
   trustWeapon(player, weaponId, ammo);
-  // Подтянуть факт с клиента после выдачи (если getWeaponData доступен).
+  syncTrustedWeaponSlot(player, weaponId);
+  return true;
+}
+
+/** Забрать оружие из слота и сбросить trust. */
+export function revokeWeapon(player: Player, weaponId: number): boolean {
+  try {
+    player.removeWeapon(weaponId);
+  } catch {
+    return false;
+  }
+
+  const state = stateOf(player);
+  const slot = weaponSlot(weaponId);
+  if (state && slot >= 0 && slot < WEAPON_SLOTS && state.weapons[slot]) {
+    state.weapons[slot].id = 0;
+    state.weapons[slot].ammo = 0;
+    state.weaponTrustedUntil = nowMs() + getConfig().weaponGraceMs;
+  }
+
+  return true;
+}
+
+function syncTrustedWeaponSlot(player: Player, weaponId: number): void {
   try {
     const slot = weaponSlot(weaponId);
-    if (slot >= 0) {
-      const data = player.getWeaponData(slot) as {
-        weapons?: number;
-        weapon?: number;
-        ammo?: number;
-      };
-      const gotId = Number(data.weapons ?? data.weapon ?? 0);
-      const gotAmmo = Number(data.ammo ?? 0);
-      const state = stateOf(player);
-      if (state?.weapons[slot] && gotId === weaponId && gotAmmo >= 0) {
-        state.weapons[slot].id = gotId;
-        state.weapons[slot].ammo = gotAmmo;
-        state.weaponTrustedUntil = nowMs() + getConfig().weaponGraceMs;
-      }
+    if (slot < 0) {
+      return;
+    }
+
+    const data = player.getWeaponData(slot) as {
+      weaponid?: number;
+      weapons?: number;
+      weapon?: number;
+      ammo?: number;
+    };
+    const gotId = Number(data.weaponid ?? data.weapons ?? data.weapon ?? 0);
+    const gotAmmo = Number(data.ammo ?? 0);
+    const state = stateOf(player);
+    if (state?.weapons[slot] && gotId === weaponId && gotAmmo >= 0) {
+      state.weapons[slot].id = gotId;
+      state.weapons[slot].ammo = gotAmmo;
+      state.weaponTrustedUntil = nowMs() + getConfig().weaponGraceMs;
     }
   } catch {
     // ignore
   }
-
-  return true;
 }
 
 export function grantArmour(player: Player, armour: number): void {
