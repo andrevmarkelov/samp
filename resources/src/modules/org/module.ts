@@ -6,6 +6,7 @@ import { bindArmyLocker } from "./army-locker";
 import { bindArmyFactoryDoors } from "./army-factory-doors";
 import { bindAmmunationDoors } from "./ammunation-doors";
 import { bindOrgGates } from "./gates";
+import { bindHospitalArchive } from "./hospital-archive";
 import { bindHospitalRoofAccess } from "./hospital-roof";
 import { bindHospitalDoors } from "./hospital-doors";
 import { bindHospitalMedkit } from "./hospital-medkit";
@@ -38,6 +39,7 @@ export const orgModule: GameModule = {
     bindArmyDisguise();
     bindHospitalRoofAccess();
     bindHospitalDoors();
+    bindHospitalArchive();
     bindHospitalStock();
     bindHospitalMedkit();
     bindMeriyaStaffDoors();

@@ -29,6 +29,8 @@ const BED_USE_RADIUS = 2;
 const TICK_MS = 200;
 const HEAL_MS = 4500;
 const HEAL_AMOUNT = 10;
+/** Звук тика лечения (PlayerPlaySound). */
+const HEAL_SOUND_ID = 17803;
 const HOSPITAL_MAP_ICON_SLOT = 0;
 const HOSPITAL_MAP_ICON_TYPE = 22;
 const MAPICON_LOCAL = 0;
@@ -132,7 +134,10 @@ const BEDS: readonly SpawnPoint[] = [
 const lastTeleportAt = new Map<number, number>();
 const lastExitMsgAt = new Map<number, number>();
 const iconShown = new Set<number>();
+/** Слот → индекс койки (пока лежит на ней). */
 const bedByPlayer = new Map<number, number>();
+/** Слоты, начавшие лечение через /hospital — ходят по интерьеру, пока hospitalized. */
+const treatingPlayers = new Set<number>();
 const occupantByBed: Array<number | null> = BEDS.map(() => null);
 const bedLabels: BedLabelSet[] = [];
 let lastHealAt = 0;
@@ -192,26 +197,40 @@ export const hospitalModule: GameModule = {
     setInterval(tickHospital, TICK_MS);
 
     omp.on("playerConnect", (player) => {
-      const id = playerId(player);
-      if (id !== null) {
-        lastTeleportAt.delete(id);
-        lastExitMsgAt.delete(id);
-        iconShown.delete(id);
-        releaseBed(id);
-      }
+      clearHospitalSlot(player);
     });
 
     omp.on("playerDisconnect", (player) => {
-      const id = playerId(player);
-      if (id !== null) {
-        lastTeleportAt.delete(id);
-        lastExitMsgAt.delete(id);
-        iconShown.delete(id);
-        releaseBed(id);
-      }
+      clearHospitalSlot(player);
+    });
+
+    // Смерть сбрасывает сессию койки — после респавна снова нужен /hospital.
+    omp.on("playerDeath", (player) => {
+      clearHospitalSlot(player);
     });
   },
 };
+
+/**
+ * Снять hospitalized после внешнего полного лечения (/medhelp и т.п.).
+ * Иначе пациент с 100 HP остаётся заперт в интерьере.
+ */
+export function dischargeHospitalPatient(player: Player): void {
+  const id = playerId(player);
+  if (id !== null) {
+    releaseBed(id);
+    treatingPlayers.delete(id);
+  }
+
+  const account = getAccount(player);
+  if (!account?.hospitalized) {
+    return;
+  }
+
+  patchAccount(player, { hospitalized: false });
+  void saveUserHospitalized(account.id, false, account.health);
+  queueSave(player);
+}
 
 export function tryOccupyHospitalBed(player: Player): void {
   if (!isAuthenticated(player)) {
@@ -229,8 +248,11 @@ export function tryOccupyHospitalBed(player: Player): void {
     return;
   }
 
-  if (bedByPlayer.has(id)) {
-    player.sendClientMessage(Color.gray, "Вы уже лежите на койке.");
+  if (treatingPlayers.has(id)) {
+    player.sendClientMessage(
+      Color.gray,
+      "Лечение уже идёт. Можете ходить по больнице; на улицу — после выздоровления."
+    );
     return;
   }
 
@@ -297,18 +319,24 @@ function occupyBed(player: Player, playerSlot: number, bedIndex: number): void {
 
   occupantByBed[bedIndex] = playerSlot;
   bedByPlayer.set(playerSlot, bedIndex);
+  treatingPlayers.add(playerSlot);
   updateBedLabel(bedIndex);
 
   try {
-    placeAt(player, bed);
+    placeAt(player, bed, { settleMs: false });
   } catch {
     releaseBed(playerSlot);
+    treatingPlayers.delete(playerSlot);
     return;
   }
 
   player.sendClientMessage(
     Color.info,
     `Вы заняли койку №${bedIndex + 1}. Лечение началось.`
+  );
+  player.sendClientMessage(
+    Color.gray,
+    "Можете ходить по больнице. На улицу — после выздоровления."
   );
 }
 
@@ -327,6 +355,7 @@ function releaseBed(playerSlot: number): void {
 
 function finishTreatment(player: Player, playerSlot: number): void {
   releaseBed(playerSlot);
+  treatingPlayers.delete(playerSlot);
 
   const account = getAccount(player);
   patchAccount(player, { health: MAX_HEALTH, hospitalized: false });
@@ -337,6 +366,19 @@ function finishTreatment(player: Player, playerSlot: number): void {
   }
 
   player.sendClientMessage(Color.info, "Лечение завершено. Можете выйти на улицу.");
+}
+
+function clearHospitalSlot(player: Player): void {
+  const id = playerId(player);
+  if (id === null) {
+    return;
+  }
+
+  lastTeleportAt.delete(id);
+  lastExitMsgAt.delete(id);
+  iconShown.delete(id);
+  treatingPlayers.delete(id);
+  releaseBed(id);
 }
 
 function getAccountBySlot(slot: number): ReturnType<typeof getAccount> {
@@ -427,7 +469,7 @@ function tickHospital(): void {
   const now = Date.now();
   if (now - lastHealAt >= HEAL_MS) {
     lastHealAt = now;
-    healOccupiedBeds();
+    healTreatingPatients();
   }
 
   omp.players.forEach((player) => {
@@ -503,39 +545,44 @@ function tickHospital(): void {
   });
 }
 
-function healOccupiedBeds(): void {
-  omp.players.forEach((player) => {
-    const id = playerId(player);
-    if (id === null || !isPlayerActive(player)) {
-      return;
-    }
+function healTreatingPatients(): void {
+  if (treatingPlayers.size === 0) {
+    return;
+  }
 
-    const bedIndex = bedByPlayer.get(id);
-    const bed = bedIndex === undefined ? undefined : BEDS[bedIndex];
-    if (bedIndex === undefined || !bed) {
-      return;
+  for (const id of [...treatingPlayers]) {
+    const player = omp.players.at(id);
+    if (!player || !isPlayerActive(player)) {
+      treatingPlayers.delete(id);
+      releaseBed(id);
+      continue;
     }
 
     const account = getAccount(player);
     if (!account?.hospitalized) {
+      treatingPlayers.delete(id);
       releaseBed(id);
-      return;
+      continue;
     }
 
     try {
-      const pos = player.getPos();
       if (player.getVirtualWorld() !== HOSPITAL_WORLD) {
+        // Выход из VW без улицы (админ и т.п.) — койку освобождаем, лечение на паузе.
         releaseBed(id);
-        return;
+        continue;
       }
 
-      if (distance3d(pos.x, pos.y, pos.z, bed.x, bed.y, bed.z) > BED_USE_RADIUS) {
-        releaseBed(id);
-        player.sendClientMessage(Color.gray, "Вы встали с койки. Лечение остановлено.");
-        return;
+      const bedIndex = bedByPlayer.get(id);
+      const bed = bedIndex === undefined ? undefined : BEDS[bedIndex];
+      if (bed) {
+        const pos = player.getPos();
+        if (distance3d(pos.x, pos.y, pos.z, bed.x, bed.y, bed.z) > BED_USE_RADIUS) {
+          // Отошёл от койки — можно ходить по интерьеру, лечение продолжается.
+          releaseBed(id);
+        }
       }
     } catch {
-      return;
+      continue;
     }
 
     let live = account.health;
@@ -546,13 +593,25 @@ function healOccupiedBeds(): void {
     }
 
     const next = Math.min(MAX_HEALTH, live + HEAL_AMOUNT);
+    if (next <= live) {
+      if (next >= MAX_HEALTH) {
+        finishTreatment(player, id);
+      }
+      continue;
+    }
+
     applyHealth(player, next);
     patchAccount(player, { health: next });
+    try {
+      player.playGameSound(HEAL_SOUND_ID, 0, 0, 0);
+    } catch {
+      // Слот пустой.
+    }
 
     if (next >= MAX_HEALTH) {
       finishTreatment(player, id);
     }
-  });
+  }
 }
 
 function tryLeaveHospital(player: Player): void {
@@ -572,7 +631,9 @@ function tryLeaveHospital(player: Player): void {
     lastExitMsgAt.set(id, now);
     player.sendClientMessage(
       Color.error,
-      "Вам нужно лечение. Займите койку: /hospital."
+      treatingPlayers.has(id)
+        ? "Лечение ещё не закончено. На улицу — после выздоровления."
+        : "Вам нужно лечение. Займите койку: /hospital."
     );
     return;
   }

@@ -781,6 +781,10 @@ minX 2153.8, minY -2292.9, maxX 2237.8, maxY -2218.9
 | Disconnect / увольнение | чемодан снят, оставшиеся ед. **возвращаются** на склад (`addWarehouseMeds`) |
 | Конфликт | во время доставки (`/pickmed` / рейс) набор со склада не выдаётся; с чемоданом нельзя `/pickmed` |
 
+### Архивная (больница)
+
+Файл: `org/hospital-archive.ts`. Пикапы **ALT** в VW больницы (interior 0): холл `1163.47, -1330.92` ↔ архивная `1161.67, -1330.91`. Вход/выход только с пикапа; доступ — сотрудники **Больницы** и **FBI**.
+
 ---
 
 ## Гетто: барыга Смоки
@@ -1484,6 +1488,7 @@ Law (LSPD / областная полиция / FBI), рядом (`WHISPER_RADIU
 | Склады: металл с шахты | `warehouse` → `addMineMetal`, `miner/index.ts` → `deliver` |
 | Склады: медикаменты больницы | `warehouse` → `addWarehouseMeds` |
 | Больница: склад медикаментов (лейбл) | `org/hospital-stock.ts` |
+| Больница: архивная (ALT) | `org/hospital-archive.ts` |
 | Больница: набор врача /medhelp | `org/hospital-medkit.ts`, `commands/medhelp.ts` |
 | Больница: доставка лекарств | `vehicles/hospital.ts` |
 | Склады: списание медикаментов | `warehouse/repository.ts` → `takeWarehouseMeds` |

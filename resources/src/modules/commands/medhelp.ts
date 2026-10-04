@@ -21,6 +21,7 @@ import {
   MAX_HEALTH,
   patchAccount,
 } from "../auth/session";
+import { dischargeHospitalPatient } from "../hospital";
 import { ORG_HOSPITAL_ID, getMembership } from "../org";
 import {
   consumeHospitalMed,
@@ -77,8 +78,7 @@ export function bindMedhelpOffers(): void {
     }
 
     if (Date.now() > offer.expiresAt) {
-      pendingOffers.delete(slot);
-      releaseYnOffer(slot, "medhelp");
+      clearExpiredMedhelpOffer(slot);
       player.sendClientMessage(Color.error, "Предложение лечения истекло.");
       return;
     }
@@ -254,6 +254,8 @@ function tryMedhelp(player: Player, raw: string): void {
     return;
   }
 
+  clearExpiredMedhelpOffer(targetSlot);
+
   if (pendingOffers.has(targetSlot) || !claimYnOffer(targetSlot, "medhelp")) {
     player.sendClientMessage(Color.error, "У игрока уже есть активное предложение.");
     return;
@@ -413,6 +415,8 @@ function acceptOffer(patient: Player, patientSlot: number, offer: MedhelpOffer):
 
   patchAccount(patient, { health: MAX_HEALTH });
   applyHealth(patient, MAX_HEALTH);
+  // Иначе hospitalized остаётся true — пациент с 100 HP не выйдет на улицу.
+  dischargeHospitalPatient(patient);
 
   const patientWallet = getAccount(patient);
   const doctorWallet = getAccount(doctor);
@@ -451,6 +455,23 @@ function refuseOffer(patient: Player, patientSlot: number, offer: MedhelpOffer):
       `${playerName(patient)} отказался от лечения.`
     );
   }
+}
+
+function clearExpiredMedhelpOffer(slot: number): void {
+  const offer = pendingOffers.get(slot);
+  if (!offer) {
+    if (getYnOfferKind(slot) === "medhelp") {
+      releaseYnOffer(slot, "medhelp");
+    }
+    return;
+  }
+
+  if (Date.now() <= offer.expiresAt) {
+    return;
+  }
+
+  pendingOffers.delete(slot);
+  releaseYnOffer(slot, "medhelp");
 }
 
 function broadcastHospitalMed(
