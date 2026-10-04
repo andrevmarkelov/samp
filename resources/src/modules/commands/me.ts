@@ -10,5 +10,5 @@ registerCommand("me", "Действие или эмоция от третьег�
     return;
   }
 
-  sendNearby(player, CHAT_RADIUS, Color.action, `* ${playerName(player)} ${text}`);
+  sendNearby(player, CHAT_RADIUS, Color.action, `${playerName(player)} ${text}`);
 });

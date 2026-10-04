@@ -1282,8 +1282,9 @@ Staff (инвайт / увольнение / ранг): **≥ 9**. Управл�
 | Ник | тёмно-серый `0x2A2A2A` (только обычный IC-чат) |
 | Снятие | повторный `/mask`, смерть, тюрьма, истечение таймера |
 | Выход | купленные и надетая маска сбрасываются |
+| `/unmask [id]` | полиция / FBI рядом — сорвать маску (отыгровка как `/me`, без анимации) |
 
-Файлы: `modules/mask/index.ts`, `commands/mask.ts`, `businesses/shop-247.ts`.
+Файлы: `modules/mask/index.ts`, `commands/mask.ts`, `commands/unmask.ts`, `businesses/shop-247.ts`.
 
 ---
 

@@ -38,6 +38,7 @@ import "./sellhouse";
 import "./pay";
 import "./find-id";
 import "./mask";
+import "./unmask";
 import { bindMenuDialogs } from "./mn";
 import { bindGpsDialogs } from "../gps";
 import { bindReportDialogs } from "./report";
