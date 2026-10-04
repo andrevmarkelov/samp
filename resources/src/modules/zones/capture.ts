@@ -510,6 +510,26 @@ export function isCaptureCombatKill(victim: Player, killer: Player): boolean {
   );
 }
 
+/** Участник активного капта (атака/защита), стоящий на зоне капта. */
+export function isCaptureParticipantOnTurf(player: Player): boolean {
+  const current = state;
+  if (!current || ending) {
+    return false;
+  }
+
+  if (!isPlayable(player)) {
+    return false;
+  }
+
+  const orgId = playerOrgId(player);
+  if (!isCaptureSide(orgId, current)) {
+    return false;
+  }
+
+  const turf = getTurf(current.zoneId);
+  return !!turf && playerOnTurf(player, turf);
+}
+
 export function startCapture(): void {
   if (!startCaptureHud()) {
     omp.log(`[${SERVER_TAG}] текстрау каптов не создан`);

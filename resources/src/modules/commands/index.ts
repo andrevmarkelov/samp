@@ -47,6 +47,9 @@ import "./mask";
 import "./unmask";
 import "./frisk";
 import "./take";
+import "./cuff";
+import "./putpl";
+import "./arrest";
 import "./anim";
 import { bindMenuDialogs } from "./mn";
 import { bindGpsDialogs } from "../gps";
@@ -64,6 +67,7 @@ import { bindHelpDialogs } from "./help";
 import { bindTakeDialogs } from "./take";
 import { bindSellGunOffers } from "./sellgun";
 import { bindSellDrugOffers } from "./selldrug";
+import { bindArrestCheckpoints } from "./arrest";
 
 export const commandsModule: GameModule = {
   name: "commands",
@@ -85,5 +89,6 @@ export const commandsModule: GameModule = {
     bindTakeDialogs();
     bindSellGunOffers();
     bindSellDrugOffers();
+    bindArrestCheckpoints();
   },
 };

@@ -3,6 +3,7 @@ import { Color } from "../../shared/colors";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { getAccount, isAuthenticated } from "../auth/session";
 import { assignStreamWorld, refreshStreamForPlayer } from "../mapping/stream";
+import { MERIYA_ADVOKAT_RANK, ORG_MERIYA_ID } from "../org/meriya";
 import { LAW_ORG_IDS } from "../org/lspd";
 import { getMembership } from "../org/membership";
 import { bindPrisonControl, isPrisonYardOpen } from "./control";
@@ -20,7 +21,8 @@ const PICKUP_RADIUS = 1.5;
 const TICK_MS = 200;
 const LABEL_HEIGHT = 0.85;
 const LABEL_DRAW_DISTANCE = 12;
-const DENY = "Открыть могут сотрудники LSPD, областной полиции и FBI.";
+const DENY =
+  "Открыть могут сотрудники LSPD, областной полиции, FBI и адвокаты мэрии.";
 
 const POINT = {
   x: 1810.8636,
@@ -302,6 +304,18 @@ function tickPrison(): void {
   });
 }
 
+/** Вход/выход и комната охраны: law + адвокаты мэрии (ранг как в /advokats). */
+function canEnterPrisonStaffDoor(
+  membership: NonNullable<ReturnType<typeof getMembership>>
+): boolean {
+  const orgId = membership.org.id;
+  if ((LAW_ORG_IDS as readonly number[]).includes(orgId)) {
+    return true;
+  }
+
+  return orgId === ORG_MERIYA_ID && membership.rank.id === MERIYA_ADVOKAT_RANK;
+}
+
 function tryUse(player: Player, door: PrisonDoor): void {
   if (isJailed(player) && (door.staffOnly || door.dest.world === STREET_WORLD)) {
     deny(player, JAIL_INMATE_DENY);
@@ -316,13 +330,13 @@ function tryUse(player: Player, door: PrisonDoor): void {
     }
 
     const membership = account ? getMembership(account) : null;
-    const orgId = membership?.org.id;
-    if (orgId === undefined || !(LAW_ORG_IDS as readonly number[]).includes(orgId)) {
+    if (!membership || !canEnterPrisonStaffDoor(membership)) {
       deny(player, DENY);
       return;
     }
   }
 
+  // Двор закрыт — никому, в т.ч. мэрии (пульт только у полиции/FBI).
   if (door.dest.world === PRISON_YARD_WORLD && !isPrisonYardOpen()) {
     deny(player, "Двор закрыт.");
     return;

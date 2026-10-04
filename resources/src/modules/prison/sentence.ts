@@ -11,6 +11,7 @@ import {
   type Account,
 } from "../auth/session";
 import { refreshStreamForPlayer } from "../mapping/stream";
+import { clearCuff } from "../cuff";
 import { clearMask } from "../mask";
 import { applyOrgVisuals } from "../org/appearance";
 import { clearArmyDisguise } from "../org/army-disguise";
@@ -141,6 +142,7 @@ export async function applyJail(player: Player, minutes: number): Promise<boolea
 
   placeInJail(player);
   clearArmyDisguise(player);
+  clearCuff(player);
   if (clearMask(player)) {
     tell(player, Color.gray, "Маска снята.");
   }

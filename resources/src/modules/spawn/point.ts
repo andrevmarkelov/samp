@@ -1,6 +1,7 @@
 import type { Player } from "@omp-node/core";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { trustPosition } from "../anticheat/trust";
+import { isCuffed } from "../cuff";
 
 export type SpawnPoint = {
   x: number;
@@ -177,7 +178,7 @@ export function scheduleSettleFreeze(player: Player, settleMs: number): void {
       settleTokens.delete(id);
 
       try {
-        if (isPlayerActive(player)) {
+        if (isPlayerActive(player) && !isCuffed(player)) {
           player.toggleControllable(true);
         }
       } catch {
@@ -209,7 +210,7 @@ export function clearPlaceAtSettle(player: Player): void {
   }
 
   try {
-    if (isPlayerActive(player)) {
+    if (isPlayerActive(player) && !isCuffed(player)) {
       player.toggleControllable(true);
     }
   } catch {

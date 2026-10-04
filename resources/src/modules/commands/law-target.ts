@@ -3,17 +3,19 @@ import { Color } from "../../shared/colors";
 import { WHISPER_RADIUS, arePlayersNearby } from "../../shared/nearby";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { getAccount, isAuthenticated } from "../auth/session";
+import { isCuffed } from "../cuff";
 import { canLawSearchTarget, isLawOfficer } from "../org/law";
 import { isJailed } from "../prison/sentence";
 
 const DENY = "Команда доступна сотрудникам полиции и FBI.";
 const PLAYER_STATE_WASTED = 7;
+const PLAYER_STATE_SPECTATING = 9;
 
 export type LawTargetResult =
   | { ok: true; officer: Player; target: Player; officerId: number; targetId: number }
   | { ok: false };
 
-/** Общий разбор `/cmd [id]` для law-обыска / изъятия. */
+/** Общий разбор `/cmd [id]` для law-обыска / изъятия / наручников. */
 export function resolveLawNearbyTarget(
   officer: Player,
   args: string,
@@ -26,6 +28,11 @@ export function resolveLawNearbyTarget(
 
   if (isJailed(officer)) {
     officer.sendClientMessage(Color.error, "В тюрьме команда недоступна.");
+    return { ok: false };
+  }
+
+  if (isCuffed(officer)) {
+    officer.sendClientMessage(Color.error, "В наручниках команда недоступна.");
     return { ok: false };
   }
 
@@ -58,7 +65,20 @@ export function resolveLawNearbyTarget(
   }
 
   try {
-    if (target.getState() === PLAYER_STATE_WASTED) {
+    const officerState = officer.getState();
+    if (
+      officerState === PLAYER_STATE_WASTED ||
+      officerState === PLAYER_STATE_SPECTATING
+    ) {
+      officer.sendClientMessage(Color.error, "Сейчас команда недоступна.");
+      return { ok: false };
+    }
+
+    const targetState = target.getState();
+    if (
+      targetState === PLAYER_STATE_WASTED ||
+      targetState === PLAYER_STATE_SPECTATING
+    ) {
       officer.sendClientMessage(Color.error, "Игрок не в игре.");
       return { ok: false };
     }
@@ -75,7 +95,7 @@ export function resolveLawNearbyTarget(
   if (!canLawSearchTarget(officer, target)) {
     officer.sendClientMessage(
       Color.error,
-      "Полиция может применять команду только к гражданским. FBI — к любым."
+      "Полиция может применять команду только к гражданским. FBI — к любым (в т.ч. полиции)."
     );
     return { ok: false };
   }

@@ -18,6 +18,7 @@ import {
   normalizeHunger,
   patchAccount,
 } from "../auth/session";
+import { applyCuffDisconnectJail } from "../cuff";
 import { isSafeZoneDamage } from "../zones/safe";
 import { isBankBusy } from "../bank/tellers";
 import type { GameModule } from "../types";
@@ -256,6 +257,8 @@ export const persistModule: GameModule = {
       if (slotId !== null) {
         hungerWarned.delete(slotId);
       }
+      // До queueSave: иначе в БД уйдёт jail_seconds=0 и штраф за выход сгорит.
+      applyCuffDisconnectJail(player);
       queueSave(player);
     });
 
