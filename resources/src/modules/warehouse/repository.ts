@@ -227,6 +227,23 @@ export function takeWarehouseDrugs(orgId: number, amount: number): boolean {
   return true;
 }
 
+/** Списать медикаменты со склада. false — недостаточно на складе. */
+export function takeWarehouseMeds(orgId: number, amount: number): boolean {
+  const take = Math.max(0, Math.floor(amount));
+  if (take <= 0) {
+    return false;
+  }
+
+  const record = cache.get(orgId);
+  if (!record || record.meds < take) {
+    return false;
+  }
+
+  record.meds -= take;
+  void persistMedsTake(orgId, take);
+  return true;
+}
+
 /** Открыть/закрыть склад банды или мафии. */
 export function setWarehouseLocked(orgId: number, locked: boolean): boolean {
   if (!warehouseUsesLock(orgId)) {
@@ -357,6 +374,21 @@ async function persistAmmoTake(orgId: number, amount: number): Promise<void> {
   try {
     await execute(
       "UPDATE warehouses SET ammo = GREATEST(0, CAST(ammo AS SIGNED) - ?) WHERE org_id = ?",
+      [amount, orgId]
+    );
+  } catch {
+    // Кэш уже обновлён.
+  }
+}
+
+async function persistMedsTake(orgId: number, amount: number): Promise<void> {
+  if (!isDatabaseReady() || amount <= 0) {
+    return;
+  }
+
+  try {
+    await execute(
+      "UPDATE warehouses SET meds = GREATEST(0, CAST(meds AS SIGNED) - ?) WHERE org_id = ?",
       [amount, orgId]
     );
   } catch {

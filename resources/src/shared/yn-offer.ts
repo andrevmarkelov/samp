@@ -4,6 +4,7 @@ export type YnOfferKind =
   | "biz"
   | "car"
   | "medcard"
+  | "medhelp"
   | "pass"
   | "lic"
   | "show_medcard"

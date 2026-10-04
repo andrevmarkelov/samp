@@ -61,6 +61,12 @@ export function unregisterOrgVehicle(vehicle: Vehicle): void {
   }
 }
 
+/** ТС зарегистрирован за организацией (больница, полиция…). */
+export function isRegisteredOrgVehicle(vehicle: Vehicle, orgId: number): boolean {
+  const access = accessFor(vehicle);
+  return access !== null && access.orgIds.includes(orgId);
+}
+
 export function bindOrgVehicleAccess(): void {
   omp.on("vehicleStreamIn", (vehicle, player) => {
     applyDoorLock(vehicle, player);

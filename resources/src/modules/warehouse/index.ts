@@ -16,6 +16,7 @@ export {
   takeMineMetal,
   takeWarehouseAmmo,
   takeWarehouseDrugs,
+  takeWarehouseMeds,
   takeWarehouseMetal,
   setWarehouseLocked,
   getWarehouse,

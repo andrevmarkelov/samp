@@ -13,6 +13,11 @@ import { getAccount, isAuthenticated, patchAccount, applyWallet } from "../auth/
 import { registerCommand } from "../commands/registry";
 import { ORG_HOSPITAL_ID, getMembership } from "../org";
 import {
+  clearMedkitCase,
+  hasHospitalMedkitCase,
+  setHospitalMedkitStockBlocked,
+} from "../org/hospital-medkit";
+import {
   HOSPITAL_MEDS_STOCK_POINT,
   refreshHospitalMedsStockLabel,
 } from "../org/hospital-stock";
@@ -157,6 +162,7 @@ export function spawnHospitalVehicles(): void {
   }
 
   bindMedDelivery();
+  setHospitalMedkitStockBlocked((player) => isHospitalMedDeliveryActive(player));
 }
 
 function bindMedVan(vehicle: Vehicle): void {
@@ -579,6 +585,14 @@ function onPickMed(player: Player): void {
     return;
   }
 
+  if (hasHospitalMedkitCase(player)) {
+    player.sendClientMessage(
+      Color.error,
+      "Сначала уберите набор медикаментов (выйдите из больницы или израсходуйте)."
+    );
+    return;
+  }
+
   if (vanMeds <= 0) {
     player.sendClientMessage(Color.error, "В фургоне нет медикаментов.");
     return;
@@ -741,6 +755,8 @@ function returnCarriedToVan(player: Player, id: number, message: string): void {
 
 function giveBox(player: Player): void {
   clearBox(player);
+  // На всякий случай сбрасываем флаг чемодана врача (слоты разные, состояние общее).
+  clearMedkitCase(player);
   player.setAttachedObject(
     SLOT_BOX,
     BOX_MODEL,
