@@ -49,6 +49,7 @@ import "./cuff";
 import "./putpl";
 import "./arrest";
 import "./demote";
+import "./id";
 import "./anim";
 import { bindMenuDialogs } from "./mn";
 import { bindGpsDialogs } from "../gps";

@@ -13,6 +13,7 @@ import { getAccount, isAuthenticated } from "../auth/session";
 import { isMasked, MASK_COLOR } from "../mask";
 import { getMembership, resolveChatColor } from "../org";
 import type { GameModule } from "../types";
+import { tryChatEmotion } from "./emotions";
 import { notifyIfMuted, clearMuteWatch, watchMute } from "./mute";
 import { clearTalk, playLocalSpeech } from "./talk";
 
@@ -49,6 +50,10 @@ export const chatModule: GameModule = {
       }
 
       const account = getAccount(player);
+      if (tryChatEmotion(player, text, account?.gender ?? null)) {
+        return false;
+      }
+
       const masked = isMasked(player);
       const inOrg = account ? getMembership(account) : null;
       const verb = byGender(account?.gender ?? null, "сказал", "сказала");
