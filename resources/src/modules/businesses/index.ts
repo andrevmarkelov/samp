@@ -15,6 +15,7 @@ import { ensureBusinessesTable, listBusinesses } from "./repository";
 import { startShop247 } from "./shop-247";
 import { startClothesShops } from "./clothes";
 import { startGasStations } from "./gas";
+import { startFastfoodShops } from "./fastfood";
 import { startStreetFoodStalls } from "./street-food";
 import { startWorkshopShops } from "./workshop";
 import { clearInsideBusiness } from "./session";
@@ -36,6 +37,7 @@ export const businessesModule: GameModule = {
       startBusinessEntrances();
       startBusinessExits();
       startStreetFoodStalls();
+      startFastfoodShops();
       startGasStations();
       startAmmuShops();
       startShop247();

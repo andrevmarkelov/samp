@@ -226,7 +226,7 @@ async function onMenuResponse(
   }
 
   await buyShopItem(player, businessId, item);
-  standingOn.delete(slotId);
+  // standingOn остаётся — можно отойти; ещё покупка — отойти от пикапа и встать снова.
 }
 
 async function buyShopItem(

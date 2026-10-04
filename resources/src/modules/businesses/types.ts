@@ -50,6 +50,10 @@ export function isStreetFoodType(typeId: number): boolean {
   return typeId === BusinessType.STREET_FOOD;
 }
 
+export function isFastfoodType(typeId: number): boolean {
+  return typeId === BusinessType.FASTFOOD;
+}
+
 export function isAmmuType(typeId: number): boolean {
   return typeId === BusinessType.AMMU;
 }

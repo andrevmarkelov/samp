@@ -365,7 +365,7 @@ async function onMainMenuResponse(
   }
 
   await runWorkshopService(player, business, kind);
-  standingOn.delete(slotId);
+  // standingOn остаётся — можно отойти; ещё услуга — отойти от пикапа и встать снова.
 }
 
 function showColorPicker(player: Player, businessId: number, step: 1 | 2): void {
@@ -461,7 +461,7 @@ async function onColor2Response(
     color2: paint.id,
     expectedRuntimeId: pending.vehicleRuntimeId,
   });
-  standingOn.delete(slotId);
+  // sticky — можно отойти; ещё услуга — отойти от пикапа и встать снова.
 }
 
 async function runWorkshopService(

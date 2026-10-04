@@ -3,13 +3,16 @@ import { SERVER_TAG } from "../../shared/brand";
 import { Color } from "../../shared/colors";
 import { formatMoney } from "../../shared/money";
 import { isPlayerActive, playerId } from "../../shared/player";
-import { grantArmour, grantWeapon } from "../anticheat/trust";
+import { saveUserHunger } from "../auth/repository";
 import {
+  MAX_HUNGER,
   applyWallet,
   getAccount,
   isAuthenticated,
+  normalizeHunger,
   patchAccount,
 } from "../auth/session";
+import { notifyHungerRestored } from "../persist";
 import {
   getBusiness,
   listBusinesses,
@@ -18,41 +21,52 @@ import {
   type BusinessRecord,
 } from "./repository";
 import { getInsideBusiness } from "./session";
-import { isAmmuType } from "./types";
+import { isFastfoodType } from "./types";
 import { businessIdFromVirtualWorld, businessVirtualWorld } from "./world";
 
-export const AMMU_MENU_DIALOG_ID = 94;
+export const FASTFOOD_MENU_DIALOG_ID = 98;
 
 const PICKUP_RADIUS = 1.6;
 const TICK_MS = 200;
 const PLAYER_STATE_ONFOOT = 1;
-const DIALOG_STYLE_LIST = 2;
-const MAX_ARMOR = 100;
+const DIALOG_STYLE_TABLIST_HEADERS = 5;
+const EAT_SOUND_ID = 32200;
+const ANIM_SYNC_ALL = 1;
+const EAT_ANIM_MS = 3000;
 /** Доля выручки на счёт бизнеса. */
 const BIZ_SHARE = 0.8;
 
-type AmmuItem =
-  | { kind: "armor"; name: string; price: number }
-  | { kind: "weapon"; name: string; price: number; weaponId: number; ammo: number };
+type FoodItem = {
+  name: string;
+  price: number;
+  hunger: number;
+};
 
-const MENU: readonly AmmuItem[] = [
-  { kind: "armor", name: "Бронежилет", price: 2_500 },
-  { kind: "weapon", name: "Desert Eagle", price: 4_500, weaponId: 24, ammo: 49 },
-  { kind: "weapon", name: "Shotgun", price: 4_000, weaponId: 25, ammo: 30 },
-  { kind: "weapon", name: "UZI", price: 3_000, weaponId: 28, ammo: 100 },
-  { kind: "weapon", name: "AK-47", price: 9_000, weaponId: 30, ammo: 90 },
-  { kind: "weapon", name: "Rifle", price: 7_000, weaponId: 33, ammo: 30 },
+/** Дороже и сытнее, чем уличный ларёк. */
+const MENU: readonly FoodItem[] = [
+  { name: "Кола", price: 80, hunger: 15 },
+  { name: "Картофель фри", price: 150, hunger: 30 },
+  { name: "Хот-дог", price: 180, hunger: 40 },
+  { name: "Бургер", price: 280, hunger: 55 },
+  { name: "Чизбургер", price: 350, hunger: 65 },
+  { name: "Пицца", price: 450, hunger: 80 },
+  { name: "Комбо-обед", price: 600, hunger: 100 },
 ];
 
 const standingOn = new Map<number, number>();
 const pendingMenu = new Map<number, number>();
 const buying = new Set<number>();
+const eatTimers = new Map<number, ReturnType<typeof setTimeout>>();
 
-export function startAmmuShops(): void {
-  setInterval(tickAmmuShops, TICK_MS);
+export function startFastfoodShops(): void {
+  setInterval(tickFastfood, TICK_MS);
+
+  omp.on("playerConnect", (player) => {
+    preloadEatAnim(player);
+  });
 
   omp.on("dialogResponse", (player, dialogId, response, listItem) => {
-    if (Number(dialogId) !== AMMU_MENU_DIALOG_ID) {
+    if (Number(dialogId) !== FASTFOOD_MENU_DIALOG_ID) {
       return;
     }
     void onMenuResponse(player, Number(response) !== 0, Number(listItem));
@@ -63,6 +77,11 @@ export function startAmmuShops(): void {
     if (slotId !== null) {
       standingOn.delete(slotId);
       pendingMenu.delete(slotId);
+      const timer = eatTimers.get(slotId);
+      if (timer) {
+        clearTimeout(timer);
+        eatTimers.delete(slotId);
+      }
     }
     const account = getAccount(player);
     if (account) {
@@ -71,9 +90,9 @@ export function startAmmuShops(): void {
   });
 
   const count = listBusinesses().filter(
-    (b) => isAmmuType(b.typeId) && hasBuyPickup(b)
+    (b) => isFastfoodType(b.typeId) && hasBuyPickup(b)
   ).length;
-  omp.log(`[${SERVER_TAG}] аммунация: точек продажи ${count}`);
+  omp.log(`[${SERVER_TAG}] закусочные: точек продажи ${count}`);
 }
 
 function hasBuyPickup(business: BusinessRecord): boolean {
@@ -84,7 +103,7 @@ function hasBuyPickup(business: BusinessRecord): boolean {
   );
 }
 
-function tickAmmuShops(): void {
+function tickFastfood(): void {
   omp.players.forEach((player) => {
     if (!isPlayerActive(player) || !isAuthenticated(player)) {
       return;
@@ -102,9 +121,14 @@ function tickAmmuShops(): void {
       }
 
       const pos = player.getPos();
-      const interior = player.getInterior();
-      const world = player.getVirtualWorld();
-      const shop = findAmmuBuyPickupAt(pos.x, pos.y, pos.z, interior, world, slotId);
+      const shop = findBuyPickupAt(
+        pos.x,
+        pos.y,
+        pos.z,
+        player.getInterior(),
+        player.getVirtualWorld(),
+        slotId
+      );
       if (!shop) {
         standingOn.delete(slotId);
         return;
@@ -115,14 +139,14 @@ function tickAmmuShops(): void {
       }
 
       standingOn.set(slotId, shop.id);
-      openAmmuMenu(player, shop);
+      openMenu(player, shop);
     } catch {
       standingOn.delete(slotId);
     }
   });
 }
 
-function findAmmuBuyPickupAt(
+function findBuyPickupAt(
   x: number,
   y: number,
   z: number,
@@ -143,7 +167,7 @@ function findAmmuBuyPickupAt(
   const business = getBusiness(businessId);
   if (
     !business ||
-    !isAmmuType(business.typeId) ||
+    !isFastfoodType(business.typeId) ||
     !hasBuyPickup(business) ||
     interior !== business.interiorId ||
     world !== businessVirtualWorld(business.id)
@@ -163,37 +187,30 @@ function findAmmuBuyPickupAt(
   return business;
 }
 
-function openAmmuMenu(player: Player, shop: BusinessRecord): void {
+function openMenu(player: Player, shop: BusinessRecord): void {
   const account = getAccount(player);
   const slotId = playerId(player);
   if (!account || slotId === null) {
     return;
   }
 
-  if (!account.licenses.gun) {
-    player.sendClientMessage(Color.error, "Для покупки нужна лицензия на оружие.");
-    return;
-  }
-
   if (shop.isLocked && shop.ownerId !== account.id) {
-    player.sendClientMessage(Color.error, "Магазин закрыт.");
+    player.sendClientMessage(Color.error, "Закусочная закрыта.");
     return;
   }
 
   pendingMenu.set(slotId, shop.id);
 
-  const lines = MENU.map((item) => {
-    if (item.kind === "armor") {
-      return `${item.name}\t${formatMoney(item.price)}`;
-    }
-    return `${item.name}\t${formatMoney(item.price)} (${item.ammo} патр.)`;
-  });
+  const lines = [
+    "Блюдо\tЦена",
+    ...MENU.map((item) => `${item.name}\t${formatMoney(item.price)}`),
+  ];
 
   try {
     Dialog.show(
       player,
-      AMMU_MENU_DIALOG_ID,
-      DIALOG_STYLE_LIST,
+      FASTFOOD_MENU_DIALOG_ID,
+      DIALOG_STYLE_TABLIST_HEADERS,
       shop.name,
       lines.join("\n"),
       "Купить",
@@ -202,7 +219,7 @@ function openAmmuMenu(player: Player, shop: BusinessRecord): void {
   } catch {
     pendingMenu.delete(slotId);
     standingOn.delete(slotId);
-    player.sendClientMessage(Color.error, "Не удалось открыть витрину.");
+    player.sendClientMessage(Color.error, "Не удалось открыть меню.");
   }
 }
 
@@ -218,7 +235,9 @@ async function onMenuResponse(
 
   const businessId = pendingMenu.get(slotId);
   pendingMenu.delete(slotId);
+
   if (!ok || businessId === undefined) {
+    // standingOn остаётся — меню не всплывёт снова, можно отойти от стойки.
     return;
   }
 
@@ -227,14 +246,14 @@ async function onMenuResponse(
     return;
   }
 
-  await buyAmmuItem(player, businessId, item);
-  // standingOn остаётся — можно отойти; ещё покупка — отойти от пикапа и встать снова.
+  await buyFood(player, businessId, item);
+  // После покупки sticky тоже держим: отойти свободно; ещё заказ — отойти и снова встать.
 }
 
-async function buyAmmuItem(
+async function buyFood(
   player: Player,
   businessId: number,
-  item: AmmuItem
+  item: FoodItem
 ): Promise<void> {
   if (!isPlayerActive(player) || !isAuthenticated(player)) {
     return;
@@ -246,40 +265,19 @@ async function buyAmmuItem(
     return;
   }
 
-  if (!account.licenses.gun) {
-    player.sendClientMessage(Color.error, "Для покупки нужна лицензия на оружие.");
-    return;
-  }
-
   const business = getBusiness(businessId);
-  if (!business || !isAmmuType(business.typeId)) {
-    player.sendClientMessage(Color.error, "Магазин недоступен.");
+  if (!business || !isFastfoodType(business.typeId) || !hasBuyPickup(business)) {
+    player.sendClientMessage(Color.error, "Закусочная недоступна.");
     return;
   }
 
   if (business.isLocked && business.ownerId !== account.id) {
-    player.sendClientMessage(Color.error, "Магазин закрыт.");
+    player.sendClientMessage(Color.error, "Закусочная закрыта.");
     return;
   }
 
-  try {
-    if (player.getState() !== PLAYER_STATE_ONFOOT) {
-      return;
-    }
-    const pos = player.getPos();
-    const near = findAmmuBuyPickupAt(
-      pos.x,
-      pos.y,
-      pos.z,
-      player.getInterior(),
-      player.getVirtualWorld(),
-      slotId
-    );
-    if (!near || near.id !== businessId) {
-      player.sendClientMessage(Color.error, "Подойдите к витрине магазина.");
-      return;
-    }
-  } catch {
+  if (!isAtBuyPickup(player, business)) {
+    player.sendClientMessage(Color.error, "Подойдите к стойке.");
     return;
   }
 
@@ -301,7 +299,7 @@ async function buyAmmuItem(
     result = await payBusinessCashShare(businessId, account.id, item.price, BIZ_SHARE);
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
-    omp.log(`[${SERVER_TAG}] аммунация biz=${businessId} (${account.name}): ${message}`);
+    omp.log(`[${SERVER_TAG}] закусочная biz=${businessId} (${account.name}): ${message}`);
     player.sendClientMessage(Color.error, "Покупка не прошла. Попробуйте ещё раз.");
     return;
   } finally {
@@ -326,24 +324,128 @@ async function buyAmmuItem(
     return;
   }
 
-  patchAccount(player, { money: result.cashLeft });
+  // После await могли отойти — деньги уже списаны, еду всё равно выдаём.
+  const liveAccount = getAccount(player);
+  if (!liveAccount) {
+    return;
+  }
+
+  const nextHunger = Math.min(
+    MAX_HUNGER,
+    normalizeHunger(liveAccount.hunger) + item.hunger
+  );
+
+  patchAccount(player, { money: result.cashLeft, hunger: nextHunger });
   const live = getAccount(player);
   if (live) {
     applyWallet(player, live);
   }
 
-  if (item.kind === "armor") {
-    grantArmour(player, MAX_ARMOR);
-    player.sendClientMessage(
-      Color.tryOk,
-      `Вы купили бронежилет за ${formatMoney(item.price)}.`
+  notifyHungerRestored(player, nextHunger);
+
+  void saveUserHunger(account.id, nextHunger).catch(() => {
+    // Периодический save подхватит.
+  });
+
+  try {
+    const pos = player.getPos();
+    player.playGameSound(EAT_SOUND_ID, pos.x, pos.y, pos.z);
+  } catch {
+    // Слот пустой.
+  }
+
+  playEatAnimation(player);
+
+  player.sendClientMessage(
+    Color.tryOk,
+    `Вы купили ${item.name} за ${formatMoney(item.price)}. Сытость: ${nextHunger}.`
+  );
+}
+
+function isAtBuyPickup(player: Player, business: BusinessRecord): boolean {
+  try {
+    if (player.getState() !== PLAYER_STATE_ONFOOT) {
+      return false;
+    }
+
+    if (
+      player.getInterior() !== business.interiorId ||
+      player.getVirtualWorld() !== businessVirtualWorld(business.id)
+    ) {
+      return false;
+    }
+
+    const pos = player.getPos();
+    return (
+      Math.hypot(
+        pos.x - (business.buyPickupX as number),
+        pos.y - (business.buyPickupY as number),
+        pos.z - (business.buyPickupZ as number)
+      ) <= PICKUP_RADIUS
     );
+  } catch {
+    return false;
+  }
+}
+
+function preloadEatAnim(player: Player): void {
+  try {
+    player.applyAnimation(
+      "FOOD",
+      "EAT_Burger",
+      4.1,
+      false,
+      false,
+      false,
+      false,
+      1,
+      ANIM_SYNC_ALL
+    );
+    player.clearAnimations(ANIM_SYNC_ALL);
+  } catch {
+    // Подтянется при покупке.
+  }
+}
+
+function playEatAnimation(player: Player): void {
+  const slotId = playerId(player);
+  if (slotId === null) {
     return;
   }
 
-  grantWeapon(player, item.weaponId, item.ammo);
-  player.sendClientMessage(
-    Color.tryOk,
-    `Вы купили ${item.name} (${item.ammo} патр.) за ${formatMoney(item.price)}.`
+  const prev = eatTimers.get(slotId);
+  if (prev) {
+    clearTimeout(prev);
+  }
+
+  try {
+    player.applyAnimation(
+      "FOOD",
+      "EAT_Burger",
+      4.1,
+      false,
+      false,
+      false,
+      false,
+      0,
+      ANIM_SYNC_ALL
+    );
+  } catch {
+    return;
+  }
+
+  eatTimers.set(
+    slotId,
+    setTimeout(() => {
+      eatTimers.delete(slotId);
+      if (playerId(player) !== slotId) {
+        return;
+      }
+      try {
+        player.clearAnimations(ANIM_SYNC_ALL);
+      } catch {
+        // Уже вышел.
+      }
+    }, EAT_ANIM_MS)
   );
 }

@@ -1137,6 +1137,20 @@ resources/src/modules/businesses/
 
 80% → баланс бизнеса. Анимация еды `FOOD/EAT_Burger`.
 
+**Закусочные** (`type_id` FASTFOOD): файл `businesses/fastfood.ts`, диалог **98**. Встать на пикап покупки в интерьере → меню. Дороже и сытнее ларька.
+
+| | Цена | Сытость |
+|---|---|---|
+| Кола | $80 | +15 |
+| Картофель фри | $150 | +30 |
+| Хот-дог | $180 | +40 |
+| Бургер | $280 | +55 |
+| Чизбургер | $350 | +65 |
+| Пицца | $450 | +80 |
+| Комбо-обед | $600 | +100 |
+
+80% → баланс бизнеса. Анимация `FOOD/EAT_Burger`.
+
 ---
 
 ## Телефон и объявления
@@ -1569,6 +1583,7 @@ Law (LSPD / областная полиция / FBI), рядом (`WHISPER_RADIU
 | Маски /mask | `mask/index.ts`, `commands/mask.ts` |
 | Анимации /anim | `anim/catalog.ts`, `anim/index.ts`, `commands/anim.ts` |
 | Уличная еда / голод | `businesses/street-food.ts`, `persist/index.ts` |
+| Закусочные (меню еды) | `businesses/fastfood.ts` |
 | Телефон / /ad | `commands/ads.ts`, `repository` → `payBusinessPhonePurchase` |
 | /help по разделам | `commands/help.ts` |
 | Бизнесы: иконки / типы | `businesses/map-icons.ts`, `businesses/types.ts` |
