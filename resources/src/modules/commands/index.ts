@@ -39,6 +39,8 @@ import "./pay";
 import "./find-id";
 import "./mask";
 import "./unmask";
+import "./frisk";
+import "./take";
 import "./anim";
 import { bindMenuDialogs } from "./mn";
 import { bindGpsDialogs } from "../gps";
@@ -52,6 +54,7 @@ import { bindFindIdMarks } from "./find-id";
 import { bindAds } from "./ads";
 import { bindMedcardOffers } from "./medcard";
 import { bindHelpDialogs } from "./help";
+import { bindTakeDialogs } from "./take";
 
 export const commandsModule: GameModule = {
   name: "commands",
@@ -69,5 +72,6 @@ export const commandsModule: GameModule = {
     bindFindIdMarks();
     bindAds();
     bindMedcardOffers();
+    bindTakeDialogs();
   },
 };

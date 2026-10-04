@@ -18,6 +18,30 @@ export function isLawOfficer(player: Player): boolean {
   return orgId !== undefined && LAW_ORG_SET.has(orgId);
 }
 
+export function isFbiOfficer(player: Player): boolean {
+  const account = getAccount(player);
+  if (!account || !isAuthenticated(player)) {
+    return false;
+  }
+
+  return getMembership(account)?.org.id === ORG_FBI_ID;
+}
+
+/**
+ * FBI — любого; полиция (LSPD / обл.) — только не-law («обычных» игроков).
+ */
+export function canLawSearchTarget(officer: Player, target: Player): boolean {
+  if (!isLawOfficer(officer)) {
+    return false;
+  }
+
+  if (isFbiOfficer(officer)) {
+    return true;
+  }
+
+  return !isLawOfficer(target);
+}
+
 /** «ФБР» или «Полицейский» (LSPD / областная полиция). */
 export function lawOfficerLabel(player: Player): string {
   const account = getAccount(player);
