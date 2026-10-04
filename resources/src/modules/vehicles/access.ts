@@ -27,7 +27,14 @@ type OrgVehicleAccess = {
   ptr: number | null;
 };
 
+type JobVehicleAccess = {
+  jobId: number;
+  denyMessage: string;
+  ptr: number | null;
+};
+
 const byVehicleId = new Map<number, OrgVehicleAccess>();
+const jobByVehicleId = new Map<number, JobVehicleAccess>();
 const denyAt = new Map<number, number>();
 
 export function registerOrgVehicle(
@@ -61,10 +68,46 @@ export function unregisterOrgVehicle(vehicle: Vehicle): void {
   }
 }
 
+/** Гражданская работа (автобус и т.п.). */
+export function registerJobVehicle(
+  vehicle: Vehicle,
+  jobId: number,
+  denyMessage?: string,
+  retried = false
+): void {
+  const id = liveVehicleId(vehicle);
+  if (id === null) {
+    if (!retried) {
+      setTimeout(() => {
+        registerJobVehicle(vehicle, jobId, denyMessage, true);
+      }, 0);
+    }
+    return;
+  }
+
+  jobByVehicleId.set(id, {
+    jobId: Math.max(0, Math.floor(jobId)),
+    denyMessage: denyMessage?.trim() || DEFAULT_DENY,
+    ptr: vehiclePtr(vehicle),
+  });
+}
+
+export function unregisterJobVehicle(vehicle: Vehicle): void {
+  const id = liveVehicleId(vehicle);
+  if (id !== null) {
+    jobByVehicleId.delete(id);
+  }
+}
+
 /** ТС зарегистрирован за организацией (больница, полиция…). */
 export function isRegisteredOrgVehicle(vehicle: Vehicle, orgId: number): boolean {
   const access = accessFor(vehicle);
   return access !== null && access.orgIds.includes(orgId);
+}
+
+export function isRegisteredJobVehicle(vehicle: Vehicle, jobId: number): boolean {
+  const access = jobAccessFor(vehicle);
+  return access !== null && access.jobId === jobId;
 }
 
 export function bindOrgVehicleAccess(): void {
@@ -118,6 +161,14 @@ export function syncOrgVehicleAccess(player: Player): void {
 
     applyDoorLock(vehicle, player);
   }
+  for (const [id] of jobByVehicleId) {
+    const vehicle = omp.vehicles.at(id);
+    if (!vehicle) {
+      continue;
+    }
+
+    applyDoorLock(vehicle, player);
+  }
 }
 
 function ejectFromForbiddenOrgVehicle(player: Player): void {
@@ -163,6 +214,12 @@ function denyNearbyIfForbidden(player: Player): void {
   const access = accessFor(vehicle);
   if (access && !canUseOrgVehicle(player, access.orgIds, vehicle)) {
     deny(player, denyMessage(player, vehicle, access));
+    return;
+  }
+
+  const jobAccess = jobAccessFor(vehicle);
+  if (jobAccess && !canUseJobVehicle(player, jobAccess.jobId)) {
+    deny(player, jobAccess.denyMessage);
     return;
   }
 
@@ -219,6 +276,14 @@ function refuseIfForbidden(
     return true;
   }
 
+  const jobAccess = jobAccessFor(vehicle);
+  // Пассажирам job-ТС можно; за руль — только с нужной работой.
+  if (!passenger && jobAccess && !canUseJobVehicle(player, jobAccess.jobId)) {
+    deny(player, jobAccess.denyMessage);
+    eject(player, entering);
+    return true;
+  }
+
   if (!passenger && !skipsDriveLicense(player, vehicle, access)) {
     const licenseMsg = driveLicenseDeny(player, vehicle);
     if (licenseMsg) {
@@ -244,15 +309,21 @@ function eject(player: Player, entering: boolean): void {
 
 function applyDoorLock(vehicle: Vehicle, player: Player): void {
   const access = accessFor(vehicle);
-  if (!access) {
+  const jobAccess = jobAccessFor(vehicle);
+  if (!access && !jobAccess) {
     return;
   }
 
   try {
-    const locked = canUseOrgVehicle(player, access.orgIds, vehicle)
-      ? DOORS_UNLOCKED
-      : DOORS_LOCKED;
-    vehicle.setParamsForPlayer(player, 0, locked);
+    let allowed = true;
+    if (access) {
+      allowed = canUseOrgVehicle(player, access.orgIds, vehicle);
+    }
+    if (allowed && jobAccess) {
+      // Двери job-ТС открыты всем (пассажиры), ограничение — только водитель.
+      allowed = true;
+    }
+    vehicle.setParamsForPlayer(player, 0, allowed ? DOORS_UNLOCKED : DOORS_LOCKED);
   } catch {
     // Слот или транспорт уже не в мире.
   }
@@ -294,6 +365,15 @@ function canUseOrgVehicle(
   );
 }
 
+function canUseJobVehicle(player: Player, jobId: number): boolean {
+  if (!isPlayerActive(player) || jobId <= 0) {
+    return false;
+  }
+
+  const account = getAccount(player);
+  return !!account && account.jobId === jobId;
+}
+
 function denyMessage(
   player: Player,
   vehicle: Vehicle,
@@ -320,6 +400,26 @@ function accessFor(vehicle: Vehicle): OrgVehicleAccess | null {
   const ptr = vehiclePtr(vehicle);
   if (ptr === null || access.ptr !== ptr) {
     byVehicleId.delete(id);
+    return null;
+  }
+
+  return access;
+}
+
+function jobAccessFor(vehicle: Vehicle): JobVehicleAccess | null {
+  const id = liveVehicleId(vehicle);
+  if (id === null) {
+    return null;
+  }
+
+  const access = jobByVehicleId.get(id);
+  if (!access) {
+    return null;
+  }
+
+  const ptr = vehiclePtr(vehicle);
+  if (ptr === null || access.ptr !== ptr) {
+    jobByVehicleId.delete(id);
     return null;
   }
 

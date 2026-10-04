@@ -6,6 +6,7 @@ import { listBusinesses } from "../businesses/repository";
 import { BusinessType } from "../businesses/types";
 import { isLoaderOnShift } from "../loader";
 import { isMinerOnShift } from "../miner";
+import { isBusDriverOnShift } from "../jobs/bus/active";
 import { isAutoschoolExamOnRoute } from "../autoschool/session";
 import { isHospitalMedDeliveryActive } from "../vehicles/hospital";
 import { isArmyAmmoCarrying } from "../vehicles/army-ammo-delivery";
@@ -68,6 +69,13 @@ const TARGETS = {
     x: 2236.532,
     y: -2212.7854,
     z: 13.5469,
+  },
+  busDriver: {
+    key: "busDriver",
+    label: "Водитель автобуса",
+    x: 1269.8052,
+    y: -1840.6724,
+    z: 13.3936,
   },
   station: {
     key: "station",
@@ -212,7 +220,7 @@ const CATEGORIES: readonly GpsCategory[] = [
   {
     key: "jobs",
     label: "По работе",
-    targets: [TARGETS.mine, TARGETS.loader],
+    targets: [TARGETS.mine, TARGETS.loader, TARGETS.busDriver],
   },
 ];
 
@@ -521,6 +529,7 @@ function setRoute(player: Player, target: GpsTarget): void {
     if (
       !isMinerOnShift(player) &&
       !isLoaderOnShift(player) &&
+      !isBusDriverOnShift(player) &&
       !isAutoschoolExamOnRoute(player) &&
       !isHospitalMedDeliveryActive(player) &&
       !isArmyAmmoCarrying(player)
@@ -566,6 +575,7 @@ function tickGps(): void {
       if (
         !isMinerOnShift(player) &&
         !isLoaderOnShift(player) &&
+        !isBusDriverOnShift(player) &&
         !isAutoschoolExamOnRoute(player) &&
         !isHospitalMedDeliveryActive(player) &&
         !isArmyAmmoCarrying(player) &&

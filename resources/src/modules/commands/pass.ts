@@ -7,6 +7,7 @@ import { byGender, genderLabel } from "../auth/gender";
 import { getAccount, type Account } from "../auth/session";
 import { ageFromBirthDate, formatBirthDate } from "../auth/validation";
 import { residenceLabel } from "../houses/residence";
+import { jobLabel } from "../jobs";
 import { getMembership } from "../org";
 import { registerCommand } from "./registry";
 
@@ -94,6 +95,7 @@ function showPassport(viewer: Player, owner: Account): void {
     passRow("Дата рождения", formatBirthDate(owner.birthDate)),
     passRow("Организация", membership?.org.name ?? "Нет"),
     passRow("Должность", membership?.rank.title ?? "Нет"),
+    passRow("Работа", jobLabel(owner.jobId, owner.gender)),
     passRow("Законопослушность", String(owner.lawfulness)),
   ].join("\n");
 

@@ -99,6 +99,8 @@ export type Account = {
   adminLevel: number;
   orgId: number;
   orgRank: number;
+  /** Гражданская работа (0 — безработный). */
+  jobId: number;
   familyId: number;
   familyRank: number;
   mutedUntil: number | null;
@@ -214,6 +216,7 @@ export function patchAccount(
       | "adminLevel"
       | "orgId"
       | "orgRank"
+      | "jobId"
       | "familyId"
       | "familyRank"
       | "skin"

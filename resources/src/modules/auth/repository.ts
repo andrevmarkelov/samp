@@ -47,6 +47,7 @@ type UserRow = RowDataPacket & {
   admin_level: number;
   org_id: number;
   org_rank: number;
+  job_id: number;
   family_id: number;
   family_rank: number;
   muted_until: number | null;
@@ -84,6 +85,7 @@ CREATE TABLE IF NOT EXISTS users (
   admin_password_hash VARCHAR(255) NULL DEFAULT NULL,
   org_id SMALLINT UNSIGNED NOT NULL DEFAULT 0,
   org_rank TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  job_id SMALLINT UNSIGNED NOT NULL DEFAULT 0,
   family_id INT UNSIGNED NOT NULL DEFAULT 0,
   family_rank TINYINT UNSIGNED NOT NULL DEFAULT 0,
   muted_until INT UNSIGNED NULL DEFAULT NULL,
@@ -178,8 +180,12 @@ const COLUMN_MIGRATIONS = [
     sql: "org_rank TINYINT UNSIGNED NOT NULL DEFAULT 0 AFTER org_id",
   },
   {
+    name: "job_id",
+    sql: "job_id SMALLINT UNSIGNED NOT NULL DEFAULT 0 AFTER org_rank",
+  },
+  {
     name: "family_id",
-    sql: "family_id INT UNSIGNED NOT NULL DEFAULT 0 AFTER org_rank",
+    sql: "family_id INT UNSIGNED NOT NULL DEFAULT 0 AFTER job_id",
   },
   {
     name: "family_rank",
@@ -344,7 +350,7 @@ async function migrateBannedUntilDatetime(): Promise<void> {
 
 export async function findUserByName(name: string): Promise<UserRow | null> {
   const rows = await query<UserRow>(
-    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, bank, donate, lawfulness, health, drugs, ammo, metal, passport, hospitalized, wanted_level, military_id, medcard, hunger, phone, invited_by, birth_date, admin_level, org_id, org_rank, family_id, family_rank, muted_until, jail_seconds, license_car, license_moto, license_fly, license_boat, license_gun, banned_until, ban_reason FROM users WHERE name = ? LIMIT 1",
+    "SELECT id, name, email, password_hash, gender, skin, level, exp, money, bank, donate, lawfulness, health, drugs, ammo, metal, passport, hospitalized, wanted_level, military_id, medcard, hunger, phone, invited_by, birth_date, admin_level, org_id, org_rank, job_id, family_id, family_rank, muted_until, jail_seconds, license_car, license_moto, license_fly, license_boat, license_gun, banned_until, ban_reason FROM users WHERE name = ? LIMIT 1",
     [name]
   );
   return rows[0] ?? null;
@@ -412,12 +418,20 @@ export async function createUser(input: {
     adminLevel: 0,
     orgId: 0,
     orgRank: 0,
+    jobId: 0,
     familyId: 0,
     familyRank: 0,
     mutedUntil: null,
     jailSeconds: 0,
     licenses: { ...EMPTY_LICENSES },
   };
+}
+
+export async function saveUserJob(userId: number, jobId: number): Promise<void> {
+  await execute("UPDATE users SET job_id = ? WHERE id = ?", [
+    Math.max(0, Math.floor(jobId)),
+    userId,
+  ]);
 }
 
 export async function saveUserVitals(
@@ -745,6 +759,11 @@ export async function saveUserOrg(
   ]);
 }
 
+export function parseJobId(value: unknown): number {
+  const id = Math.floor(Number(value) || 0);
+  return id > 0 ? id : 0;
+}
+
 export async function saveUserFamily(
   userId: number,
   familyId: number,
@@ -831,6 +850,7 @@ export function accountFromRow(row: UserRow): Account {
     adminLevel: parseAdminLevel(row.admin_level),
     orgId: parseOrgId(row.org_id),
     orgRank: parseOrgRank(row.org_rank),
+    jobId: parseJobId(row.job_id),
     familyId: parseFamilyId(row.family_id),
     familyRank: parseFamilyRank(row.family_rank),
     mutedUntil: parseMutedUntil(row.muted_until),

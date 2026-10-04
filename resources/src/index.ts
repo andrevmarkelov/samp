@@ -17,6 +17,7 @@ import { prisonModule } from "./modules/prison";
 import { afkModule } from "./modules/afk";
 import { minerModule } from "./modules/miner";
 import { loaderModule } from "./modules/loader";
+import { jobsModule } from "./modules/jobs";
 import { armyFactoryModule } from "./modules/army-factory";
 import { paydayModule } from "./modules/payday";
 import { worldTimeModule } from "./modules/worldtime";
@@ -70,6 +71,7 @@ const modules: GameModule[] = [
   orgModule,
   autoschoolModule,
   vehiclesModule,
+  jobsModule,
   anticheatModule,
 ];
 

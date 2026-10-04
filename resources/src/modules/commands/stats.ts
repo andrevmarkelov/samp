@@ -6,6 +6,7 @@ import { genderLabel } from "../auth/gender";
 import { MAX_HUNGER, getAccount, normalizeHunger } from "../auth/session";
 import { residenceLabel } from "../houses/residence";
 import { businessOwnershipLabel } from "../businesses/ownership";
+import { jobLabel } from "../jobs";
 import { getMembership, resolvePlayerSkin } from "../org";
 import { expForNextLevel } from "../payday/progress";
 
@@ -62,6 +63,7 @@ export function showStatsDialog(viewer: Player, target?: Player): void {
     statsRow("Голод", `${normalizeHunger(account.hunger)}/${MAX_HUNGER}`),
     statsRow("Организация", membership?.org.name ?? "Нет"),
     statsRow("Должность", rank),
+    statsRow("Работа", jobLabel(account.jobId, account.gender)),
   ].join("\n");
 
   try {
