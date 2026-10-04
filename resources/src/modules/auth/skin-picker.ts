@@ -2,35 +2,65 @@ import { INVALID_TEXTDRAW, TextDraw, omp, type Player } from "@omp-node/core";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { writeSpawnInfo, type SpawnPoint } from "../spawn/point";
 import type { Gender } from "./gender";
-import { skinByIndex, skinIndexOf, wrapSkinIndex, type SkinOption } from "./skins";
+import {
+  SKINS,
+  skinByIndex,
+  skinIndexOf,
+  type SkinOption,
+} from "./skins";
 
 const PICKER_INTERIOR = 3;
 const PICKER_WORLD_BASE = 10_000;
 const HOVER_COLOR = 0xccccccff;
 const ANIM_SYNC_ALL = 1;
 const ARROW_SOUND_ID = 1083;
-const CAMERA = { x: 206.46, y: -137.7, z: 1003.09 };
-const STAND: SpawnPoint = {
-  x: 206.46,
-  y: -129.8,
-  z: 1003.09,
-  angle: facingTowards({ x: 206.46, y: -129.8 }, CAMERA),
+/** Точка выбора скина при регистрации (интерьер 3, VW = 10000 + slot). */
+const AUTH_STAND: SpawnPoint = {
+  x: 214.6442,
+  y: -137.5518,
+  z: 1003.5078,
+  angle: 92.8925,
   interior: PICKER_INTERIOR,
   world: 0,
 };
+const AUTH_CAMERA = cameraInFront(AUTH_STAND, 4);
 
-function facingTowards(
-  from: { x: number; y: number },
-  to: { x: number; y: number }
-): number {
-  const angle = (Math.atan2(to.x - from.x, to.y - from.y) * 180) / Math.PI;
-  return angle < 0 ? angle + 360 : angle;
-}
+export type SkinPickerMode = "auth" | "clothes";
+
+export type SkinPickerOpenOptions = {
+  gender: Gender;
+  skinId?: number;
+  mode?: SkinPickerMode;
+  /** Каталог скинов; по умолчанию регистрационный. */
+  catalog?: SkinOption[];
+  /** Точка превью (world подставится автоматически). */
+  stand?: SpawnPoint;
+  camera?: { x: number; y: number; z: number };
+  businessId?: number;
+};
 
 type PickerSession = {
   gender: Gender;
   index: number;
+  mode: SkinPickerMode;
+  catalog: SkinOption[];
+  stand: SpawnPoint;
+  camera: { x: number; y: number; z: number };
+  businessId?: number;
 };
+
+/** Камера перед игроком по angle (GTA SA: 0 = север +Y, 90 = запад −X). */
+export function cameraInFront(
+  stand: { x: number; y: number; z: number; angle: number },
+  dist: number
+): { x: number; y: number; z: number } {
+  const rad = (stand.angle * Math.PI) / 180;
+  return {
+    x: stand.x - Math.sin(rad) * dist,
+    y: stand.y + Math.cos(rad) * dist,
+    z: stand.z + 0.15,
+  };
+}
 
 type PickerDraws = {
   all: TextDraw[];
@@ -102,8 +132,34 @@ function pickerWorld(player: Player): number {
   return PICKER_WORLD_BASE + (playerId(player) ?? 0);
 }
 
+function sessionOf(player: Player): PickerSession | null {
+  const id = playerId(player);
+  if (id === null) {
+    return null;
+  }
+  return sessions.get(id) ?? null;
+}
+
 function pickerPoint(player: Player): SpawnPoint {
-  return { ...STAND, world: pickerWorld(player) };
+  const session = sessionOf(player);
+  const stand = session?.stand ?? AUTH_STAND;
+  return { ...stand, world: pickerWorld(player) };
+}
+
+function pickerCamera(player: Player): { x: number; y: number; z: number } {
+  return sessionOf(player)?.camera ?? AUTH_CAMERA;
+}
+
+function sessionSkin(session: PickerSession): SkinOption | null {
+  return session.catalog[session.index] ?? null;
+}
+
+function wrapCatalogIndex(catalog: SkinOption[], index: number): number {
+  const total = catalog.length;
+  if (total <= 0) {
+    return 0;
+  }
+  return ((index % total) + total) % total;
 }
 
 export function isSkinPicking(player: Player): boolean {
@@ -111,13 +167,20 @@ export function isSkinPicking(player: Player): boolean {
   return id !== null && sessions.has(id);
 }
 
+export function skinPickerMode(player: Player): SkinPickerMode | null {
+  return sessionOf(player)?.mode ?? null;
+}
+
+export function skinPickerBusinessId(player: Player): number | null {
+  return sessionOf(player)?.businessId ?? null;
+}
+
 export function selectedSkin(player: Player): SkinOption | null {
-  const id = playerId(player);
-  const session = id === null ? undefined : sessions.get(id);
+  const session = sessionOf(player);
   if (!session) {
     return null;
   }
-  return skinByIndex(session.gender, session.index);
+  return sessionSkin(session);
 }
 
 function createDraws(): PickerDraws | null {
@@ -326,8 +389,9 @@ function hideDraws(player: Player): void {
 
 function applyCamera(player: Player): void {
   const point = pickerPoint(player);
+  const camera = pickerCamera(player);
   try {
-    player.setCameraPos(CAMERA.x, CAMERA.y, CAMERA.z);
+    player.setCameraPos(camera.x, camera.y, camera.z);
     player.setCameraLookAt(point.x, point.y, point.z + 0.62, 2);
   } catch {
     // Слот ещё не готов.
@@ -412,7 +476,11 @@ function leaveSpectate(player: Player, skinId: number): void {
   }
 }
 
-export function openSkinPicker(player: Player, gender: Gender, skinId = 0): SkinOption | null {
+export function openSkinPicker(
+  player: Player,
+  genderOrOptions: Gender | SkinPickerOpenOptions,
+  skinId = 0
+): SkinOption | null {
   const id = playerId(player);
   if (id === null || !isPlayerActive(player)) {
     return null;
@@ -425,14 +493,43 @@ export function openSkinPicker(player: Player, gender: Gender, skinId = 0): Skin
     return null;
   }
 
-  const index = skinId > 0 ? skinIndexOf(gender, skinId) : 0;
-  const skin = skinByIndex(gender, index);
+  const options: SkinPickerOpenOptions =
+    typeof genderOrOptions === "string"
+      ? { gender: genderOrOptions, skinId }
+      : genderOrOptions;
+
+  const gender = options.gender;
+  const catalog = options.catalog ?? SKINS[gender];
+  if (catalog.length === 0) {
+    return null;
+  }
+
+  const wantedId = options.skinId ?? skinId;
+  let index = 0;
+  if (wantedId > 0) {
+    const found = catalog.findIndex((skin) => skin.id === wantedId);
+    index = found >= 0 ? found : 0;
+  }
+
+  const skin = catalog[index];
   if (!skin) {
     return null;
   }
 
+  const stand = options.stand ?? AUTH_STAND;
+  const camera = options.camera ?? cameraInFront(stand, 4);
+  const mode = options.mode ?? "auth";
+
   const alreadyOpen = sessions.has(id);
-  sessions.set(id, { gender, index });
+  sessions.set(id, {
+    gender,
+    index,
+    mode,
+    catalog,
+    stand,
+    camera,
+    businessId: options.businessId,
+  });
   leaveSpectate(player, skin.id);
   preloadPickerAnims(player);
   applyPreview(player, skin.id);
@@ -470,7 +567,14 @@ export function resumeSkinPreview(player: Player, gender: Gender, skinId: number
     return false;
   }
 
-  sessions.set(id, { gender, index });
+  sessions.set(id, {
+    gender,
+    index,
+    mode: "auth",
+    catalog: SKINS[gender],
+    stand: AUTH_STAND,
+    camera: AUTH_CAMERA,
+  });
   applyPreview(player, skin.id);
   startFacingLock(player, id);
   return true;
@@ -493,14 +597,13 @@ export function closeSkinPicker(player: Player): void {
 }
 
 export function cycleSkin(player: Player, delta: number): SkinOption | null {
-  const id = playerId(player);
-  const session = id === null ? undefined : sessions.get(id);
+  const session = sessionOf(player);
   if (!session) {
     return null;
   }
 
-  session.index = wrapSkinIndex(session.gender, session.index + delta);
-  const skin = skinByIndex(session.gender, session.index);
+  session.index = wrapCatalogIndex(session.catalog, session.index + delta);
+  const skin = sessionSkin(session);
   if (!skin) {
     return null;
   }
@@ -548,9 +651,32 @@ function isCancelClick(clicked: unknown): boolean {
   return numeric === -1 || numeric === INVALID_TEXTDRAW;
 }
 
-export function bindSkinPicker(
-  onAction: (player: Player, action: "prev" | "next" | "select" | "cancel") => void
-): void {
+type SkinPickerActionHandler = (
+  player: Player,
+  action: "prev" | "next" | "select" | "cancel"
+) => void;
+
+let authActionHandler: SkinPickerActionHandler | null = null;
+let clothesActionHandler: SkinPickerActionHandler | null = null;
+let pickerEventsBound = false;
+
+export function bindSkinPicker(onAction: SkinPickerActionHandler): void {
+  authActionHandler = onAction;
+  ensurePickerEvents();
+}
+
+/** Обработчик магазина одежды (mode = clothes). */
+export function bindClothesSkinPicker(onAction: SkinPickerActionHandler): void {
+  clothesActionHandler = onAction;
+  ensurePickerEvents();
+}
+
+function ensurePickerEvents(): void {
+  if (pickerEventsBound) {
+    return;
+  }
+  pickerEventsBound = true;
+
   if (!draws) {
     draws = createDraws();
   }
@@ -560,12 +686,19 @@ export function bindSkinPicker(
       return;
     }
 
+    const mode = skinPickerMode(player);
+    const handler =
+      mode === "clothes" ? clothesActionHandler : authActionHandler;
+    if (!handler) {
+      return;
+    }
+
     if (isCancelClick(textdraw)) {
       const id = playerId(player);
       if (id !== null && ignoreCancel.has(id)) {
         return;
       }
-      onAction(player, "cancel");
+      handler(player, "cancel");
       return;
     }
 
@@ -575,16 +708,16 @@ export function bindSkinPicker(
 
     if (sameDraw(textdraw, draws.prev)) {
       playPickerSound(player, ARROW_SOUND_ID);
-      onAction(player, "prev");
+      handler(player, "prev");
       return;
     }
     if (sameDraw(textdraw, draws.next)) {
       playPickerSound(player, ARROW_SOUND_ID);
-      onAction(player, "next");
+      handler(player, "next");
       return;
     }
     if (sameDraw(textdraw, draws.select)) {
-      onAction(player, "select");
+      handler(player, "select");
     }
   });
 

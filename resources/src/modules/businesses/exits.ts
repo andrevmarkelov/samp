@@ -7,10 +7,12 @@ import { STREET_WORLD, placeAt, type SpawnPoint } from "../spawn/point";
 import type { BusinessRecord } from "./repository";
 import { businessHasInterior, getBusiness, listBusinesses } from "./repository";
 import { clearInsideBusiness, getInsideBusiness, setInsideBusiness } from "./session";
+import { isClothesType } from "./types";
 import { businessIdFromVirtualWorld, businessVirtualWorld } from "./world";
 
 const EXIT_PICKUP_MODEL = 19132;
 const BUY_PICKUP_MODEL = 1274;
+const CLOTHES_BUY_PICKUP_MODEL = 1275;
 const PICKUP_TYPE = 1;
 const PLAYER_STATE_ONFOOT = 1;
 const PICKUP_RADIUS = 1.5;
@@ -44,7 +46,7 @@ export function startBusinessExits(): void {
       business.buyPickupZ !== null
     ) {
       new Pickup(
-        BUY_PICKUP_MODEL,
+        isClothesType(business.typeId) ? CLOTHES_BUY_PICKUP_MODEL : BUY_PICKUP_MODEL,
         PICKUP_TYPE,
         business.buyPickupX,
         business.buyPickupY,

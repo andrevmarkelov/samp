@@ -593,9 +593,9 @@ async function migrateInteriorPickupCoords(): Promise<void> {
     [26, 377.1115, -193.0494, 1000.6401, 379.2613, -190.4658, 1000.6328],
     [27, 772.3323, -5.1769, 1000.7287, null, null, null],
     [28, 773.8818, -78.3945, 1000.6621, null, null, null],
-    [29, 204.3624, -168.6568, 1000.5234, null, null, null],
-    [30, 207.6834, -110.9505, 1005.1328, null, null, null],
-    [31, 207.0871, -139.9479, 1003.5078, null, null, null],
+    [29, 204.3624, -168.6568, 1000.5234, 204.3622, -159.9521, 1000.5234],
+    [30, 207.6834, -110.9505, 1005.1328, 207.6923, -101.1981, 1005.2578],
+    [31, 207.0871, -139.9479, 1003.5078, 207.0167, -129.495, 1003.5078],
     [32, 501.9161, -67.9002, 998.7578, 497.0241, -75.7667, 998.7578],
     [33, 501.9901, -67.7595, 998.7578, 497.0165, -75.9557, 998.7578],
     [34, 501.955, -67.9791, 998.7578, 496.9535, -75.6969, 998.7578],
@@ -786,6 +786,90 @@ export async function payBusinessCashShare(
     const [userUpdate] = await conn.query<ResultSetHeader>(
       "UPDATE users SET money = ? WHERE id = ? AND money >= ?",
       [cashLeft, payerId, price]
+    );
+    if (userUpdate.affectedRows !== 1) {
+      await conn.rollback();
+      return { ok: false, reason: "funds" };
+    }
+
+    const [bizUpdate] = await conn.query<ResultSetHeader>(
+      "UPDATE businesses SET balance = ? WHERE id = ?",
+      [balance, businessId]
+    );
+    if (bizUpdate.affectedRows !== 1) {
+      await conn.rollback();
+      return { ok: false, reason: "db" };
+    }
+
+    await conn.commit();
+    return { ok: true, cashLeft, balance, businessGain, amount: price };
+  } catch {
+    await conn.rollback();
+    return { ok: false, reason: "db" };
+  } finally {
+    conn.release();
+  }
+}
+
+/** Покупка скина: наличные + skin в одной транзакции, доля `share` на бизнес. */
+export async function payBusinessClothesPurchase(
+  businessId: number,
+  payerId: number,
+  price: number,
+  skin: number,
+  share = 0.8
+): Promise<PayVehicleRentalResult> {
+  if (!Number.isInteger(price) || price < 1 || !Number.isInteger(skin) || skin < 0) {
+    return { ok: false, reason: "db" };
+  }
+
+  const rate = Math.min(1, Math.max(0, share));
+  const businessGain = Math.floor(price * rate);
+  const conn = await getPool().getConnection();
+
+  try {
+    await conn.beginTransaction();
+
+    const [bizRows] = await conn.query<RowDataPacket[]>(
+      "SELECT id, balance FROM businesses WHERE id = ? LIMIT 1 FOR UPDATE",
+      [businessId]
+    );
+    const bizRow = bizRows[0];
+    if (!bizRow) {
+      await conn.rollback();
+      return { ok: false, reason: "not_found" };
+    }
+
+    const [userRows] = await conn.query<RowDataPacket[]>(
+      "SELECT money, skin FROM users WHERE id = ? LIMIT 1 FOR UPDATE",
+      [payerId]
+    );
+    const userRow = userRows[0];
+    if (!userRow) {
+      await conn.rollback();
+      return { ok: false, reason: "db" };
+    }
+
+    const money = Math.max(0, Math.floor(Number(userRow.money)));
+    if (money < price) {
+      await conn.rollback();
+      return { ok: false, reason: "funds" };
+    }
+
+    if (Math.floor(Number(userRow.skin)) === skin) {
+      await conn.rollback();
+      return { ok: false, reason: "db" };
+    }
+
+    const cashLeft = money - price;
+    const balance = Math.min(
+      MAX_MONEY,
+      Math.max(0, Math.floor(Number(bizRow.balance))) + businessGain
+    );
+
+    const [userUpdate] = await conn.query<ResultSetHeader>(
+      "UPDATE users SET money = ?, skin = ? WHERE id = ? AND money >= ?",
+      [cashLeft, skin, payerId, price]
     );
     if (userUpdate.affectedRows !== 1) {
       await conn.rollback();
