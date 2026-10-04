@@ -33,6 +33,7 @@ import "./clear";
 import "./su";
 import "./wanted";
 import "./limit";
+import "./eject";
 import "./report";
 import "./ads";
 import "./home";

@@ -52,7 +52,7 @@ const CATEGORIES: readonly HelpCategory[] = [
   {
     key: "vehicles",
     label: "Управление транспортом",
-    commands: ["lock", "car", "trunk", "limit", "unrent"],
+    commands: ["lock", "car", "trunk", "limit", "eject", "unrent"],
   },
   {
     key: "houses",
