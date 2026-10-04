@@ -3,6 +3,7 @@ import { Color } from "../../shared/colors";
 import { isPlayerActive, playerChatName, playerId } from "../../shared/player";
 import { getAccount } from "../auth/session";
 import { registerCommand } from "../commands/registry";
+import { afkStatusSuffix } from "../commands/status-tags";
 import { hasAdminAccess, isAdminLoggedIn } from "./session";
 
 type OnlineAdmin = {
@@ -42,10 +43,11 @@ export function bindAdminsList(): void {
 
         const slot = playerId(other) ?? 0;
         const logged = isAdminLoggedIn(other) ? "да" : "нет";
+        const afk = afkStatusSuffix(other, true);
         list.push({
           level: account.adminLevel,
           slot,
-          line: `${playerChatName(other)} | ${account.adminLevel} lvl | alogin: ${logged}`,
+          line: `${playerChatName(other)} | ${account.adminLevel} lvl | alogin: ${logged}${afk}`,
         });
       });
 

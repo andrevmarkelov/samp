@@ -38,6 +38,39 @@ export function isPlayerAfk(player: Player): boolean {
   return tracks.get(id)?.afkSince != null;
 }
 
+/** Сколько мс игрок в AFK, или `null` если не AFK. */
+export function getAfkElapsedMs(player: Player): number | null {
+  const id = playerId(player);
+  if (id === null) {
+    return null;
+  }
+
+  const since = tracks.get(id)?.afkSince;
+  if (since == null) {
+    return null;
+  }
+
+  return Math.max(0, Date.now() - since);
+}
+
+/** Короткий срок AFK: `45с`, `12м 05с`, `1ч 02м`. */
+export function formatAfkElapsed(ms: number): string {
+  const totalSec = Math.floor(Math.max(0, ms) / 1000);
+  const hours = Math.floor(totalSec / 3600);
+  const minutes = Math.floor((totalSec % 3600) / 60);
+  const seconds = totalSec % 60;
+
+  if (hours > 0) {
+    return `${hours}ч ${String(minutes).padStart(2, "0")}м`;
+  }
+
+  if (minutes > 0) {
+    return `${minutes}м ${String(seconds).padStart(2, "0")}с`;
+  }
+
+  return `${seconds}с`;
+}
+
 export const afkModule: GameModule = {
   name: "afk",
   start() {

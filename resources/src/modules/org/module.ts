@@ -20,6 +20,7 @@ import { bindFbiMapIcon } from "./fbi-map";
 import { bindLspdDoors } from "./lspd-doors";
 import { bindLspdLocker } from "./lspd-locker";
 import { bindLspdMapIcon } from "./lspd-map";
+import { bindLspdSurrender } from "./lspd-surrender";
 import { bindAutoschoolDoors } from "./autoschool-doors";
 import { bindAutoschoolMapIcon } from "./autoschool-map";
 import { bindMafiaDoors } from "./mafia-doors";
@@ -42,6 +43,7 @@ export const orgModule: GameModule = {
     bindMeriyaLocker();
     bindPoliceDoors();
     bindLspdDoors();
+    bindLspdSurrender();
     bindAmmunationDoors();
     bindPoliceLocker();
     bindLspdLocker();

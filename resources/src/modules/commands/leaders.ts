@@ -4,6 +4,7 @@ import { isPlayerActive, playerChatName, playerId } from "../../shared/player";
 import { getAccount } from "../auth/session";
 import { MAX_ORG_RANK, getMembership } from "../org";
 import { registerCommand } from "./registry";
+import { afkStatusSuffix } from "./status-tags";
 
 export const LEADERS_DIALOG_ID = 126;
 
@@ -42,10 +43,11 @@ registerCommand("leaders", "Список лидеров online", (player) => {
     }
 
     const phone = account.phone ? ` | тел. ${account.phone}` : "";
+    const afk = afkStatusSuffix(other);
     list.push({
       orgName: membership.org.name,
       slot: playerId(other) ?? 0,
-      line: `${playerChatName(other)} | ${membership.org.name} | ${membership.rank.title}${phone}`,
+      line: `${playerChatName(other)} | ${membership.org.name} | ${membership.rank.title}${phone}${afk}`,
     });
   });
 

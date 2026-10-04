@@ -17,6 +17,7 @@ import { byGender } from "../auth/gender";
 import { saveUserFamily } from "../auth/repository";
 import { getAccount, patchAccount } from "../auth/session";
 import { registerCommand } from "../commands/registry";
+import { memberStatusSuffix } from "../commands/status-tags";
 import { getFamily } from "./catalog";
 import { getFamilyMembership } from "./membership";
 import { getFamilyRank } from "./ranks";
@@ -274,6 +275,7 @@ registerCommand("fmembers", "Состав семьи в сети", (player) => {
     rankTitle: string;
     name: string;
     phone: string | null;
+    status: string;
   };
 
   const rows: MemberRow[] = [];
@@ -306,6 +308,7 @@ registerCommand("fmembers", "Состав семьи в сети", (player) => {
       rankTitle: otherMembership.rank.title,
       name: playerChatName(other),
       phone: otherAccount.phone,
+      status: memberStatusSuffix(other),
     });
   });
 
@@ -318,7 +321,7 @@ registerCommand("fmembers", "Состав семьи в сети", (player) => {
 
   const lines = rows.map((row) => {
     const phone = row.phone ? ` | тел. ${row.phone}` : "";
-    return `[${row.rankId}] ${row.rankTitle} ${row.name}${phone}`;
+    return `[${row.rankId}] ${row.rankTitle} ${row.name}${phone}${row.status}`;
   });
 
   const body =

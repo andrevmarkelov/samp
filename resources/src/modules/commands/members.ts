@@ -1,9 +1,10 @@
-import { Dialog, omp, type Player } from "@omp-node/core";
+import { Dialog, omp } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { isPlayerActive, playerChatName } from "../../shared/player";
 import { getAccount } from "../auth/session";
 import { getMembership } from "../org";
 import { registerCommand } from "./registry";
+import { memberStatusSuffix } from "./status-tags";
 
 export const ORG_MEMBERS_DIALOG_ID = 125;
 
@@ -22,6 +23,7 @@ registerCommand("members", "Состав организации в сети", (p
     rankTitle: string;
     name: string;
     phone: string | null;
+    status: string;
   };
 
   const rows: MemberRow[] = [];
@@ -51,6 +53,7 @@ registerCommand("members", "Состав организации в сети", (p
       rankTitle: otherMembership.rank.title,
       name: playerChatName(other),
       phone: otherAccount.phone,
+      status: memberStatusSuffix(other),
     });
   });
 
@@ -63,7 +66,7 @@ registerCommand("members", "Состав организации в сети", (p
 
   const lines = rows.map((row) => {
     const phone = row.phone ? ` | тел. ${row.phone}` : "";
-    return `[${row.rankId}] ${row.rankTitle} ${row.name}${phone}`;
+    return `[${row.rankId}] ${row.rankTitle} ${row.name}${phone}${row.status}`;
   });
 
   const body =
