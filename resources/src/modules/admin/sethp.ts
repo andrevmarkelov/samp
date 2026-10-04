@@ -1,12 +1,26 @@
 import { omp } from "@omp-node/core";
 import { Color } from "../../shared/colors";
-import { isPlayerActive, playerId } from "../../shared/player";
+import { isPlayerActive, playerChatName, playerId } from "../../shared/player";
 import { MAX_HEALTH, applyHealth, getAccount, patchAccount } from "../auth/session";
 import { queueSave } from "../persist";
 import { registerCommand } from "../commands/registry";
 import { hasAdminAccess, isAdminLoggedIn } from "./session";
 
 const MIN_SET_HP = 0;
+
+function broadcastAdmins(text: string): void {
+  omp.players.forEach((other) => {
+    if (!isPlayerActive(other) || !hasAdminAccess(other, 1)) {
+      return;
+    }
+
+    try {
+      other.sendClientMessage(Color.gray, text);
+    } catch {
+      // Слот пустой.
+    }
+  });
+}
 
 function parseSethpArgs(args: string): { slot: number; hp: number } | null {
   const parts = args.trim().split(/\s+/);
@@ -78,7 +92,10 @@ export function bindAdminSethp(): void {
 
       player.sendClientMessage(
         Color.info,
-        `HP игрока ${parsed.slot} установлено: ${parsed.hp}`
+        `HP игрока ${playerChatName(target)} установлено: ${parsed.hp}`
+      );
+      broadcastAdmins(
+        `[A] Администратор ${playerChatName(player)} установил HP игроку ${playerChatName(target)}: ${parsed.hp}.`
       );
     },
     true

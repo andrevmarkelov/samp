@@ -122,6 +122,20 @@ function pickOrgChoice(
   return null;
 }
 
+function broadcastAdmins(text: string): void {
+  omp.players.forEach((other) => {
+    if (!isPlayerActive(other) || !hasAdminAccess(other, 1)) {
+      return;
+    }
+
+    try {
+      other.sendClientMessage(Color.gray, text);
+    } catch {
+      // Слот пустой.
+    }
+  });
+}
+
 async function applyLeader(
   admin: Player,
   target: Player,
@@ -156,6 +170,9 @@ async function applyLeader(
     if (isPlayerActive(target)) {
       target.sendClientMessage(Color.info, "Вас сняли с лидерки.");
     }
+    broadcastAdmins(
+      `[A] Администратор ${playerChatName(admin)} снял ${tag} с лидерки.`
+    );
     return;
   }
 
@@ -167,6 +184,9 @@ async function applyLeader(
       `Вас назначили лидером организации ${orgName}.`
     );
   }
+  broadcastAdmins(
+    `[A] Администратор ${playerChatName(admin)} назначил ${tag} лидером организации ${orgName}.`
+  );
 }
 
 export function bindAdminMakeleader(): void {

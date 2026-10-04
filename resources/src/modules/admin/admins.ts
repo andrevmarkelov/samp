@@ -5,6 +5,7 @@ import { getAccount } from "../auth/session";
 import { registerCommand } from "../commands/registry";
 import { afkStatusSuffix } from "../commands/status-tags";
 import { hasAdminAccess, isAdminLoggedIn } from "./session";
+import { getAdminSpectateTarget } from "./spectate";
 
 type OnlineAdmin = {
   line: string;
@@ -44,10 +45,13 @@ export function bindAdminsList(): void {
         const slot = playerId(other) ?? 0;
         const logged = isAdminLoggedIn(other) ? "да" : "нет";
         const afk = afkStatusSuffix(other, true);
+        const specTarget = getAdminSpectateTarget(other);
+        const spec =
+          specTarget !== null ? ` | sp > ${specTarget}` : "";
         list.push({
           level: account.adminLevel,
           slot,
-          line: `${playerChatName(other)} | ${account.adminLevel} lvl | alogin: ${logged}${afk}`,
+          line: `${playerChatName(other)} | ${account.adminLevel} lvl | alogin: ${logged}${afk}${spec}`,
         });
       });
 

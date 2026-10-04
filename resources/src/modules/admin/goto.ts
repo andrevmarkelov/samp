@@ -154,7 +154,7 @@ export function bindAdminGoto(): void {
         `Вы телепортировались к ${playerChatName(target)}.`
       );
       broadcastAdmins(
-        `Администратор ${playerChatName(player)} телепортировался к ${playerChatName(target)}.`
+        `[A] Администратор ${playerChatName(player)} телепортировался к ${playerChatName(target)}.`
       );
     },
     true
@@ -210,7 +210,7 @@ export function bindAdminGoto(): void {
       }
 
       broadcastAdmins(
-        `[A] Администратор ${playerChatName(player)} телепортировал к себе игрока ${playerChatName(target)}`
+        `[A] Администратор ${playerChatName(player)} телепортировал к себе игрока ${playerChatName(target)}.`
       );
     },
     true

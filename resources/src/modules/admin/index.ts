@@ -11,6 +11,7 @@ import { bindAdminKick } from "./kick";
 import { bindAdminMute } from "./mute";
 import { bindAdminSethp } from "./sethp";
 import { bindAdminSlap } from "./slap";
+import { bindAdminSpectate } from "./spectate";
 import { bindAdminBan } from "./ban";
 import { bindAdminSetlevel } from "./setlevel";
 import { bindAdminSetskin } from "./setskin";
@@ -43,6 +44,7 @@ export const adminModule: GameModule = {
     bindAdminsList();
     bindAdminKick();
     bindAdminSlap();
+    bindAdminSpectate();
     bindAdminBan();
     bindAdminJail();
     bindAdminMute();
