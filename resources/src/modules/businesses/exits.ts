@@ -7,12 +7,13 @@ import { STREET_WORLD, placeAt, type SpawnPoint } from "../spawn/point";
 import type { BusinessRecord } from "./repository";
 import { businessHasInterior, getBusiness, listBusinesses } from "./repository";
 import { clearInsideBusiness, getInsideBusiness, setInsideBusiness } from "./session";
-import { isClothesType } from "./types";
+import { isClothesType, isWorkshopType } from "./types";
 import { businessIdFromVirtualWorld, businessVirtualWorld } from "./world";
 
 const EXIT_PICKUP_MODEL = 19132;
 const BUY_PICKUP_MODEL = 1274;
 const CLOTHES_BUY_PICKUP_MODEL = 1275;
+const WORKSHOP_BUY_PICKUP_MODEL = 19131;
 const PICKUP_TYPE = 1;
 const PLAYER_STATE_ONFOOT = 1;
 const PICKUP_RADIUS = 1.5;
@@ -46,20 +47,33 @@ export function startBusinessExits(): void {
       business.buyPickupZ !== null
     ) {
       new Pickup(
-        isClothesType(business.typeId) ? CLOTHES_BUY_PICKUP_MODEL : BUY_PICKUP_MODEL,
+        buyPickupModel(business.typeId),
         PICKUP_TYPE,
         business.buyPickupX,
         business.buyPickupY,
         business.buyPickupZ,
         world
       );
+
+      if (isWorkshopType(business.typeId)) {
+        new TextLabel(
+          "Сервис",
+          Color.info,
+          business.buyPickupX,
+          business.buyPickupY,
+          business.buyPickupZ + LABEL_HEIGHT,
+          LABEL_DRAW_DISTANCE,
+          world,
+          false
+        );
+      }
     }
   }
 
   setInterval(tickBusinessExits, TICK_MS);
 
   omp.on("playerKeyStateChange", (player, newKeys, oldKeys) => {
-    const pressed = newKeys & ~oldKeys;
+    const pressed = Number(newKeys) & ~Number(oldKeys);
     if ((pressed & KEY_WALK) === 0) {
       return;
     }
@@ -75,6 +89,16 @@ export function startBusinessExits(): void {
       clearInsideBusiness(id);
     }
   });
+}
+
+function buyPickupModel(typeId: number): number {
+  if (isClothesType(typeId)) {
+    return CLOTHES_BUY_PICKUP_MODEL;
+  }
+  if (isWorkshopType(typeId)) {
+    return WORKSHOP_BUY_PICKUP_MODEL;
+  }
+  return BUY_PICKUP_MODEL;
 }
 
 function tickBusinessExits(): void {
@@ -97,13 +121,19 @@ function tickBusinessExits(): void {
       const pos = player.getPos();
       const interior = player.getInterior();
       const world = player.getVirtualWorld();
-      const business = findInteriorExitBusiness(pos.x, pos.y, pos.z, interior, world, id);
-
+      const business = findInteriorExitBusiness(
+        pos.x,
+        pos.y,
+        pos.z,
+        interior,
+        world,
+        id,
+        PICKUP_RADIUS
+      );
       if (!business) {
         nearExit.delete(id);
         return;
       }
-
       nearExit.set(id, business.id);
     } catch {
       nearExit.delete(id);
@@ -140,7 +170,7 @@ function tryExitBusiness(player: Player): void {
     const pos = player.getPos();
     const interior = player.getInterior();
     const world = player.getVirtualWorld();
-    if (!isNearInteriorExit(pos.x, pos.y, pos.z, interior, world, business)) {
+    if (!isNearInteriorExit(pos.x, pos.y, pos.z, interior, world, business, PICKUP_RADIUS)) {
       nearExit.delete(id);
       return;
     }
@@ -181,7 +211,8 @@ function findInteriorExitBusiness(
   z: number,
   interior: number,
   world: number,
-  slotId: number
+  slotId: number,
+  radius: number
 ): BusinessRecord | null {
   const businessId = businessIdFromVirtualWorld(world);
   if (businessId === null) {
@@ -194,7 +225,7 @@ function findInteriorExitBusiness(
   }
 
   const business = getBusiness(businessId);
-  if (!business || !isNearInteriorExit(x, y, z, interior, world, business)) {
+  if (!business || !isNearInteriorExit(x, y, z, interior, world, business, radius)) {
     return null;
   }
 
@@ -208,7 +239,8 @@ function isNearInteriorExit(
   z: number,
   interior: number,
   world: number,
-  business: BusinessRecord
+  business: BusinessRecord,
+  radius: number
 ): boolean {
   if (
     !businessHasInterior(business) ||
@@ -223,7 +255,7 @@ function isNearInteriorExit(
 
   return (
     distance3d(x, y, z, business.interiorX, business.interiorY, business.interiorZ) <=
-    PICKUP_RADIUS
+    radius
   );
 }
 

@@ -56,6 +56,12 @@ type RentalDef = {
 type RentalSlot = {
   businessId: number;
   vehicleId: number;
+  /** Указатель сущности — защита от переиспользования vehicle id. */
+  ptr: number;
+  spawnX: number;
+  spawnY: number;
+  spawnZ: number;
+  spawnAngle: number;
   renterUserId: number | null;
   renterSlotId: number | null;
   leaveTimer: ReturnType<typeof setTimeout> | null;
@@ -97,34 +103,9 @@ export function isActiveRentalVehicle(vehicleId: number): boolean {
 
 export function spawnRentalVehicles(): void {
   for (const def of RENTAL_DEFS) {
-    const vehicle = createServerVehicle({
-      model: MODEL,
-      x: def.x,
-      y: def.y,
-      z: def.z,
-      angle: def.angle,
-      color1: COLOR,
-      color2: COLOR,
-      respawnSec: RESPAWN_SEC,
-      world: STREET_WORLD,
-    });
-    if (!vehicle) {
+    if (!createRentalSlot(def)) {
       omp.log(`[${SERVER_TAG}] аренда авто: не удалось создать машину бизнеса #${def.businessId}`);
-      continue;
     }
-
-    const vehicleId = liveVehicleId(vehicle);
-    if (vehicleId === null) {
-      continue;
-    }
-
-    slotsByVehicle.set(vehicleId, {
-      businessId: def.businessId,
-      vehicleId,
-      renterUserId: null,
-      renterSlotId: null,
-      leaveTimer: null,
-    });
   }
 
   bindRentalEvents();
@@ -135,9 +116,144 @@ export function spawnRentalVehicles(): void {
   omp.log(`[${SERVER_TAG}] аренда авто: ${slotsByVehicle.size} машин`);
 }
 
+function createRentalSlot(def: RentalDef): boolean {
+  const vehicle = createServerVehicle({
+    model: MODEL,
+    x: def.x,
+    y: def.y,
+    z: def.z,
+    angle: def.angle,
+    color1: COLOR,
+    color2: COLOR,
+    respawnSec: RESPAWN_SEC,
+    world: STREET_WORLD,
+  });
+  if (!vehicle) {
+    return false;
+  }
+
+  const vehicleId = liveVehicleId(vehicle);
+  const ptr = vehiclePtr(vehicle);
+  if (vehicleId === null || ptr === null) {
+    try {
+      vehicle.destroy();
+    } catch {
+      // ignore
+    }
+    return false;
+  }
+
+  // На этом id мог остаться «мёртвый» слот после destroy — перезаписываем.
+  const stale = slotsByVehicle.get(vehicleId);
+  if (stale) {
+    clearLeaveTimer(stale);
+    if (stale.renterUserId !== null) {
+      vehicleByRenter.delete(stale.renterUserId);
+    }
+    if (stale.renterSlotId !== null) {
+      vehicleBySlot.delete(stale.renterSlotId);
+    }
+  }
+
+  slotsByVehicle.set(vehicleId, {
+    businessId: def.businessId,
+    vehicleId,
+    ptr,
+    spawnX: def.x,
+    spawnY: def.y,
+    spawnZ: def.z,
+    spawnAngle: def.angle,
+    renterUserId: null,
+    renterSlotId: null,
+    leaveTimer: null,
+  });
+  return true;
+}
+
+/** Слот аренды только если это та же сущность (ptr) и модель Sentinel. */
+function resolveRentalSlot(vehicle: Vehicle): RentalSlot | null {
+  const vehicleId = liveVehicleId(vehicle);
+  if (vehicleId === null) {
+    return null;
+  }
+
+  const slot = slotsByVehicle.get(vehicleId);
+  if (!slot) {
+    return null;
+  }
+
+  const ptr = vehiclePtr(vehicle);
+  let model = 0;
+  try {
+    model = Math.floor(Number(vehicle.getModel()));
+  } catch {
+    dropStaleRentalSlot(slot);
+    return null;
+  }
+
+  if (ptr === null || Number(ptr) !== Number(slot.ptr) || model !== MODEL) {
+    dropStaleRentalSlot(slot);
+    return null;
+  }
+
+  return slot;
+}
+
+function dropStaleRentalSlot(slot: RentalSlot): void {
+  clearLeaveTimer(slot);
+  if (slot.renterUserId !== null) {
+    vehicleByRenter.delete(slot.renterUserId);
+  }
+  if (slot.renterSlotId !== null) {
+    vehicleBySlot.delete(slot.renterSlotId);
+  }
+  slotsByVehicle.delete(slot.vehicleId);
+
+  // Восстанавливаем точку аренды новой машиной.
+  createRentalSlot({
+    businessId: slot.businessId,
+    x: slot.spawnX,
+    y: slot.spawnY,
+    z: slot.spawnZ,
+    angle: slot.spawnAngle,
+  });
+}
+
 function bindRentalEvents(): void {
   omp.on("vehicleStreamIn", (vehicle, player) => {
     applyRentalDoorLock(vehicle, player);
+  });
+
+  // Смерть арендной машины: сдать аренду и вернуть на точку (тот же id/ptr).
+  omp.on("vehicleDeath", (vehicle) => {
+    const slot = resolveRentalSlot(vehicle);
+    if (!slot) {
+      return;
+    }
+
+    if (slot.renterUserId !== null) {
+      forceEndRentalByUser(slot.renterUserId, "disconnect");
+      return;
+    }
+
+    clearLeaveTimer(slot);
+    setTimeout(() => {
+      const live = omp.vehicles.at(slot.vehicleId);
+      if (!live) {
+        dropStaleRentalSlot(slot);
+        return;
+      }
+      try {
+        live.setToRespawn();
+        const ptr = vehiclePtr(live);
+        if (ptr !== null) {
+          slot.ptr = ptr;
+        }
+      } catch {
+        dropStaleRentalSlot(slot);
+      }
+      refreshDoorLocks(slot.vehicleId);
+    }, 500);
   });
 
   omp.on("playerStateChange", (player, newState, oldState) => {
@@ -203,15 +319,12 @@ function handleEnterRental(player: Player, asPassenger: boolean): void {
     return;
   }
 
-  const vehicleId = liveVehicleId(vehicle);
-  if (vehicleId === null) {
-    return;
-  }
-
-  const slot = slotsByVehicle.get(vehicleId);
+  const slot = resolveRentalSlot(vehicle);
   if (!slot) {
     return;
   }
+
+  const vehicleId = slot.vehicleId;
 
   const account = getAccount(player);
   const slotId = playerId(player);
@@ -646,12 +759,7 @@ function refreshDoorLocks(vehicleId: number): void {
 }
 
 function applyRentalDoorLock(vehicle: Vehicle, player: Player): void {
-  const vehicleId = liveVehicleId(vehicle);
-  if (vehicleId === null) {
-    return;
-  }
-
-  const slot = slotsByVehicle.get(vehicleId);
+  const slot = resolveRentalSlot(vehicle);
   if (!slot) {
     return;
   }
@@ -665,6 +773,15 @@ function applyRentalDoorLock(vehicle: Vehicle, player: Player): void {
     vehicle.setParamsForPlayer(player, 0, allowed ? DOORS_UNLOCKED : DOORS_LOCKED);
   } catch {
     // Слот или транспорт уже не в мире.
+  }
+}
+
+function vehiclePtr(vehicle: Vehicle): number | null {
+  try {
+    const ptr = vehicle.getPtr();
+    return ptr === null || ptr === undefined ? null : Number(ptr);
+  } catch {
+    return null;
   }
 }
 

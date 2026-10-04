@@ -190,6 +190,31 @@ export async function updatePlayerVehicleFuel(
   return result.affectedRows === 1;
 }
 
+export async function updatePlayerVehicleColors(
+  vehicleId: number,
+  color1: number,
+  color2: number
+): Promise<boolean> {
+  const c1 = Math.max(0, Math.min(255, Math.floor(color1)));
+  const c2 = Math.max(0, Math.min(255, Math.floor(color2)));
+  const [result] = await getPool().query<ResultSetHeader>(
+    "UPDATE player_vehicles SET color1 = ?, color2 = ? WHERE id = ?",
+    [c1, c2, vehicleId]
+  );
+  return result.affectedRows === 1;
+}
+
+export async function updatePlayerVehicleNitro(
+  vehicleId: number,
+  hasNitro: boolean
+): Promise<boolean> {
+  const [result] = await getPool().query<ResultSetHeader>(
+    "UPDATE player_vehicles SET has_nitro = ? WHERE id = ?",
+    [hasNitro ? 1 : 0, vehicleId]
+  );
+  return result.affectedRows === 1;
+}
+
 export type TrunkItem = "ammo" | "metal" | "drugs";
 
 function trunkColumn(item: TrunkItem): string {

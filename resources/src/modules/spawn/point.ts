@@ -139,7 +139,14 @@ export function placeAt(player: Player, point: SpawnPoint, options?: PlaceAtOpti
   player.setCameraBehind();
   trustPosition(player, point.x, point.y, point.z, point.interior, point.world);
 
-  const settleMs = resolveSettleMs(point, options);
+  scheduleSettleFreeze(player, resolveSettleMs(point, options));
+}
+
+/**
+ * Заморозка после телепорта (в т.ч. в ТС — toggleControllable блокирует и машину).
+ * `settleMs <= 0` — no-op.
+ */
+export function scheduleSettleFreeze(player: Player, settleMs: number): void {
   if (settleMs <= 0) {
     return;
   }
@@ -148,6 +155,8 @@ export function placeAt(player: Player, point: SpawnPoint, options?: PlaceAtOpti
   if (id === null) {
     return;
   }
+
+  clearPlaceAtSettle(player);
 
   try {
     player.toggleControllable(false);

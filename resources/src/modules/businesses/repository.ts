@@ -600,6 +600,9 @@ async function migrateInteriorPickupCoords(): Promise<void> {
     [33, 501.9901, -67.7595, 998.7578, 497.0165, -75.9557, 998.7578],
     [34, 501.955, -67.9791, 998.7578, 496.9535, -75.6969, 998.7578],
     [35, -2636.6331, 1402.8477, 906.4609, -2653.3042, 1407.2484, 906.2771],
+    [36, 1278.0013, -20.638, 1000.9547, 1288.5238, -6.405, 1000.9547],
+    [37, 1278.0013, -20.638, 1000.9547, 1288.5238, -6.405, 1000.9547],
+    [38, 1278.0013, -20.638, 1000.9547, 1288.5238, -6.405, 1000.9547],
     [51, 1133.1864, -15.4922, 1000.6797, 1139.5787, -4.1631, 1000.6719],
   ];
 
@@ -611,7 +614,11 @@ async function migrateInteriorPickupCoords(): Promise<void> {
            buy_pickup_x = ?, buy_pickup_y = ?, buy_pickup_z = ?,
            name = IF(id = 51 AND (name = 'Казино (Temple)' OR interior_id IS NULL),
                      'Casino (Redsands West) (Temple)', name),
-           interior_id = IF(id = 51 AND interior_id IS NULL, 12, interior_id)
+           interior_id = CASE
+             WHEN id IN (36, 37, 38) THEN 20
+             WHEN id = 51 AND interior_id IS NULL THEN 12
+             ELSE interior_id
+           END
        WHERE id = ?`,
       [ix, iy, iz, bx, by, bz, id]
     );

@@ -32,7 +32,7 @@ export function startBusinessEntrances(): void {
   setInterval(tickBusinessEntrances, TICK_MS);
 
   omp.on("playerKeyStateChange", (player, newKeys, oldKeys) => {
-    const pressed = newKeys & ~oldKeys;
+    const pressed = Number(newKeys) & ~Number(oldKeys);
     if ((pressed & KEY_WALK) === 0) {
       return;
     }
@@ -69,18 +69,18 @@ function tickBusinessEntrances(): void {
       const pos = player.getPos();
       const world = player.getVirtualWorld();
       const interior = player.getInterior();
+      const state = player.getState();
 
-      if (world !== STREET_WORLD || interior !== 0 || player.getState() !== PLAYER_STATE_ONFOOT) {
+      if (world !== STREET_WORLD || interior !== 0 || state !== PLAYER_STATE_ONFOOT) {
         nearEntrance.delete(id);
         return;
       }
 
-      const business = findBusinessEntranceAt(pos.x, pos.y, pos.z);
+      const business = findBusinessEntranceAt(pos.x, pos.y, pos.z, PICKUP_RADIUS);
       if (!business || !businessHasInterior(business)) {
         nearEntrance.delete(id);
         return;
       }
-
       nearEntrance.set(id, business.id);
     } catch {
       nearEntrance.delete(id);
@@ -121,7 +121,7 @@ async function tryEnterBusiness(player: Player): Promise<void> {
     if (
       world !== STREET_WORLD ||
       interior !== 0 ||
-      !isNearEntrance(pos.x, pos.y, pos.z, business)
+      !isNearEntrance(pos.x, pos.y, pos.z, business, PICKUP_RADIUS)
     ) {
       nearEntrance.delete(slotId);
       return;
@@ -189,7 +189,6 @@ async function tryEnterBusiness(player: Player): Promise<void> {
       return;
     }
 
-    // БД уже обновлена в транзакции — кэш всегда синхронизируем.
     if (result.cashLeft >= 0) {
       setBusinessBalance(business.id, result.balance);
     }
@@ -246,7 +245,12 @@ export function teleportToBusinessInterior(player: Player, business: BusinessRec
   }
 }
 
-function findBusinessEntranceAt(x: number, y: number, z: number): BusinessRecord | null {
+function findBusinessEntranceAt(
+  x: number,
+  y: number,
+  z: number,
+  radius: number
+): BusinessRecord | null {
   let best: BusinessRecord | null = null;
   let bestDistance = Number.POSITIVE_INFINITY;
 
@@ -259,7 +263,7 @@ function findBusinessEntranceAt(x: number, y: number, z: number): BusinessRecord
       business.entranceY,
       business.entranceZ
     );
-    if (distance > PICKUP_RADIUS || distance >= bestDistance) {
+    if (distance > radius || distance >= bestDistance) {
       continue;
     }
 
@@ -270,10 +274,16 @@ function findBusinessEntranceAt(x: number, y: number, z: number): BusinessRecord
   return best;
 }
 
-function isNearEntrance(x: number, y: number, z: number, business: BusinessRecord): boolean {
+function isNearEntrance(
+  x: number,
+  y: number,
+  z: number,
+  business: BusinessRecord,
+  radius: number
+): boolean {
   return (
     distance3d(x, y, z, business.entranceX, business.entranceY, business.entranceZ) <=
-    PICKUP_RADIUS
+    radius
   );
 }
 

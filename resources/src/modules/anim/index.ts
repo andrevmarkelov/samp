@@ -338,9 +338,10 @@ export const animModule: GameModule = {
 
     omp.on("playerStateChange", (player, newState) => {
       const state = Number(newState);
-      // Водитель / пассажир — сброс.
+      // Водитель / пассажир: только сброс нашего /anim.
+      // ClearAnimations при посадке выкидывает из ТС (баг SA-MP).
       if (state === 2 || state === 3) {
-        forceClearAnim(player);
+        stopPlayerAnim(player);
       }
     });
   },

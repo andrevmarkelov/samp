@@ -1,12 +1,12 @@
 ﻿family_home = CreateDynamicObject(631, 199.112976, 6.427748, 1500.895874, 0.000000, 0.000022, 0.000000, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 65535, "none", "none", 0xFFFFFFFF);
-CreateDynamicObject(2345, 199.679993, 2.717909, 1500.803955, 0.000000, -0.000022, 179.999863, -1, -1); // 0
+CreateDynamicObject(2345, 199.679993, 2.717909, 1500.803955, 0.000000, -0.000022, 179.999863, -1, -1);
 family_home = CreateDynamicObject(19370, 200.901672, 4.941114, 1501.662964, 0.000000, 0.000022, 0.000000, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 3603, "bevmans01_la", "wilsdoor_01_la", 0);
-CreateDynamicObject(2345, 199.830139, 2.717909, 1501.314209, 0.000000, -0.000022, 179.999863, -1, -1); // 0
-CreateDynamicObject(2345, 199.700012, 2.717909, 1501.814453, 0.000000, -0.000022, 179.999863, -1, -1); // 0
-CreateDynamicObject(2345, 199.159485, 2.717909, 1502.344604, 0.000000, -0.000022, 179.999863, -1, -1); // 0
-CreateDynamicObject(2345, 199.950256, 2.717909, 1500.413696, 0.000000, -0.000022, 179.999863, -1, -1); // 0
+CreateDynamicObject(2345, 199.830139, 2.717909, 1501.314209, 0.000000, -0.000022, 179.999863, -1, -1);
+CreateDynamicObject(2345, 199.700012, 2.717909, 1501.814453, 0.000000, -0.000022, 179.999863, -1, -1);
+CreateDynamicObject(2345, 199.159485, 2.717909, 1502.344604, 0.000000, -0.000022, 179.999863, -1, -1);
+CreateDynamicObject(2345, 199.950256, 2.717909, 1500.413696, 0.000000, -0.000022, 179.999863, -1, -1);
 family_home = CreateDynamicObject(19446, 199.687561, 4.908155, 1503.469604, 0.000000, 89.999969, -179.999893, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 10101, "2notherbuildsfe", "ferry_build14", 0);
 family_home = CreateDynamicObject(18762, 198.426575, 2.454541, 1502.403687, 0.000000, 0.000022, 0.000000, -1, -1);
@@ -21,7 +21,7 @@ family_home = CreateDynamicObject(19789, 199.917664, 2.452527, 1499.543213, -89.
 SetDynamicObjectMaterial(family_home, 0, 13691, "bevcunto2_lahills", "stonewall3_la", 0xFFFFFFFF);
 family_home = CreateDynamicObject(19789, 199.917664, 2.443556, 1499.555908, -89.999992, 0.000025, 89.999962, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 4829, "airport_las", "sjmlahus28", 0xFFFFFFFF);
-CreateDynamicObject(2345, 199.929504, 2.717909, 1502.984985, 0.000000, -0.000022, 179.999863, -1, -1); // 0
+CreateDynamicObject(2345, 199.929504, 2.717909, 1502.984985, 0.000000, -0.000022, 179.999863, -1, -1);
 family_home = CreateDynamicObject(19446, 199.687561, 4.908155, 1504.100098, 0.000000, 89.999969, -179.999893, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 10101, "2notherbuildsfe", "ferry_build14", 0);
 family_home = CreateDynamicObject(18762, 199.395325, 2.020888, 1502.403687, 0.000000, 0.000022, 0.000000, -1, -1);
@@ -34,7 +34,7 @@ family_home = CreateDynamicObject(18762, 200.375061, 2.450635, 1502.403687, 0.00
 SetDynamicObjectMaterial(family_home, 0, 13691, "bevcunto2_lahills", "stonewall3_la", 0xFFD3D3D3);
 family_home = CreateDynamicObject(19325, 201.134216, 6.960402, 1501.780151, -0.000022, 0.000000, -89.999931, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 10932, "station_sfse", "neon", 0xFFFFFFFF);
-CreateDynamicObject(638, 197.572083, 1.597669, 1500.360229, 0.000000, 0.000022, 0.000000, -1, -1); // 0
+CreateDynamicObject(638, 197.572083, 1.597669, 1500.360229, 0.000000, 0.000022, 0.000000, -1, -1);
 family_home = CreateDynamicObject(19325, 201.134216, 5.020887, 1503.378174, -0.000022, -90.000000, -89.999931, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 10932, "station_sfse", "neon", 0xFFFFFFFF);
 family_home = CreateDynamicObject(2137, 198.653381, 8.479017, 1499.962402, -0.000022, 0.000000, -89.999931, -1, -1);
@@ -101,12 +101,12 @@ SetDynamicObjectMaterial(family_home, 1, 14389, "madpoolbit", "AH_flroortile4", 
 SetDynamicObjectMaterial(family_home, 0, 14389, "madpoolbit", "AH_flroortile4", 0);
 family_home = CreateDynamicObject(19325, 199.550476, 7.169141, 1506.127686, 0.000022, 0.000000, 89.999931, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 19480, "signsurf", "sign", 0);
-CreateDynamicObject(638, 197.571106, -0.714401, 1500.361206, 0.000000, 0.000022, 0.000000, -1, -1); // 0
+CreateDynamicObject(638, 197.571106, -0.714401, 1500.361206, 0.000000, 0.000022, 0.000000, -1, -1);
 family_home = CreateDynamicObject(2079, 195.852356, 10.164135, 1500.640137, -0.000003, 0.000022, -10.200010, -1, -1);
 SetDynamicObjectMaterial(family_home, 2, 18029, "genintintsmallrest", "GB_restaursmll15", 0);
 family_home = CreateDynamicObject(19466, 197.905823, -0.840682, 1501.599487, 0.000000, 0.000036, -0.000029, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 10932, "station_sfse", "neon", 0xFFFFFFFF);
-CreateDynamicObject(3004, 194.149475, 0.851393, 1501.521118, -76.491997, 179.995209, -0.004796, -1, -1); // 0
+CreateDynamicObject(3004, 194.149475, 0.851393, 1501.521118, -76.491997, 179.995209, -0.004796, -1, -1);
 family_home = CreateDynamicObject(18766, 198.424500, 0.450087, 1504.943726, -0.000014, 270.000000, -89.999962, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 13691, "bevcunto2_lahills", "stonewall3_la", 0xFFFFFFFF);
 family_home = CreateDynamicObject(19325, 201.134216, 2.970594, 1505.970337, -0.000022, 0.000000, -89.999931, -1, -1);
@@ -130,10 +130,10 @@ SetDynamicObjectMaterial(family_home, 3, 19480, "signsurf", "sign", 0);
 SetDynamicObjectMaterial(family_home, 2, 18646, "matcolours", "grey-93-percent", 0);
 SetDynamicObjectMaterial(family_home, 1, 19480, "signsurf", "sign", 0);
 SetDynamicObjectMaterial(family_home, 0, 19480, "signsurf", "sign", 0);
-CreateDynamicObject(638, 193.823425, 7.576612, 1504.570801, 0.000022, 0.000000, 89.999931, -1, -1); // 0
-CreateDynamicObject(2332, 199.387390, -1.382063, 1500.572144, 0.000000, 0.000022, 0.000000, -1, -1); // 0
-CreateDynamicObject(2965, 193.914490, 0.283522, 1500.873779, 0.000036, 0.000024, 52.799973, -1, -1); // 0
-CreateDynamicObject(2233, 198.038391, 10.591810, 1504.176880, -0.000022, 0.000000, -89.999931, -1, -1); // 0
+CreateDynamicObject(638, 193.823425, 7.576612, 1504.570801, 0.000022, 0.000000, 89.999931, -1, -1);
+CreateDynamicObject(2332, 199.387390, -1.382063, 1500.572144, 0.000000, 0.000022, 0.000000, -1, -1);
+CreateDynamicObject(2965, 193.914490, 0.283522, 1500.873779, 0.000036, 0.000024, 52.799973, -1, -1);
+CreateDynamicObject(2233, 198.038391, 10.591810, 1504.176880, -0.000022, 0.000000, -89.999931, -1, -1);
 family_home = CreateDynamicObject(19466, 194.374817, 10.030836, 1500.718628, -0.000014, 270.000000, -89.999962, -1, -1);
 SetDynamicObjectMaterial(family_home, 1, 14652, "ab_trukstpa", "mp_diner_wood", 0);
 SetDynamicObjectMaterial(family_home, 0, 10932, "station_sfse", "neon", 0);
@@ -196,7 +196,7 @@ SetDynamicObjectMaterial(family_home, 3, 19480, "signsurf", "sign", 0);
 SetDynamicObjectMaterial(family_home, 2, 18646, "matcolours", "grey-93-percent", 0);
 SetDynamicObjectMaterial(family_home, 1, 19480, "signsurf", "sign", 0);
 SetDynamicObjectMaterial(family_home, 0, 19480, "signsurf", "sign", 0);
-CreateDynamicObject(3004, 193.368713, -0.311446, 1501.521118, -76.491997, 179.994812, 179.994537, -1, -1); // 0
+CreateDynamicObject(3004, 193.368713, -0.311446, 1501.521118, -76.491997, 179.994812, 179.994537, -1, -1);
 family_home = CreateDynamicObject(19466, 197.905823, -0.840682, 1505.471924, 0.000000, 0.000036, -0.000029, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 10932, "station_sfse", "neon", 0xFFFFFFFF);
 family_home = CreateDynamicObject(19908, 194.374817, 11.151380, 1499.934082, 0.000000, 270.000000, 179.999863, -1, -1);
@@ -209,7 +209,7 @@ SetDynamicObjectMaterial(family_home, 1, 14623, "mafcasmain", "marble_wall", 0);
 SetDynamicObjectMaterial(family_home, 0, 14389, "madpoolbit", "AH_flroortile4", 0);
 family_home = CreateDynamicObject(19325, 201.134216, -2.059859, 1502.030151, -0.000022, 0.000000, -89.999931, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 10932, "station_sfse", "neon", 0xFFFFFFFF);
-CreateDynamicObject(2801, 194.424011, 11.371290, 1500.381470, 0.000000, 0.000022, 0.000000, -1, -1); // 0
+CreateDynamicObject(2801, 194.424011, 11.371290, 1500.381470, 0.000000, 0.000022, 0.000000, -1, -1);
 family_home = CreateDynamicObject(18766, 202.925964, 2.456984, 1506.603516, 0.000000, -0.000022, 179.999756, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 13691, "bevcunto2_lahills", "stonewall3_la", 0xFFFFFFFF);
 family_home = CreateDynamicObject(19908, 203.484192, 3.002882, 1506.337891, 0.000036, 0.000000, 89.999886, -1, -1);
@@ -252,7 +252,7 @@ family_home = CreateDynamicObject(18766, 202.805359, 7.470228, 1507.403198, 0.00
 SetDynamicObjectMaterial(family_home, 0, 13691, "bevcunto2_lahills", "stonewall3_la", 0xFFFFFFFF);
 family_home = CreateDynamicObject(18766, 202.803406, 7.474256, 1507.403198, 0.000000, 0.000022, 0.000000, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 13691, "bevcunto2_lahills", "stonewall3_la", 0xFFD3D3D3);
-CreateDynamicObject(2225, 197.868225, 12.471508, 1504.146851, -0.000022, 0.000000, -89.999931, -1, -1); // 0
+CreateDynamicObject(2225, 197.868225, 12.471508, 1504.146851, -0.000022, 0.000000, -89.999931, -1, -1);
 family_home = CreateDynamicObject(19940, 193.421692, 10.045363, 1505.003418, 0.000080, 0.000000, 89.999748, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 10765, "airportgnd_sfse", "white", 0);
 family_home = CreateDynamicObject(19378, 194.891541, 11.910595, 1503.459839, 0.000000, 89.999969, -179.999893, -1, -1);
@@ -262,7 +262,7 @@ SetDynamicObjectMaterial(family_home, 1, 10871, "blacksky_sfse", "ws_glass_balus
 SetDynamicObjectMaterial(family_home, 0, 65535, "none", "none", 0xFF00FFBB);
 family_home = CreateDynamicObject(19908, 203.486145, 5.506116, 1507.537720, 0.000014, 90.000000, 89.999886, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 10765, "airportgnd_sfse", "white", 0);
-CreateDynamicObject(2855, 193.214172, 10.041456, 1505.019653, 0.000059, 0.000000, 89.999817, -1, -1); // 0
+CreateDynamicObject(2855, 193.214172, 10.041456, 1505.019653, 0.000059, 0.000000, 89.999817, -1, -1);
 family_home = CreateDynamicObject(19466, 194.374817, 12.271375, 1500.718628, -0.000014, 270.000000, -89.999962, -1, -1);
 SetDynamicObjectMaterial(family_home, 1, 14652, "ab_trukstpa", "mp_diner_wood", 0);
 SetDynamicObjectMaterial(family_home, 0, 10932, "station_sfse", "neon", 0);
@@ -285,13 +285,13 @@ SetDynamicObjectMaterial(family_home, 0, 3096, "bbpcpx", "bluepink64", 0x6000000
 family_home = CreateDynamicObject(14793, 201.355408, 1.288588, 1508.262329, 0.000022, 0.000000, 89.999931, -1, -1);
 SetDynamicObjectMaterial(family_home, 1, 18024, "intclotheshiphop", "mp_cop_light", 0);
 SetDynamicObjectMaterial(family_home, 0, 19480, "signsurf", "sign", 0);
-CreateDynamicObject(2841, 194.569275, 12.134229, 1504.189819, 0.000022, 0.000000, 89.999931, -1, -1); // 0
+CreateDynamicObject(2841, 194.569275, 12.134229, 1504.189819, 0.000022, 0.000000, 89.999931, -1, -1);
 family_home = CreateDynamicObject(19908, 203.484192, -2.109175, 1502.397095, 0.000022, 0.000000, 89.999931, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 10765, "airportgnd_sfse", "white", 0);
 family_home = CreateDynamicObject(8650, 198.221741, 10.425368, 1507.981689, 0.000000, -89.999977, 0.000000, -1, -1);
 SetDynamicObjectMaterial(family_home, 1, 10101, "2notherbuildsfe", "ferry_build14", 0);
 SetDynamicObjectMaterial(family_home, 0, 10101, "2notherbuildsfe", "ferry_build14", 0);
-CreateDynamicObject(638, 200.311462, -3.733994, 1500.361206, 0.000000, 0.000022, 0.000000, -1, -1); // 0
+CreateDynamicObject(638, 200.311462, -3.733994, 1500.361206, 0.000000, 0.000022, 0.000000, -1, -1);
 family_home = CreateDynamicObject(14793, 195.084534, 12.899122, 1503.271240, 0.000029, 0.000000, 89.999908, -1, -1);
 SetDynamicObjectMaterial(family_home, 1, 18024, "intclotheshiphop", "mp_cop_light", 0);
 SetDynamicObjectMaterialText(family_home, 0, "None", 10, "Arial", 20, 0, 0, 0, 0);
@@ -323,13 +323,13 @@ family_home = CreateDynamicObject(19938, 189.402420, 2.608473, 1500.829102, -58.
 SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0);
 family_home = CreateDynamicObject(19445, 189.524490, 7.186293, 1499.154419, -89.999992, 180.000031, 89.999962, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0);
-CreateDynamicObject(2855, 191.672684, 10.041456, 1505.019653, -0.000059, 0.000000, -89.999817, -1, -1); // 0
+CreateDynamicObject(2855, 191.672684, 10.041456, 1505.019653, -0.000059, 0.000000, -89.999817, -1, -1);
 family_home = CreateDynamicObject(2960, 189.414871, 5.064894, 1503.657471, 0.000014, 180.000000, 89.999985, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 18646, "matcolours", "grey-93-percent", 0);
 family_home = CreateDynamicObject(1897, 191.269897, 10.093645, 1504.334106, 59.099934, 193.370071, 74.230286, -1, -1);
 SetDynamicObjectMaterial(family_home, 1, 19480, "signsurf", "sign", 0);
 SetDynamicObjectMaterial(family_home, 0, 10765, "airportgnd_sfse", "white", 0);
-CreateDynamicObject(2233, 198.038391, 13.882094, 1504.176880, -0.000022, 0.000000, -89.999931, -1, -1); // 0
+CreateDynamicObject(2233, 198.038391, 13.882094, 1504.176880, -0.000022, 0.000000, -89.999931, -1, -1);
 family_home = CreateDynamicObject(19940, 191.431229, 10.045363, 1505.003418, 0.000080, 0.000000, 89.999748, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 10765, "airportgnd_sfse", "white", 0);
 family_home = CreateDynamicObject(19940, 189.402420, 1.964185, 1499.793213, -58.100002, 269.999969, 179.999893, -1, -1);
@@ -504,7 +504,7 @@ SetDynamicObjectMaterial(family_home, 1, 19480, "signsurf", "sign", 0);
 SetDynamicObjectMaterial(family_home, 0, 19480, "signsurf", "sign", 0);
 family_home = CreateDynamicObject(19420, 188.004105, 0.381666, 1501.205566, -0.000030, 148.100616, -89.999580, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 18646, "matcolours", "grey-70-percent", 0);
-CreateDynamicObject(2853, 198.116394, -6.461654, 1500.399780, -0.000050, 0.000000, -89.999840, -1, -1); // 0
+CreateDynamicObject(2853, 198.116394, -6.461654, 1500.399780, -0.000050, 0.000000, -89.999840, -1, -1);
 family_home = CreateDynamicObject(2030, 198.074890, -6.439682, 1500.007324, 0.000000, 0.000050, 0.000000, -1, -1);
 SetDynamicObjectMaterial(family_home, 2, 19480, "signsurf", "sign", 0);
 SetDynamicObjectMaterial(family_home, 1, 19480, "signsurf", "sign", 0);
@@ -626,7 +626,7 @@ family_home = CreateDynamicObject(19940, 186.203079, 2.246412, 1504.175415, 0.00
 SetDynamicObjectMaterial(family_home, 0, 14652, "ab_trukstpa", "mp_diner_wood", 0);
 family_home = CreateDynamicObject(19940, 186.203079, 1.834364, 1503.925415, 0.000022, 0.000000, 89.999870, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 14652, "ab_trukstpa", "mp_diner_wood", 0);
-CreateDynamicObject(19920, 191.677811, -6.111373, 1500.409790, 7.100017, -0.000009, 117.399933, -1, -1); // 0
+CreateDynamicObject(19920, 191.677811, -6.111373, 1500.409790, 7.100017, -0.000009, 117.399933, -1, -1);
 family_home = CreateDynamicObject(19940, 186.203079, 1.434340, 1503.675415, 0.000022, 0.000000, 89.999870, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 14652, "ab_trukstpa", "mp_diner_wood", 0);
 family_home = CreateDynamicObject(19420, 186.604202, -0.327194, 1502.454468, 0.000040, 148.100616, 90.000130, -1, -1);
@@ -654,10 +654,10 @@ SetDynamicObjectMaterial(family_home, 0, 14652, "ab_trukstpa", "mp_diner_wood", 
 family_home = CreateDynamicObject(8650, 204.323669, -4.625535, 1507.981689, -0.000022, -90.000000, -89.999931, -1, -1);
 SetDynamicObjectMaterial(family_home, 1, 10101, "2notherbuildsfe", "ferry_build14", 0);
 SetDynamicObjectMaterial(family_home, 0, 10101, "2notherbuildsfe", "ferry_build14", 0);
-CreateDynamicObject(2239, 189.962723, 14.647962, 1504.171143, 0.000022, 0.000000, 89.999931, -1, -1); // 0
+CreateDynamicObject(2239, 189.962723, 14.647962, 1504.171143, 0.000022, 0.000000, 89.999931, -1, -1);
 family_home = CreateDynamicObject(19373, 187.797806, -2.925765, 1502.105347, 0.000022, 90.000000, 89.999931, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 14652, "ab_trukstpa", "mp_diner_wood", 0);
-CreateDynamicObject(2028, 191.108475, -6.111373, 1500.483765, 0.000022, 0.000000, 89.999931, -1, -1); // 0
+CreateDynamicObject(2028, 191.108475, -6.111373, 1500.483765, 0.000022, 0.000000, 89.999931, -1, -1);
 family_home = CreateDynamicObject(19089, 187.433304, 1.834364, 1507.795654, -0.000029, 0.000000, -89.999908, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0xFFEEEEEE);
 family_home = CreateDynamicObject(1827, 191.115067, -6.123641, 1499.973022, 0.000000, 0.000067, 0.000000, -1, -1);
@@ -669,7 +669,7 @@ family_home = CreateDynamicObject(2030, 191.092606, -6.119369, 1500.007324, 0.00
 SetDynamicObjectMaterial(family_home, 2, 19480, "signsurf", "sign", 0);
 SetDynamicObjectMaterial(family_home, 1, 19480, "signsurf", "sign", 0);
 SetDynamicObjectMaterial(family_home, 0, 19480, "signsurf", "sign", 0);
-CreateDynamicObject(4016, 186.049667, 1.006144, 1503.948364, 0.000000, 0.000000, 0.000000, -1, -1); // 0
+CreateDynamicObject(4016, 186.049667, 1.006144, 1503.948364, 0.000000, 0.000000, 0.000000, -1, -1);
 family_home = CreateDynamicObject(19420, 188.005081, -3.341109, 1501.990112, 0.000012, 0.000000, 89.999931, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 18646, "matcolours", "grey-70-percent", 0);
 family_home = CreateDynamicObject(19940, 186.203079, -0.165756, 1502.675415, 0.000022, 0.000000, 89.999870, -1, -1);
@@ -678,7 +678,7 @@ family_home = CreateDynamicObject(19908, 203.484192, -5.679611, 1507.286987, -0.
 SetDynamicObjectMaterial(family_home, 0, 10765, "airportgnd_sfse", "white", 0);
 family_home = CreateDynamicObject(19481, 199.747375, -8.328292, 1499.996582, 0.000022, -90.000000, 89.999931, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 19063, "xmasorbs", "sphere", 0xAFFFFFFF);
-CreateDynamicObject(2083, 190.475174, 15.244276, 1504.171021, 0.000029, -0.000036, 89.999710, -1, -1); // 0
+CreateDynamicObject(2083, 190.475174, 15.244276, 1504.171021, 0.000029, -0.000036, 89.999710, -1, -1);
 family_home = CreateDynamicObject(19420, 185.803177, 0.911696, 1503.224487, 0.000040, 148.100616, 90.000130, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 18646, "matcolours", "grey-70-percent", 0);
 family_home = CreateDynamicObject(19938, 185.190262, 2.608473, 1500.829102, -58.100002, 269.999969, 179.999847, -1, -1);
@@ -753,10 +753,10 @@ family_home = CreateDynamicObject(19089, 187.433304, 0.634292, 1508.545044, -0.0
 SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0xFFEEEEEE);
 family_home = CreateDynamicObject(1897, 188.276566, -4.572859, 1499.318970, 0.000000, 0.000022, -0.000012, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 9583, "bigshap_sfw", "shipceiling_sfw", 0);
-CreateDynamicObject(3004, 187.909378, 12.910840, 1505.721680, -76.491997, 179.994873, -90.005119, -1, -1); // 0
+CreateDynamicObject(3004, 187.909378, 12.910840, 1505.721680, -76.491997, 179.994873, -90.005119, -1, -1);
 family_home = CreateDynamicObject(19373, 186.808914, -2.923752, 1502.107422, 0.000022, 90.000000, 89.999931, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 14652, "ab_trukstpa", "mp_diner_wood", 0);
-CreateDynamicObject(638, 195.460876, -8.804306, 1500.361206, 0.000022, 0.000000, 89.999931, -1, -1); // 0
+CreateDynamicObject(638, 195.460876, -8.804306, 1500.361206, 0.000022, 0.000000, 89.999931, -1, -1);
 family_home = CreateDynamicObject(2964, 187.338455, 13.059887, 1504.164673, 0.000044, 0.000029, 89.999832, -1, -1);
 SetDynamicObjectMaterial(family_home, 4, 14653, "ab_trukstpb", "met_supp", 0);
 SetDynamicObjectMaterial(family_home, 2, 14653, "ab_trukstpb", "met_supp", 0);
@@ -813,14 +813,14 @@ family_home = CreateDynamicObject(19435, 187.433304, 0.654128, 1509.086060, 89.9
 SetDynamicObjectMaterial(family_home, 0, 1560, "7_11_door", "CJ_CHROME2", 0);
 family_home = CreateDynamicObject(19420, 185.804764, -1.742172, 1501.990112, 0.000020, 0.000000, 89.999908, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 18646, "matcolours", "grey-70-percent", 0);
-CreateDynamicObject(2855, 189.784378, 15.768322, 1504.670532, 0.000036, 0.000029, -0.000080, -1, -1); // 0
+CreateDynamicObject(2855, 189.784378, 15.768322, 1504.670532, 0.000036, 0.000029, -0.000080, -1, -1);
 family_home = CreateDynamicObject(19786, 189.423538, -6.028549, 1503.179077, 4.700018, 0.000000, 89.999931, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 1560, "7_11_door", "CJ_CHROME2", 0);
 family_home = CreateDynamicObject(19447, 186.916946, -2.796797, 1504.753174, -89.999992, 0.000063, 89.999962, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 14650, "ab_trukstpc", "mp_CJ_WOOD5", 0xFFFFFFFF);
 family_home = CreateDynamicObject(19476, 185.186478, -0.188644, 1503.231812, -58.100002, 179.999893, 179.999756, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0xAFFFFFFF);
-CreateDynamicObject(638, 184.600662, 1.037245, 1500.360229, 0.000000, 0.000029, 0.000000, -1, -1); // 0
+CreateDynamicObject(638, 184.600662, 1.037245, 1500.360229, 0.000000, 0.000029, 0.000000, -1, -1);
 family_home = CreateDynamicObject(19940, 185.192215, -0.044296, 1503.634033, -31.899994, 270.000000, 179.999863, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0);
 family_home = CreateDynamicObject(19481, 200.828430, -8.578353, 1505.417725, 89.999992, 89.999992, -89.999969, -1, -1);
@@ -840,7 +840,7 @@ SetDynamicObjectMaterial(family_home, 1, 10101, "2notherbuildsfe", "ferry_build1
 SetDynamicObjectMaterial(family_home, 0, 10101, "2notherbuildsfe", "ferry_build14", 0);
 family_home = CreateDynamicObject(19908, 190.160355, 16.934097, 1501.086792, 0.000007, -0.000007, 179.999863, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 10765, "airportgnd_sfse", "white", 0);
-CreateDynamicObject(2965, 187.314407, 13.456618, 1505.074341, 0.000049, -0.000018, 142.799942, -1, -1); // 0
+CreateDynamicObject(2965, 187.314407, 13.456618, 1505.074341, 0.000049, -0.000018, 142.799942, -1, -1);
 family_home = CreateDynamicObject(19940, 185.191238, -1.104354, 1499.843140, 0.000000, 90.000031, 0.000000, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0);
 family_home = CreateDynamicObject(19480, 185.233597, -0.061935, 1497.105469, 0.000000, 360.000000, 0.000000, -1, -1);
@@ -884,7 +884,7 @@ SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0xA
 family_home = CreateDynamicObject(19445, 189.593216, -4.870590, 1507.828735, 0.000014, 179.999985, 89.999962, -1, -1);
 SetDynamicObjectMaterial(family_home, 1, 10101, "2notherbuildsfe", "ferry_build14", 0);
 SetDynamicObjectMaterial(family_home, 0, 10101, "2notherbuildsfe", "ferry_build14", 0);
-CreateDynamicObject(1731, 183.860306, 8.271924, 1501.660522, 0.000000, 0.000022, 0.000000, -1, -1); // 0
+CreateDynamicObject(1731, 183.860306, 8.271924, 1501.660522, 0.000000, 0.000022, 0.000000, -1, -1);
 family_home = CreateDynamicObject(18880, 193.682922, -9.218063, 1499.989990, -0.000036, 0.000007, -89.999855, -1, -1);
 SetDynamicObjectMaterial(family_home, 3, 19480, "signsurf", "sign", 0);
 SetDynamicObjectMaterial(family_home, 2, 18646, "matcolours", "grey-93-percent", 0);
@@ -902,7 +902,7 @@ family_home = CreateDynamicObject(19476, 185.186478, -2.193099, 1501.597900, -58
 SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0xAFFFFFFF);
 family_home = CreateDynamicObject(19445, 185.143997, 0.742178, 1495.165039, -89.999992, 103.368530, 103.368454, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0xFEEEEEEE);
-CreateDynamicObject(18688, 187.459915, -5.249069, 1498.941895, 0.000000, 0.000022, 0.000000, -1, -1); // 0
+CreateDynamicObject(18688, 187.459915, -5.249069, 1498.941895, 0.000000, 0.000022, 0.000000, -1, -1);
 family_home = CreateDynamicObject(19940, 185.190262, -2.092880, 1502.990845, 4.899997, 90.000031, -0.000000, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0);
 family_home = CreateDynamicObject(19089, 187.433304, -0.965804, 1509.545166, -0.000029, 0.000000, -89.999908, -1, -1);
@@ -916,23 +916,23 @@ SetDynamicObjectMaterial(family_home, 1, 10101, "2notherbuildsfe", "ferry_build1
 SetDynamicObjectMaterial(family_home, 0, 10101, "2notherbuildsfe", "ferry_build14", 0);
 family_home = CreateDynamicObject(631, 188.703201, 15.879041, 1505.065796, 0.000000, 0.000022, 0.000000, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 65535, "none", "none", 0xFFFFFFFF);
-CreateDynamicObject(841, 187.450760, -5.577987, 1500.552490, 0.000000, 0.000022, 0.000000, -1, -1); // 0
+CreateDynamicObject(841, 187.450760, -5.577987, 1500.552490, 0.000000, 0.000022, 0.000000, -1, -1);
 family_home = CreateDynamicObject(19476, 185.186478, -2.455916, 1502.398926, -58.100002, 179.999924, 179.999847, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0xAFFFFFFF);
 family_home = CreateDynamicObject(18766, 184.499832, 10.595167, 1498.429932, 0.000014, 270.000000, 90.000046, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 14593, "papaerchaseoffice", "wall_stone3_256", 0xFFFFFFFF);
 family_home = CreateDynamicObject(19476, 185.186478, -2.606064, 1501.553345, -58.100002, 179.999924, 179.999847, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0xAFFFFFFF);
-CreateDynamicObject(1569, 185.517899, -2.319686, 1497.182129, 0.000000, 0.000029, 0.000000, -1, -1); // 0
+CreateDynamicObject(1569, 185.517899, -2.319686, 1497.182129, 0.000000, 0.000029, 0.000000, -1, -1);
 family_home = CreateDynamicObject(19476, 185.186478, -2.737227, 1500.723389, -58.100002, 179.999924, 179.999847, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0xAFFFFFFF);
-CreateDynamicObject(638, 184.599686, -1.634932, 1500.361206, 0.000000, 0.000029, 0.000000, -1, -1); // 0
+CreateDynamicObject(638, 184.599686, -1.634932, 1500.361206, 0.000000, 0.000029, 0.000000, -1, -1);
 family_home = CreateDynamicObject(19466, 187.357376, -5.653121, 1500.435059, 0.000000, 450.000000, -179.999802, -1, -1);
 SetDynamicObjectMaterial(family_home, 1, 10765, "airportgnd_sfse", "black64", 0);
 SetDynamicObjectMaterial(family_home, 0, 10806, "airfence_sfse", "ws_griddyfence", 0);
 family_home = CreateDynamicObject(19089, 187.133011, -0.565779, 1509.795654, 0.000015, 0.000000, 89.999893, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0xFFEEEEEE);
-CreateDynamicObject(3004, 186.746536, 13.691602, 1505.721680, -76.491905, 179.995148, 89.994980, -1, -1); // 0
+CreateDynamicObject(3004, 186.746536, 13.691602, 1505.721680, -76.491905, 179.995148, 89.994980, -1, -1);
 family_home = CreateDynamicObject(19089, 187.133011, -0.965804, 1509.545410, 0.000015, 0.000000, 89.999893, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0xFFEEEEEE);
 family_home = CreateDynamicObject(19089, 187.133011, -0.165756, 1510.075684, 0.000015, 0.000000, 89.999893, -1, -1);
@@ -971,7 +971,7 @@ family_home = CreateDynamicObject(19089, 187.133011, 1.834364, 1511.295654, 0.00
 SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0xFFEEEEEE);
 family_home = CreateDynamicObject(19426, 185.258621, -3.533615, 1500.630737, 0.000000, 179.999985, -179.999847, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0xFFFFFFFF);
-CreateDynamicObject(2630, 183.641556, -0.163619, 1499.983032, 0.000000, 0.000022, 0.000000, -1, -1); // 0
+CreateDynamicObject(2630, 183.641556, -0.163619, 1499.983032, 0.000000, 0.000022, 0.000000, -1, -1);
 family_home = CreateDynamicObject(13646, 187.357376, -6.113389, 1501.994629, 0.000000, 180.000000, 0.000000, -1, -1);
 SetDynamicObjectMaterial(family_home, 1, 16640, "a51", "ventb128", 0);
 SetDynamicObjectMaterial(family_home, 0, 19480, "signsurf", "sign", 0);
@@ -981,14 +981,14 @@ family_home = CreateDynamicObject(19435, 185.285233, -3.548690, 1499.817261, 0.0
 SetDynamicObjectMaterial(family_home, 0, 16640, "a51", "ventb128", 0);
 family_home = CreateDynamicObject(19483, 183.587738, -0.155543, 1499.999390, 180.000000, 90.000000, 180.000000, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 3096, "bbpcpx", "bluepink64", 0x60000000);
-CreateDynamicObject(19325, 189.366043, -7.657821, 1498.505615, 0.000000, 0.000022, 0.000000, -1, -1); // 0
+CreateDynamicObject(19325, 189.366043, -7.657821, 1498.505615, 0.000000, 0.000022, 0.000000, -1, -1);
 family_home = CreateDynamicObject(19940, 184.070633, 10.045363, 1505.003418, 0.000066, 0.000000, 89.999794, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 10765, "airportgnd_sfse", "white", 0);
-CreateDynamicObject(2515, 183.709671, 10.566602, 1500.945068, -0.000022, 0.000000, -89.999931, -1, -1); // 0
+CreateDynamicObject(2515, 183.709671, 10.566602, 1500.945068, -0.000022, 0.000000, -89.999931, -1, -1);
 family_home = CreateDynamicObject(19834, 189.421707, -7.991561, 1500.130127, -0.000022, 0.000000, -89.999931, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 16640, "a51", "ventb64", 0);
-CreateDynamicObject(18688, 187.459915, -6.289351, 1499.242188, 0.000000, 0.000022, 0.000000, -1, -1); // 0
-CreateDynamicObject(638, 183.152542, 7.576612, 1504.570801, 0.000022, 0.000000, 89.999931, -1, -1); // 0
+CreateDynamicObject(18688, 187.459915, -6.289351, 1499.242188, 0.000000, 0.000022, 0.000000, -1, -1);
+CreateDynamicObject(638, 183.152542, 7.576612, 1504.570801, 0.000022, 0.000000, 89.999931, -1, -1);
 family_home = CreateDynamicObject(19173, 183.999954, 11.656629, 1501.643188, -0.000022, 0.000000, -89.999931, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 14581, "ab_mafiasuitea", "barbersmir1", 0);
 family_home = CreateDynamicObject(1897, 183.729782, 10.093645, 1504.334106, 59.099934, 193.370071, -105.769661, -1, -1);
@@ -997,8 +997,8 @@ SetDynamicObjectMaterial(family_home, 0, 10765, "airportgnd_sfse", "white", 0);
 family_home = CreateDynamicObject(19466, 187.357376, -6.493270, 1500.434082, 0.000000, 450.000000, -179.999802, -1, -1);
 SetDynamicObjectMaterial(family_home, 1, 10765, "airportgnd_sfse", "black64", 0);
 SetDynamicObjectMaterial(family_home, 0, 10806, "airfence_sfse", "ws_griddyfence", 0);
-CreateDynamicObject(841, 187.450760, -6.588363, 1500.552490, 0.000022, 0.000000, 89.999931, -1, -1); // 0
-CreateDynamicObject(2855, 183.863113, 10.041456, 1505.019653, 0.000044, 0.000000, 89.999863, -1, -1); // 0
+CreateDynamicObject(841, 187.450760, -6.588363, 1500.552490, 0.000022, 0.000000, 89.999931, -1, -1);
+CreateDynamicObject(2855, 183.863113, 10.041456, 1505.019653, 0.000044, 0.000000, 89.999863, -1, -1);
 family_home = CreateDynamicObject(2230, 189.408646, -8.162460, 1499.930908, 0.000022, 0.000000, 89.999931, -1, -1);
 SetDynamicObjectMaterial(family_home, 2, 9514, "711_sfw", "ws_carpark2", 0);
 family_home = CreateDynamicObject(2230, 185.167313, -3.943710, 1499.930908, -0.000022, 0.000000, -89.999901, -1, -1);
@@ -1032,10 +1032,10 @@ SetDynamicObjectMaterial(family_home, 1, 10101, "2notherbuildsfe", "ferry_build1
 SetDynamicObjectMaterial(family_home, 0, 10101, "2notherbuildsfe", "ferry_build14", 0);
 family_home = CreateDynamicObject(19445, 185.143997, -2.757821, 1495.165039, -89.999992, 103.368530, 103.368454, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0xFEEEEEEE);
-CreateDynamicObject(18688, 187.459915, -7.129075, 1498.921997, 0.000000, 0.000022, 0.000000, -1, -1); // 0
+CreateDynamicObject(18688, 187.459915, -7.129075, 1498.921997, 0.000000, 0.000022, 0.000000, -1, -1);
 family_home = CreateDynamicObject(19482, 182.967743, 9.964462, 1504.199463, 180.000000, 90.000000, 90.000000, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 3096, "bbpcpx", "bluepink64", 0x60000000);
-CreateDynamicObject(1731, 183.860306, 12.882824, 1501.660522, 0.000000, 0.000022, 0.000000, -1, -1); // 0
+CreateDynamicObject(1731, 183.860306, 12.882824, 1501.660522, 0.000000, 0.000022, 0.000000, -1, -1);
 family_home = CreateDynamicObject(19453, 189.308182, -8.839645, 1503.157227, 0.000000, 180.000000, 0.000000, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 16640, "a51", "ventb128", 0);
 family_home = CreateDynamicObject(19453, 189.308182, -8.839645, 1498.577026, 0.000000, 0.000029, 0.000000, -1, -1);
@@ -1063,7 +1063,7 @@ SetDynamicObjectMaterial(family_home, 3, 14652, "ab_trukstpa", "mp_diner_wood", 
 SetDynamicObjectMaterial(family_home, 2, 14652, "ab_trukstpa", "mp_diner_wood", 0);
 SetDynamicObjectMaterial(family_home, 1, 19480, "signsurf", "sign", 0);
 SetDynamicObjectMaterial(family_home, 0, 1560, "7_11_door", "CJ_CHROME2", 0xFFFFFFFF);
-CreateDynamicObject(19543, 187.863358, 17.128309, 1506.079956, 0.000045, 585.000000, 90.000023, -1, -1); // 0
+CreateDynamicObject(19543, 187.863358, 17.128309, 1506.079956, 0.000045, 585.000000, 90.000023, -1, -1);
 family_home = CreateDynamicObject(2960, 181.856644, 2.644057, 1503.656494, -0.000012, 180.000000, 0.000074, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 18646, "matcolours", "grey-93-percent", 0);
 family_home = CreateDynamicObject(19908, 197.420349, -11.905320, 1502.397095, 0.000007, 0.000036, 0.000006, -1, -1);
@@ -1092,12 +1092,12 @@ family_home = CreateDynamicObject(631, 185.852005, 15.879041, 1505.065796, 0.000
 SetDynamicObjectMaterial(family_home, 0, 65535, "none", "none", 0xFFFFFFFF);
 family_home = CreateDynamicObject(19452, 187.005569, -7.859786, 1501.482178, 89.999992, -0.889921, -89.110001, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 14803, "bdupsnew", "Bdup2_plantStalk", 0);
-CreateDynamicObject(2239, 184.562576, 14.758069, 1504.171143, -0.000022, 0.000000, -89.999931, -1, -1); // 0
+CreateDynamicObject(2239, 184.562576, 14.758069, 1504.171143, -0.000022, 0.000000, -89.999931, -1, -1);
 family_home = CreateDynamicObject(19483, 185.162430, -5.968490, 1503.280640, 0.000000, 0.000044, -0.000012, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 17588, "lae2coast_alpha", "LAShad1", 0x5FFFFFFF);
 family_home = CreateDynamicObject(19786, 185.162430, -6.038681, 1503.179077, 4.699948, 0.000000, -89.999832, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 1560, "7_11_door", "CJ_CHROME2", 0);
-CreateDynamicObject(2855, 182.321609, 10.041456, 1505.019653, -0.000044, 0.000000, -89.999863, -1, -1); // 0
+CreateDynamicObject(2855, 182.321609, 10.041456, 1505.019653, -0.000044, 0.000000, -89.999863, -1, -1);
 family_home = CreateDynamicObject(1897, 186.466507, -7.563949, 1499.318970, 0.000000, -0.000022, -179.999863, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 9583, "bigshap_sfw", "shipceiling_sfw", 0);
 family_home = CreateDynamicObject(14446, 183.253250, 12.577772, 1504.720093, -0.000022, 0.000000, -89.999931, -1, -1);
@@ -1125,7 +1125,7 @@ SetDynamicObjectMaterial(family_home, 0, 10765, "airportgnd_sfse", "white", 0);
 family_home = CreateDynamicObject(1897, 181.909973, 10.093645, 1504.334106, 59.099934, 193.370071, 74.230263, -1, -1);
 SetDynamicObjectMaterial(family_home, 1, 19480, "signsurf", "sign", 0);
 SetDynamicObjectMaterial(family_home, 0, 10765, "airportgnd_sfse", "white", 0);
-CreateDynamicObject(2855, 184.794144, 15.605849, 1504.670532, 0.000037, -0.000036, 179.999496, -1, -1); // 0
+CreateDynamicObject(2855, 184.794144, 15.605849, 1504.670532, 0.000037, -0.000036, 179.999496, -1, -1);
 family_home = CreateDynamicObject(19452, 187.584183, -9.074385, 1501.483276, 0.000000, 270.000000, -179.999893, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 14803, "bdupsnew", "Bdup2_plantStalk", 0);
 family_home = CreateDynamicObject(19451, 188.131668, -9.285264, 1503.442017, 89.999992, -179.999924, -89.999969, -1, -1);
@@ -1184,7 +1184,7 @@ SetDynamicObjectMaterial(family_home, 0, 19480, "signsurf", "sign", 0);
 family_home = CreateDynamicObject(2249, 181.522537, 10.050977, 1505.662354, 0.000000, 0.000044, 0.000000, -1, -1);
 SetDynamicObjectMaterial(family_home, 1, 10871, "blacksky_sfse", "ws_glass_balustrade", 0xFF9A9A9A);
 SetDynamicObjectMaterial(family_home, 0, 65535, "none", "none", 0xFF00FFBB);
-CreateDynamicObject(2528, 181.840652, 12.550429, 1499.990356, 0.000000, 0.000022, 0.000000, -1, -1); // 0
+CreateDynamicObject(2528, 181.840652, 12.550429, 1499.990356, 0.000000, 0.000022, 0.000000, -1, -1);
 family_home = CreateDynamicObject(14793, 183.144119, 12.619029, 1507.472168, 0.000029, 0.000000, 89.999908, -1, -1);
 SetDynamicObjectMaterial(family_home, 1, 18024, "intclotheshiphop", "mp_cop_light", 0);
 SetDynamicObjectMaterial(family_home, 0, 19480, "signsurf", "sign", 0);
@@ -1196,8 +1196,8 @@ SetDynamicObjectMaterial(family_home, 0, 10101, "2notherbuildsfe", "ferry_build1
 family_home = CreateDynamicObject(8650, 188.986893, 14.324660, 1488.300781, 89.999992, -180.000015, -89.999977, -1, -1);
 SetDynamicObjectMaterial(family_home, 1, 10101, "2notherbuildsfe", "ferry_build14", 0);
 SetDynamicObjectMaterial(family_home, 0, 10101, "2notherbuildsfe", "ferry_build14", 0);
-CreateDynamicObject(19325, 185.224197, -7.657821, 1498.505615, 0.000000, 0.000022, 0.000000, -1, -1); // 0
-CreateDynamicObject(2083, 184.103348, 16.129774, 1504.171021, -0.000036, -0.000037, -90.000053, -1, -1); // 0
+CreateDynamicObject(19325, 185.224197, -7.657821, 1498.505615, 0.000000, 0.000022, 0.000000, -1, -1);
+CreateDynamicObject(2083, 184.103348, 16.129774, 1504.171021, -0.000036, -0.000037, -90.000053, -1, -1);
 family_home = CreateDynamicObject(19089, 187.433304, 1.434340, 1515.405518, -0.000029, 0.000000, -89.999908, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0xFFEEEEEE);
 family_home = CreateDynamicObject(18880, 181.034500, 10.523327, 1503.989990, 0.000000, 0.000029, 0.000000, -1, -1);
@@ -1217,7 +1217,7 @@ family_home = CreateDynamicObject(19451, 186.601395, -9.285264, 1503.442017, 89.
 SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0xFEEEEEEE);
 family_home = CreateDynamicObject(19325, 189.426224, -10.618760, 1506.164307, 0.000000, 0.000029, 0.000000, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 10932, "station_sfse", "neon", 0xFFFFFFFF);
-CreateDynamicObject(11707, 179.983109, 8.184218, 1501.551025, 0.000000, -0.000022, 179.999863, -1, -1); // 0
+CreateDynamicObject(11707, 179.983109, 8.184218, 1501.551025, 0.000000, -0.000022, 179.999863, -1, -1);
 family_home = CreateDynamicObject(19911, 205.602844, -11.638777, 1506.003540, 0.000022, 90.000000, 89.999931, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 10765, "airportgnd_sfse", "white", 0);
 family_home = CreateDynamicObject(18762, 181.538406, 13.004957, 1503.330933, -89.999992, 514.505127, 64.505180, -1, -1);
@@ -1297,8 +1297,8 @@ SetDynamicObjectMaterial(family_home, 1, 18024, "intclotheshiphop", "mp_cop_ligh
 SetDynamicObjectMaterial(family_home, 0, 19480, "signsurf", "sign", 0);
 family_home = CreateDynamicObject(19445, 185.092239, 19.558121, 1505.927734, 0.000000, 0.000022, 0.000000, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0xFFFFFFFF);
-CreateDynamicObject(638, 178.000809, 4.906935, 1500.360229, 0.000000, -0.000022, 179.999863, -1, -1); // 0
-CreateDynamicObject(638, 178.002762, 5.649244, 1500.358154, 0.000000, -0.000022, 179.999863, -1, -1); // 0
+CreateDynamicObject(638, 178.000809, 4.906935, 1500.360229, 0.000000, -0.000022, 179.999863, -1, -1);
+CreateDynamicObject(638, 178.002762, 5.649244, 1500.358154, 0.000000, -0.000022, 179.999863, -1, -1);
 family_home = CreateDynamicObject(1713, 181.728958, -6.939314, 1499.988892, 0.000007, -0.000003, 90.000191, -1, -1);
 SetDynamicObjectMaterial(family_home, 2, 1726, "mrk_couches2", "kb_sofa5_256", 0);
 SetDynamicObjectMaterial(family_home, 1, 1560, "7_11_door", "cj_sheetmetal2", 0);
@@ -1331,7 +1331,7 @@ family_home = CreateDynamicObject(19089, 177.726883, 7.166578, 1505.036255, 0.00
 SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0xFFEEEEEE);
 family_home = CreateDynamicObject(18766, 178.004959, 0.450087, 1504.973145, -0.000022, 270.000000, -89.999939, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 13691, "bevcunto2_lahills", "stonewall3_la", 0xFFFFFFFF);
-CreateDynamicObject(2233, 178.309647, 11.392531, 1504.176880, 0.000029, 0.000000, 89.999847, -1, -1); // 0
+CreateDynamicObject(2233, 178.309647, 11.392531, 1504.176880, 0.000029, 0.000000, 89.999847, -1, -1);
 family_home = CreateDynamicObject(19481, 183.129349, -9.338790, 1505.417725, 89.999992, -180.000015, -89.999977, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 19063, "xmasorbs", "sphere", 0xAFFFFFFF);
 family_home = CreateDynamicObject(19445, 178.412674, 8.169752, 1507.828735, 0.000000, 179.999985, -179.999847, -1, -1);
@@ -1347,7 +1347,7 @@ family_home = CreateDynamicObject(19912, 185.028397, 13.295484, 1515.655518, 0.0
 SetDynamicObjectMaterial(family_home, 2, 19480, "signsurf", "sign", 0);
 SetDynamicObjectMaterial(family_home, 1, 3902, "libertyhi3", "metfence2_64HV", 0xF0000000);
 SetDynamicObjectMaterial(family_home, 0, 19480, "signsurf", "sign", 0);
-CreateDynamicObject(2225, 178.479813, 12.803112, 1504.146851, 0.000029, 0.000000, 89.999847, -1, -1); // 0
+CreateDynamicObject(2225, 178.479813, 12.803112, 1504.146851, 0.000029, 0.000000, 89.999847, -1, -1);
 family_home = CreateDynamicObject(19479, 176.902054, 7.307203, 1499.999512, -0.000012, -90.000023, -146.700119, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 19063, "xmasorbs", "sphere", 0xAFFFFFFF);
 family_home = CreateDynamicObject(19908, 184.800369, -11.900193, 1502.397095, 0.000007, 0.000036, 0.000006, -1, -1);
@@ -1372,7 +1372,7 @@ SetDynamicObjectMaterial(family_home, 1, 10101, "2notherbuildsfe", "ferry_build1
 SetDynamicObjectMaterial(family_home, 0, 10101, "2notherbuildsfe", "ferry_build14", 0);
 family_home = CreateDynamicObject(18766, 178.072098, 13.107435, 1503.294678, 89.999992, 180.000046, -89.999954, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 3292, "cxrf_payspray", "sf_spray1", 0xFFFFFFFF);
-CreateDynamicObject(2627, 178.038162, -3.689986, 1499.983032, 0.000000, 0.000022, 0.000000, -1, -1); // 0
+CreateDynamicObject(2627, 178.038162, -3.689986, 1499.983032, 0.000000, 0.000022, 0.000000, -1, -1);
 family_home = CreateDynamicObject(18880, 181.215042, -9.214035, 1499.989990, -0.000044, 0.000007, -89.999832, -1, -1);
 SetDynamicObjectMaterial(family_home, 3, 19480, "signsurf", "sign", 0);
 SetDynamicObjectMaterial(family_home, 2, 18646, "matcolours", "grey-93-percent", 0);
@@ -1387,7 +1387,7 @@ family_home = CreateDynamicObject(19446, 176.737137, 8.229810, 1506.150024, 0.00
 SetDynamicObjectMaterial(family_home, 0, 10101, "2notherbuildsfe", "ferry_build14", 0);
 family_home = CreateDynamicObject(19908, 184.800369, -11.900193, 1507.287109, 0.000000, 180.000000, -179.999893, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 10765, "airportgnd_sfse", "white", 0);
-CreateDynamicObject(2233, 178.309647, 14.682813, 1504.176880, 0.000029, 0.000000, 89.999847, -1, -1); // 0
+CreateDynamicObject(2233, 178.309647, 14.682813, 1504.176880, 0.000029, 0.000000, 89.999847, -1, -1);
 family_home = CreateDynamicObject(18880, 181.215042, -9.214035, 1504.800171, -0.000044, 0.000007, -89.999832, -1, -1);
 SetDynamicObjectMaterial(family_home, 3, 19480, "signsurf", "sign", 0);
 SetDynamicObjectMaterial(family_home, 2, 18646, "matcolours", "grey-93-percent", 0);
@@ -1411,7 +1411,7 @@ SetDynamicObjectMaterial(family_home, 3, 19480, "signsurf", "sign", 0);
 SetDynamicObjectMaterial(family_home, 2, 18646, "matcolours", "grey-93-percent", 0);
 SetDynamicObjectMaterial(family_home, 1, 19480, "signsurf", "sign", 0);
 SetDynamicObjectMaterial(family_home, 0, 19480, "signsurf", "sign", 0);
-CreateDynamicObject(2628, 178.468338, -7.269577, 1499.983032, 0.000022, 0.000000, 89.999931, -1, -1); // 0
+CreateDynamicObject(2628, 178.468338, -7.269577, 1499.983032, 0.000022, 0.000000, 89.999931, -1, -1);
 family_home = CreateDynamicObject(18783, 187.930374, -14.795578, 1508.553711, 0.000000, 179.999985, -179.999893, -1, -1);
 SetDynamicObjectMaterial(family_home, 1, 10101, "2notherbuildsfe", "ferry_build14", 0);
 SetDynamicObjectMaterial(family_home, 0, 19480, "signsurf", "sign", 0xFFFFFFFF);
@@ -1499,7 +1499,7 @@ family_home = CreateDynamicObject(19911, 172.715530, 3.762769, 1506.003540, 0.00
 SetDynamicObjectMaterial(family_home, 0, 10765, "airportgnd_sfse", "white", 0);
 family_home = CreateDynamicObject(19543, 176.762650, -9.351365, 1505.301270, 0.000014, 270.000000, -89.999893, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 4586, "skyscrap3_lan2", "sl_dthotelwin1", 0);
-CreateDynamicObject(19543, 176.762650, -9.452256, 1505.301270, 0.000014, 270.000000, -89.999893, -1, -1); // 0
+CreateDynamicObject(19543, 176.762650, -9.452256, 1505.301270, 0.000014, 270.000000, -89.999893, -1, -1);
 family_home = CreateDynamicObject(19908, 174.828079, -5.327437, 1507.286987, 0.000044, 179.999969, 89.999855, -1, -1);
 SetDynamicObjectMaterial(family_home, 0, 10765, "airportgnd_sfse", "white", 0);
 family_home = CreateDynamicObject(19911, 172.709427, 0.630630, 1506.003540, 0.000000, 90.000000, -90.000031, -1, -1);

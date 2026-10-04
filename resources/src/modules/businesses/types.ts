@@ -62,6 +62,10 @@ export function isClothesType(typeId: number): boolean {
   return typeId === BusinessType.CLOTHES;
 }
 
+export function isWorkshopType(typeId: number): boolean {
+  return typeId === BusinessType.WORKSHOP;
+}
+
 const TYPE_LABEL: Readonly<Record<number, string>> = {
   [BusinessType.SHOP_247]: "24/7",
   [BusinessType.AMMU]: "Магазин оружия",

@@ -16,6 +16,8 @@ import { startShop247 } from "./shop-247";
 import { startClothesShops } from "./clothes";
 import { startGasStations } from "./gas";
 import { startStreetFoodStalls } from "./street-food";
+import { startWorkshopShops } from "./workshop";
+import { clearInsideBusiness } from "./session";
 import { notifyBusinessTaxReminder, startBusinessTaxScheduler } from "./tax";
 
 const taxReminderShown = new Set<number>();
@@ -38,6 +40,7 @@ export const businessesModule: GameModule = {
       startAmmuShops();
       startShop247();
       startClothesShops();
+      startWorkshopShops();
       bindBusinessMapIcons();
       bindBusinessPurchase();
       bindBusinessMenu();
@@ -53,10 +56,19 @@ export const businessesModule: GameModule = {
       remindBusinessTaxOnLogin(player);
     });
 
+    // Смерть/респавн уводят из интерьера — иначе сессия блокирует выход/выселение.
+    omp.on("playerDeath", (player) => {
+      const id = playerId(player);
+      if (id !== null) {
+        clearInsideBusiness(id);
+      }
+    });
+
     omp.on("playerDisconnect", (player) => {
       const id = playerId(player);
       if (id !== null) {
         taxReminderShown.delete(id);
+        clearInsideBusiness(id);
       }
     });
   },

@@ -329,6 +329,20 @@ function playLockSoundNearVehicle(vehicle: Vehicle): void {
   });
 }
 
+/** Любой заспавненный личный ТС владельца (без проверки дистанции). */
+export function findOwnedPersonalVehicle(ownerId: number): Vehicle | null {
+  for (const [runtimeId, personal] of personalByRuntime) {
+    if (personal.ownerId !== ownerId) {
+      continue;
+    }
+    const vehicle = omp.vehicles.at(runtimeId);
+    if (vehicle) {
+      return vehicle;
+    }
+  }
+  return null;
+}
+
 /** Найти личный ТС владельца: сначала в чём сидит, иначе ближайший в радиусе. */
 export function findOwnedPersonalVehicleNear(
   player: Player,
