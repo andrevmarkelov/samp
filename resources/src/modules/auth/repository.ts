@@ -2,6 +2,7 @@ import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { execute, getPool, query } from "../../shared/database";
 import { isGender, type Gender } from "./gender";
 import {
+  MAX_LAWFULNESS,
   STARTING_HEALTH,
   STARTING_HUNGER,
   STARTING_LAWFULNESS,
@@ -645,6 +646,42 @@ export async function saveUserPhone(
   ]);
 }
 
+/** Поставить номер. `taken` — такой уже есть у другого игрока. */
+export async function claimUserPhone(
+  userId: number,
+  phone: string
+): Promise<"ok" | "taken" | "missing"> {
+  const normalized = normalizePhone(phone);
+  if (!normalized) {
+    return "missing";
+  }
+
+  try {
+    const result = await execute("UPDATE users SET phone = ? WHERE id = ?", [
+      normalized,
+      userId,
+    ]);
+    if (Number(result.affectedRows) === 1) {
+      return "ok";
+    }
+
+    const rows = await query<RowDataPacket & { phone: string | null }>(
+      "SELECT phone FROM users WHERE id = ? LIMIT 1",
+      [userId]
+    );
+    const row = rows[0];
+    if (!row) {
+      return "missing";
+    }
+    return normalizePhone(row.phone) === normalized ? "ok" : "missing";
+  } catch (error) {
+    if (isDuplicateKey(error)) {
+      return "taken";
+    }
+    throw error;
+  }
+}
+
 export async function saveUserHospitalized(
   userId: number,
   hospitalized: boolean,
@@ -745,6 +782,83 @@ export async function saveAdminPassword(
 
 export async function saveUserSkin(userId: number, skin: number): Promise<void> {
   await execute("UPDATE users SET skin = ? WHERE id = ?", [skin, userId]);
+}
+
+export async function saveUserGender(userId: number, gender: Gender, skin: number): Promise<void> {
+  await execute("UPDATE users SET gender = ?, skin = ? WHERE id = ?", [gender, skin, userId]);
+}
+
+export async function saveUserLawfulness(userId: number, lawfulness: number): Promise<void> {
+  await execute("UPDATE users SET lawfulness = ? WHERE id = ?", [
+    normalizeLawfulness(lawfulness),
+    userId,
+  ]);
+}
+
+/** +N к законопослушности, не выше потолка. false — уже максимум или игрок не найден. */
+export async function grantUserLawfulness(userId: number, gain: number): Promise<boolean> {
+  const delta = Math.floor(gain);
+  if (!Number.isFinite(delta) || delta < 1) {
+    return false;
+  }
+
+  const result = await execute(
+    "UPDATE users SET lawfulness = LEAST(?, lawfulness + ?) WHERE id = ? AND lawfulness < ?",
+    [MAX_LAWFULNESS, delta, userId, MAX_LAWFULNESS]
+  );
+  return Number(result.affectedRows) === 1;
+}
+
+/** Списать донат-счёт. false — на счёте меньше, чем нужно. */
+export async function spendUserDonate(userId: number, amount: number): Promise<boolean> {
+  const value = Math.floor(amount);
+  if (!Number.isFinite(value) || value < 1) {
+    return false;
+  }
+
+  const result = await execute(
+    "UPDATE users SET donate = donate - ? WHERE id = ? AND donate >= ?",
+    [value, userId, value]
+  );
+  return Number(result.affectedRows) === 1;
+}
+
+/** Списать донат и прибавить наличные одним UPDATE. */
+export async function convertDonateToCash(
+  userId: number,
+  donateAmount: number,
+  cash: number,
+  maxMoney: number
+): Promise<boolean> {
+  const donate = Math.floor(donateAmount);
+  const add = Math.floor(cash);
+  const ceiling = Math.floor(maxMoney);
+  if (
+    !Number.isFinite(donate) ||
+    donate < 1 ||
+    !Number.isFinite(add) ||
+    add < 1 ||
+    !Number.isSafeInteger(ceiling) ||
+    add > ceiling
+  ) {
+    return false;
+  }
+
+  const result = await execute(
+    "UPDATE users SET donate = donate - ?, money = money + ? WHERE id = ? AND donate >= ? AND money <= ?",
+    [donate, add, userId, donate, ceiling - add]
+  );
+  return Number(result.affectedRows) === 1;
+}
+
+/** Вернуть донат-счёт, если услугу после списания сохранить не удалось. */
+export async function refundUserDonate(userId: number, amount: number): Promise<void> {
+  const value = Math.floor(amount);
+  if (!Number.isFinite(value) || value < 1) {
+    return;
+  }
+
+  await execute("UPDATE users SET donate = donate + ? WHERE id = ?", [value, userId]);
 }
 
 export async function saveUserOrg(

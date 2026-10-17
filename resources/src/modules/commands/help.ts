@@ -24,6 +24,7 @@ const CATEGORIES: readonly HelpCategory[] = [
     label: "Общие команды",
     commands: [
       "mn",
+      "donate",
       "time",
       "gps",
       "findidhouse",

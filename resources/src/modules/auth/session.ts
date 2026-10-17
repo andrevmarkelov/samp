@@ -220,6 +220,8 @@ export function patchAccount(
       | "familyId"
       | "familyRank"
       | "skin"
+      | "gender"
+      | "donate"
       | "mutedUntil"
       | "jailSeconds"
       | "licenses"
