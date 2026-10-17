@@ -74,6 +74,7 @@ const CATEGORIES: readonly HelpCategory[] = [
     label: "Организации",
     commands: [
       "r",
+      "post",
       "d",
       "gov",
       "members",

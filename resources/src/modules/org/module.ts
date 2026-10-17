@@ -3,6 +3,7 @@ import { bindMaskVisualRestore } from "../mask";
 import { applyOrgVisuals } from "./appearance";
 import { bindArmyDisguise } from "./army-disguise";
 import { bindArmyLocker } from "./army-locker";
+import { bindArmyPosts } from "./army-posts";
 import { bindArmyFactoryDoors } from "./army-factory-doors";
 import { bindAmmunationDoors } from "./ammunation-doors";
 import { bindOrgGates } from "./gates";
@@ -52,6 +53,7 @@ export const orgModule: GameModule = {
     bindPoliceLocker();
     bindLspdLocker();
     bindArmyLocker();
+    bindArmyPosts();
     bindArmyFactoryDoors();
     bindFbiLocker();
     bindPoliceMapIcon();
