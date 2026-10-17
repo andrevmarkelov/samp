@@ -2,6 +2,7 @@ import { omp, TextDraw, type Player } from "@omp-node/core";
 import { SERVER_TAG } from "../../shared/brand";
 import { isPlayerActive } from "../../shared/player";
 import type { GameModule } from "../types";
+import { startHungerBar } from "./hunger";
 import { startSpeedo } from "./speedo";
 
 const SHOW_DELAY_MS = 250;
@@ -69,6 +70,7 @@ export const hudModule: GameModule = {
     }
 
     startSpeedo();
+    startHungerBar();
 
     omp.on("playerConnect", (player) => {
       setTimeout(() => {
