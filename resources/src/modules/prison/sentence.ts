@@ -13,6 +13,7 @@ import {
 import { refreshStreamForPlayer } from "../mapping/stream";
 import { clearCuff } from "../cuff";
 import { clearMask } from "../mask";
+import { endPhoneCall } from "../commands/call";
 import { applyOrgVisuals } from "../org/appearance";
 import { clearArmyDisguise } from "../org/army-disguise";
 import { resolveOrgSpawn } from "../org/membership";
@@ -147,6 +148,7 @@ export async function applyJail(player: Player, minutes: number): Promise<boolea
     tell(player, Color.gray, "Маска снята.");
   }
   applyOrgVisuals(player);
+  endPhoneCall(player);
   tell(player, Color.error, `Вас посадили в тюрьму. Срок: ${minutes} мин.`);
   return true;
 }

@@ -34,6 +34,8 @@ import "./limit";
 import "./eject";
 import "./report";
 import "./ads";
+import "./sms";
+import "./call";
 import "./home";
 import "./heal";
 import "./sellhouse";
@@ -71,6 +73,7 @@ import { bindSellGunOffers } from "./sellgun";
 import { bindSellDrugOffers } from "./selldrug";
 import { bindArrestCheckpoints } from "./arrest";
 import { bindDonateDialogs } from "./donate";
+import { bindPhoneCalls } from "./call";
 
 export const commandsModule: GameModule = {
   name: "commands",
@@ -94,5 +97,6 @@ export const commandsModule: GameModule = {
     bindSellDrugOffers();
     bindArrestCheckpoints();
     bindDonateDialogs();
+    bindPhoneCalls();
   },
 };

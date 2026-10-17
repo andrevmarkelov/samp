@@ -50,20 +50,29 @@ function canPlayTalkAnim(player: Player): boolean {
 }
 
 function stopTalkAnim(player: Player): void {
-  const id = playerId(player);
-  if (id !== null) {
-    const timer = talkTimers.get(id);
-    if (timer) {
-      clearTimeout(timer);
-      talkTimers.delete(id);
-    }
-  }
+  cancelTalkTimer(player);
 
   try {
     player.clearAnimations(ANIM_SYNC_ALL);
   } catch {
     // Уже вышел или анимации нет.
   }
+}
+
+/** Снять таймер обычной речи, не трогая текущую анимацию. */
+export function cancelTalkTimer(player: Player): void {
+  const id = playerId(player);
+  if (id === null) {
+    return;
+  }
+
+  const timer = talkTimers.get(id);
+  if (!timer) {
+    return;
+  }
+
+  clearTimeout(timer);
+  talkTimers.delete(id);
 }
 
 export function clearTalk(player: Player): void {
@@ -80,6 +89,8 @@ export function clearTalk(player: Player): void {
 export type SpeechOptions = {
   radius?: number;
   color?: number;
+  /** false — только надпись над ником, без анимации разговора. */
+  anim?: boolean;
 };
 
 export function playLocalSpeech(
@@ -95,6 +106,11 @@ export function playLocalSpeech(
     player.setChatBubble(text, color, radius, duration);
   } catch {
     // Пузырь не обязателен, чат всё равно уйдёт.
+  }
+
+  if (options.anim === false) {
+    cancelTalkTimer(player);
+    return;
   }
 
   if (!canPlayTalkAnim(player)) {

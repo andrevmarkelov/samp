@@ -16,6 +16,7 @@ import type { GameModule } from "../types";
 import { tryChatEmotion } from "./emotions";
 import { notifyIfMuted, clearMuteWatch, watchMute } from "./mute";
 import { clearTalk, playLocalSpeech } from "./talk";
+import { routePhoneChat } from "../commands/call";
 
 function nearbyChatLine(
   playerName: string,
@@ -46,6 +47,10 @@ export const chatModule: GameModule = {
       }
 
       if (notifyIfMuted(player, { bubble: true })) {
+        return false;
+      }
+
+      if (routePhoneChat(player, text)) {
         return false;
       }
 
