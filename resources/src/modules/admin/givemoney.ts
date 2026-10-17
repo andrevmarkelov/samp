@@ -4,6 +4,7 @@ import { isPlayerActive, playerChatName } from "../../shared/player";
 import { saveUserMoney } from "../auth/repository";
 import { applyWallet, getAccount, patchAccount } from "../auth/session";
 import { isDonateWalletHeld } from "../auth/donate-guard";
+import { isBusinessCashHeld } from "../businesses/cash-hold";
 import { isBankBusy } from "../bank/tellers";
 import { registerCommand } from "../commands/registry";
 import { hasAdminAccess } from "./session";
@@ -155,7 +156,7 @@ async function applyGive(
       }
     }
 
-    if (isBankBusy(target) || isDonateWalletHeld(target)) {
+    if (isBankBusy(target) || isDonateWalletHeld(target) || isBusinessCashHeld(target)) {
       notifyGive(admin, target, credited, toBank);
       return;
     }

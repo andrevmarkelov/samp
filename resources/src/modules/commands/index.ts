@@ -52,6 +52,7 @@ import "./demote";
 import "./id";
 import "./anim";
 import "./donate";
+import "../firework";
 import { bindMenuDialogs } from "./mn";
 import { bindGpsDialogs } from "../gps";
 import { bindReportDialogs } from "./report";

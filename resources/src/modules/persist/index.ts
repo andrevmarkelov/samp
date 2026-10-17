@@ -21,6 +21,7 @@ import {
 import { applyCuffDisconnectJail } from "../cuff";
 import { isSafeZoneDamage } from "../zones/safe";
 import { isDonateWalletHeld } from "../auth/donate-guard";
+import { isBusinessCashHeld } from "../businesses/cash-hold";
 import { isBankBusy } from "../bank/tellers";
 import type { GameModule } from "../types";
 
@@ -88,7 +89,7 @@ export function queueSave(player: Player): void {
   const health = readLiveHealth(player, account.health);
   const hunger = normalizeHunger(account.hunger);
 
-  if (isBankBusy(player) || isDonateWalletHeld(player)) {
+  if (isBankBusy(player) || isDonateWalletHeld(player) || isBusinessCashHeld(player)) {
     patchAccount(player, { health, hunger });
     void saveUserHealth(account.id, health).catch((error: unknown) => {
       const message = error instanceof Error ? error.message : String(error);

@@ -26,6 +26,7 @@ import { hudModule } from "./modules/hud";
 import { adminModule } from "./modules/admin";
 import { orgModule } from "./modules/org";
 import { maskModule } from "./modules/mask";
+import { fireworkModule } from "./modules/firework";
 import { cuffModule } from "./modules/cuff";
 import { animModule } from "./modules/anim";
 import { autoschoolModule } from "./modules/autoschool";
@@ -63,6 +64,7 @@ const modules: GameModule[] = [
   hudModule,
   sessionModule,
   maskModule,
+  fireworkModule,
   cuffModule,
   animModule,
   chatModule,

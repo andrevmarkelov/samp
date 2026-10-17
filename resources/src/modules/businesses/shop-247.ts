@@ -11,6 +11,9 @@ import {
   patchAccount,
 } from "../auth/session";
 import { addOwnedMasks } from "../mask";
+import { addOwnedFireworks } from "../firework";
+import { holdBusinessCash, releaseBusinessCash } from "./cash-hold";
+import { queueSave } from "../persist";
 import {
   getBusiness,
   listBusinesses,
@@ -36,12 +39,14 @@ const CAMERA_AMMO = 36;
 type ShopItem =
   | { kind: "phone"; name: string; price: number }
   | { kind: "weapon"; name: string; price: number; weaponId: number; ammo: number }
-  | { kind: "mask"; name: string; price: number };
+  | { kind: "mask"; name: string; price: number }
+  | { kind: "firework"; name: string; price: number };
 
 const MENU: readonly ShopItem[] = [
   { kind: "phone", name: "Мобильный телефон", price: 2_000 },
   { kind: "weapon", name: "Фотоаппарат", price: 1_000, weaponId: WEAPON_CAMERA, ammo: CAMERA_AMMO },
   { kind: "mask", name: "Маска", price: 500 },
+  { kind: "firework", name: "Фейерверк", price: 5_000 },
 ];
 
 const standingOn = new Map<number, number>();
@@ -302,8 +307,10 @@ async function buyShopItem(
       await buyPhone(player, account.id, account.name, businessId, item.price);
     } else if (item.kind === "weapon") {
       await buyCamera(player, account.id, account.name, businessId, item);
-    } else {
+    } else if (item.kind === "mask") {
       await buyMask(player, account.id, account.name, businessId, item.price);
+    } else {
+      await buyFirework(player, account.id, account.name, businessId, item.price);
     }
   } finally {
     buying.delete(account.id);
@@ -457,4 +464,72 @@ async function buyMask(
     Color.tryOk,
     `Вы купили маску за ${formatMoney(price)}. Надеть: /mask. Всего масок: ${nextMasks}.`
   );
+}
+
+async function buyFirework(
+  player: Player,
+  userId: number,
+  userName: string,
+  businessId: number,
+  price: number
+): Promise<void> {
+  const slotId = playerId(player);
+  if (slotId !== null) {
+    holdBusinessCash(slotId);
+  }
+  let bought = false;
+
+  try {
+    let result;
+    try {
+      result = await payBusinessCashShare(businessId, userId, price, BIZ_SHARE);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      omp.log(`[${SERVER_TAG}] 24/7 фейерверк biz=${businessId} (${userName}): ${message}`);
+      player.sendClientMessage(Color.error, "Покупка не прошла. Попробуйте ещё раз.");
+      return;
+    }
+
+    if (!result.ok) {
+      if (result.reason === "funds") {
+        player.sendClientMessage(
+          Color.error,
+          `Недостаточно наличных. Нужно ${formatMoney(price)}.`
+        );
+        return;
+      }
+      player.sendClientMessage(Color.error, "Покупка не прошла. Попробуйте ещё раз.");
+      return;
+    }
+
+    setBusinessBalance(businessId, result.balance);
+
+    if (!isPlayerActive(player) || getAccount(player)?.id !== userId) {
+      return;
+    }
+
+    const live = getAccount(player);
+    if (!live) {
+      return;
+    }
+
+    patchAccount(player, { money: Math.max(0, live.money - price) });
+    applyWallet(player, getAccount(player) ?? live);
+    const next = addOwnedFireworks(player, 1);
+    bought = true;
+
+    player.sendClientMessage(
+      Color.tryOk,
+      `Вы купили фейерверк за ${formatMoney(price)}. Запустить: /blow. Всего: ${next}.`
+    );
+    bought = true;
+  } finally {
+    if (slotId !== null) {
+      releaseBusinessCash(slotId);
+    }
+  }
+
+  if (bought) {
+    queueSave(player);
+  }
 }
