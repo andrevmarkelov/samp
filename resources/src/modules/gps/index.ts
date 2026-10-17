@@ -56,6 +56,13 @@ const TARGETS = {
     y: -1323.4761,
     z: 14.092,
   },
+  farm: {
+    key: "farm",
+    label: "Ферма льна",
+    x: 1948.9932,
+    y: 166.2849,
+    z: 37.2334,
+  },
   mine: {
     key: "mine",
     label: "Шахта",
@@ -220,7 +227,7 @@ const CATEGORIES: readonly GpsCategory[] = [
   {
     key: "jobs",
     label: "По работе",
-    targets: [TARGETS.mine, TARGETS.loader, TARGETS.busDriver],
+    targets: [TARGETS.farm, TARGETS.mine, TARGETS.loader, TARGETS.busDriver],
   },
 ];
 
