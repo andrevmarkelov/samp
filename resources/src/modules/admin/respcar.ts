@@ -2,6 +2,7 @@ import { INVALID_VEHICLE_ID, omp, type Vehicle } from "@omp-node/core";
 import { Color } from "../../shared/colors";
 import { isPlayerActive, playerChatName } from "../../shared/player";
 import { registerCommand } from "../commands/registry";
+import { isActiveLimoRental } from "../vehicles/limo";
 import { isActiveRentalVehicle } from "../vehicles/rental";
 import { hasAdminAccess } from "./session";
 
@@ -63,7 +64,7 @@ function respawnEmptyVehicles(): void {
         continue;
       }
 
-      if (id !== null && isActiveRentalVehicle(id)) {
+      if (id !== null && (isActiveRentalVehicle(id) || isActiveLimoRental(id))) {
         continue;
       }
 

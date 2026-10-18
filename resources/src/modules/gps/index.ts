@@ -84,6 +84,13 @@ const TARGETS = {
     y: -1840.6724,
     z: 13.3936,
   },
+  church: {
+    key: "church",
+    label: "Церковь",
+    x: 2256.6848,
+    y: -36.4731,
+    z: 26.4844,
+  },
   station: {
     key: "station",
     label: "ЖД ЛС",
@@ -195,7 +202,7 @@ const CATEGORIES: readonly GpsCategory[] = [
   {
     key: "public",
     label: "Общественные места",
-    targets: [TARGETS.station, TARGETS.bank],
+    targets: [TARGETS.station, TARGETS.bank, TARGETS.church],
   },
   {
     key: "gov",

@@ -13,7 +13,8 @@ export type YnOfferKind =
   | "finvite"
   | "selllic"
   | "sellgun"
-  | "selldrug";
+  | "selldrug"
+  | "present";
 
 const activeBySlot = new Map<number, YnOfferKind>();
 

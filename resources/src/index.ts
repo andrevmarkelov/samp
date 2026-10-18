@@ -12,6 +12,7 @@ import { vehiclesModule } from "./modules/vehicles";
 import { hospitalModule } from "./modules/hospital";
 import { cityHallModule } from "./modules/cityhall";
 import { bankModule } from "./modules/bank";
+import { churchModule } from "./modules/church";
 import { gpsModule } from "./modules/gps";
 import { prisonModule } from "./modules/prison";
 import { afkModule } from "./modules/afk";
@@ -28,6 +29,7 @@ import { adminModule } from "./modules/admin";
 import { orgModule } from "./modules/org";
 import { maskModule } from "./modules/mask";
 import { fireworkModule } from "./modules/firework";
+import { flowersModule } from "./modules/flowers";
 import { cuffModule } from "./modules/cuff";
 import { animModule } from "./modules/anim";
 import { autoschoolModule } from "./modules/autoschool";
@@ -48,6 +50,7 @@ const modules: GameModule[] = [
   hospitalModule,
   cityHallModule,
   bankModule,
+  churchModule,
   housesModule,
   businessesModule,
   warehouseModule,
@@ -67,6 +70,7 @@ const modules: GameModule[] = [
   sessionModule,
   maskModule,
   fireworkModule,
+  flowersModule,
   cuffModule,
   animModule,
   chatModule,

@@ -20,6 +20,7 @@ import { startDealerships } from "./dealership";
 import { bindPersonalVehicles } from "./personal";
 import { bindPersonalVehicleCommands } from "./commands";
 import { spawnRentalVehicles } from "./rental";
+import { spawnLimoRental } from "./limo";
 import { startSpeedLimiter } from "./limit";
 import { bindLightBarRespawn } from "./light-bar";
 import { startFuelSystem } from "./fuel";
@@ -120,6 +121,7 @@ export const vehiclesModule: GameModule = {
     spawnGangVehicles();
     spawnMafiaVehicles();
     spawnRentalVehicles();
+    spawnLimoRental();
     bindPersonalVehicles();
     bindPersonalVehicleCommands();
     startDealerships();
