@@ -5,6 +5,8 @@ import { bindArmyDisguise } from "./army-disguise";
 import { bindArmyLocker } from "./army-locker";
 import { bindArmyPosts } from "./army-posts";
 import { bindArmyFactoryDoors } from "./army-factory-doors";
+import { bindBarracksDoors } from "./barracks-doors";
+import { bindArmyHqDoors } from "./army-hq-doors";
 import { bindAmmunationDoors } from "./ammunation-doors";
 import { bindOrgGates } from "./gates";
 import { bindHospitalArchive } from "./hospital-archive";
@@ -55,6 +57,8 @@ export const orgModule: GameModule = {
     bindArmyLocker();
     bindArmyPosts();
     bindArmyFactoryDoors();
+    bindBarracksDoors();
+    bindArmyHqDoors();
     bindFbiLocker();
     bindPoliceMapIcon();
     bindLspdMapIcon();

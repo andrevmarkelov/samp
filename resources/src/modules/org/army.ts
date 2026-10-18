@@ -1,4 +1,3 @@
-import { STREET_WORLD } from "../spawn/point";
 import { ORG_FBI_ID } from "./fbi";
 import { ORG_LSPD_ID } from "./lspd";
 import { ORG_POLICE_ID } from "./police";
@@ -41,12 +40,12 @@ export const ARMY: OrganizationDef = {
   gov: true,
   illegal: false,
   spawn: {
-    x: 2733.9255,
-    y: -2449.3652,
-    z: 17.5938,
-    angle: 305.0398,
-    interior: 0,
-    world: STREET_WORLD,
+    x: 1068.8363,
+    y: 1259.9642,
+    z: 1033.9541,
+    angle: 180.0234,
+    interior: 1,
+    world: 18,
   },
   ranks: armyRanks(),
 };
