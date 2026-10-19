@@ -84,6 +84,13 @@ const TARGETS = {
     y: -1840.6724,
     z: 13.3936,
   },
+  firefighter: {
+    key: "firefighter",
+    label: "Пожарная часть",
+    x: 1749.0404,
+    y: -1454.1699,
+    z: 13.5469,
+  },
   church: {
     key: "church",
     label: "Церковь",
@@ -234,7 +241,13 @@ const CATEGORIES: readonly GpsCategory[] = [
   {
     key: "jobs",
     label: "По работе",
-    targets: [TARGETS.farm, TARGETS.mine, TARGETS.loader, TARGETS.busDriver],
+    targets: [
+      TARGETS.farm,
+      TARGETS.mine,
+      TARGETS.loader,
+      TARGETS.busDriver,
+      TARGETS.firefighter,
+    ],
   },
 ];
 

@@ -5,8 +5,8 @@ import { STREET_WORLD } from "../spawn/point";
 import type { HouseRecord } from "./repository";
 import { listHouses } from "./repository";
 
-/** Слот 11 — церковь. Слоты 50–99 заняты маркерами бизнесов. */
-const MAP_ICON_SLOT_MIN = 12;
+/** Слот 11 — церковь, слот 12 — пожарная часть. Слоты 50–99 заняты маркерами бизнесов. */
+const MAP_ICON_SLOT_MIN = 13;
 const MAP_ICON_SLOT_MAX = 49;
 const ICON_FOR_SALE = 31;
 const ICON_OWNED = 32;

@@ -101,6 +101,15 @@ type EngineStartBlocker = (player: Player, vehicle: Vehicle) => string | null;
 
 let engineStartBlocker: EngineStartBlocker | null = null;
 
+type LightToggleSkip = (vehicle: Vehicle) => boolean;
+
+let lightToggleSkip: LightToggleSkip | null = null;
+
+/** ЛКМ на этой машине — не фары (например, водомёт пожарной). */
+export function setLightToggleSkip(skip: LightToggleSkip | null): void {
+  lightToggleSkip = skip;
+}
+
 /** Блокировка запуска (например пустой бак). */
 export function setEngineStartBlocker(
   blocker: EngineStartBlocker | null
@@ -191,6 +200,10 @@ function toggleEngine(player: Player): void {
 function toggleLights(player: Player): void {
   const vehicle = driverVehicle(player);
   if (!vehicle) {
+    return;
+  }
+
+  if (lightToggleSkip?.(vehicle)) {
     return;
   }
 

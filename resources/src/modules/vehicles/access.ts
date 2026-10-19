@@ -37,6 +37,28 @@ const byVehicleId = new Map<number, OrgVehicleAccess>();
 const jobByVehicleId = new Map<number, JobVehicleAccess>();
 const denyAt = new Map<number, number>();
 
+type JobVehicleGate = (player: Player) => string | null;
+
+const jobGates = new Map<number, JobVehicleGate>();
+/** Пассажир тоже должен подходить под работу (пожарные машины). */
+const crewOnlyJobIds = new Set<number>();
+
+export function setJobVehicleGate(jobId: number, gate: JobVehicleGate | null): void {
+  if (gate) {
+    jobGates.set(jobId, gate);
+  } else {
+    jobGates.delete(jobId);
+  }
+}
+
+export function setJobVehicleCrewOnly(jobId: number, crewOnly: boolean): void {
+  if (crewOnly) {
+    crewOnlyJobIds.add(jobId);
+  } else {
+    crewOnlyJobIds.delete(jobId);
+  }
+}
+
 export function registerOrgVehicle(
   vehicle: Vehicle,
   orgId: number | readonly number[],
@@ -218,9 +240,12 @@ function denyNearbyIfForbidden(player: Player): void {
   }
 
   const jobAccess = jobAccessFor(vehicle);
-  if (jobAccess && !canUseJobVehicle(player, jobAccess.jobId)) {
-    deny(player, jobAccess.denyMessage);
-    return;
+  if (jobAccess) {
+    const jobDeny = jobVehicleDeny(player, jobAccess);
+    if (jobDeny) {
+      deny(player, jobDeny);
+      return;
+    }
   }
 
   if (skipsDriveLicense(player, vehicle, access)) {
@@ -277,11 +302,15 @@ function refuseIfForbidden(
   }
 
   const jobAccess = jobAccessFor(vehicle);
-  // Пассажирам job-ТС можно; за руль — только с нужной работой.
-  if (!passenger && jobAccess && !canUseJobVehicle(player, jobAccess.jobId)) {
-    deny(player, jobAccess.denyMessage);
-    eject(player, entering);
-    return true;
+  if (jobAccess) {
+    const jobDeny = jobVehicleDeny(player, jobAccess);
+    const blockPassenger = crewOnlyJobIds.has(jobAccess.jobId);
+    // Обычная работа: пассажирам можно. Пожарный расчёт — только своим.
+    if (jobDeny && (!passenger || blockPassenger)) {
+      deny(player, jobDeny);
+      eject(player, entering);
+      return true;
+    }
   }
 
   if (!passenger && !skipsDriveLicense(player, vehicle, access)) {
@@ -320,8 +349,12 @@ function applyDoorLock(vehicle: Vehicle, player: Player): void {
       allowed = canUseOrgVehicle(player, access.orgIds, vehicle);
     }
     if (allowed && jobAccess) {
-      // Двери job-ТС открыты всем (пассажиры), ограничение — только водитель.
-      allowed = true;
+      if (crewOnlyJobIds.has(jobAccess.jobId)) {
+        allowed = jobVehicleDeny(player, jobAccess) === null;
+      } else {
+        // Двери job-ТС открыты всем (пассажиры), ограничение — только водитель.
+        allowed = true;
+      }
     }
     vehicle.setParamsForPlayer(player, 0, allowed ? DOORS_UNLOCKED : DOORS_LOCKED);
   } catch {
@@ -372,6 +405,14 @@ function canUseJobVehicle(player: Player, jobId: number): boolean {
 
   const account = getAccount(player);
   return !!account && account.jobId === jobId;
+}
+
+function jobVehicleDeny(player: Player, access: JobVehicleAccess): string | null {
+  if (!canUseJobVehicle(player, access.jobId)) {
+    return access.denyMessage;
+  }
+
+  return jobGates.get(access.jobId)?.(player) ?? null;
 }
 
 function denyMessage(

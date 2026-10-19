@@ -47,6 +47,8 @@ const CATEGORIES: readonly HelpCategory[] = [
       "mask",
       "blow",
       "present",
+      "fire",
+      "unfire",
       "anim",
     ],
   },

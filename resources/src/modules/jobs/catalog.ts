@@ -2,6 +2,7 @@ import { byGender, type Gender } from "../auth/gender";
 
 export const JOB_NONE = 0;
 export const JOB_BUS_DRIVER = 1;
+export const JOB_FIREFIGHTER = 2;
 
 export type JobDef = {
   id: number;
@@ -13,6 +14,7 @@ export type JobDef = {
 
 const JOBS: readonly JobDef[] = [
   { id: JOB_BUS_DRIVER, title: "Водитель автобуса", minLevel: 2 },
+  { id: JOB_FIREFIGHTER, title: "Пожарный", minLevel: 3 },
 ];
 
 const byId = new Map(JOBS.map((job) => [job.id, job]));

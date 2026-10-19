@@ -70,6 +70,19 @@ export function trustWeapon(player: Player, weaponId: number, ammo: number): voi
   state.weaponTrustedUntil = nowMs() + getConfig().weaponGraceMs;
 }
 
+/** Поставить точное число патронов, без прибавки giveWeapon. */
+export function replaceTrustedWeapon(player: Player, weaponId: number, ammo: number): void {
+  const state = stateOf(player);
+  if (!state) return;
+  const slot = weaponSlot(weaponId);
+  if (slot < 0 || slot >= WEAPON_SLOTS) return;
+  const cur = state.weapons[slot];
+  if (!cur) return;
+  cur.id = weaponId;
+  cur.ammo = Math.max(0, Math.floor(ammo));
+  state.weaponTrustedUntil = nowMs() + getConfig().weaponGraceMs;
+}
+
 export function clearTrustedWeapons(player: Player): void {
   const state = stateOf(player);
   if (!state) return;

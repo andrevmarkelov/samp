@@ -14,6 +14,7 @@ import { refreshStreamForPlayer } from "../mapping/stream";
 import { clearCuff } from "../cuff";
 import { clearMask } from "../mask";
 import { endPhoneCall } from "../commands/call";
+import { endFirefighterShift } from "../jobs/firefighter";
 import { endLimoRental } from "../vehicles/limo";
 import { applyOrgVisuals } from "../org/appearance";
 import { clearArmyDisguise } from "../org/army-disguise";
@@ -151,6 +152,7 @@ export async function applyJail(player: Player, minutes: number): Promise<boolea
   applyOrgVisuals(player);
   endPhoneCall(player);
   endLimoRental(player, "jail");
+  endFirefighterShift(player);
   tell(player, Color.error, `Вас посадили в тюрьму. Срок: ${minutes} мин.`);
   return true;
 }

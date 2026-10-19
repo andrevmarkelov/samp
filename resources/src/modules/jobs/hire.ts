@@ -6,6 +6,7 @@ import { getAccount, isAuthenticated, patchAccount } from "../auth/session";
 import { MERIYA_CUSTOM_INTERIOR, MERIYA_WORLD } from "../org/meriya";
 import { syncOrgVehicleAccess } from "../vehicles/access";
 import { isBusDriverOnShift } from "./bus/active";
+import { isFirefighterOnShift } from "./firefighter/active";
 import {
   JOB_NONE,
   getJob,
@@ -107,7 +108,7 @@ function tickHirePoint(): void {
       return;
     }
 
-    if (isBusDriverOnShift(player)) {
+    if (isBusDriverOnShift(player) || isFirefighterOnShift(player)) {
       clearHireCheckpoint(player, id);
       mustLeaveCp.delete(id);
       return;
@@ -180,7 +181,11 @@ function clearHireCheckpoint(player: Player, id: number): void {
 }
 
 function isAtJobPoint(player: Player): boolean {
-  if (!isAuthenticated(player) || isBusDriverOnShift(player)) {
+  if (
+    !isAuthenticated(player) ||
+    isBusDriverOnShift(player) ||
+    isFirefighterOnShift(player)
+  ) {
     return false;
   }
 
@@ -256,7 +261,7 @@ async function handleHireChoice(player: Player, listItem: number): Promise<void>
     return;
   }
 
-  if (isBusDriverOnShift(player)) {
+  if (isBusDriverOnShift(player) || isFirefighterOnShift(player)) {
     tell(player, Color.error, "Сначала завершите или прервите рабочую смену.");
     return;
   }

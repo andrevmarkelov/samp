@@ -15,9 +15,31 @@ type EngineExtraBlocker = (player: Player, vehicle: Vehicle) => string | null;
 
 /** Доп. блок запуска (АЗС и т.п.) — без циклических импортов. */
 let extraEngineBlocker: EngineExtraBlocker | null = null;
+const extraEngineBlockers: EngineExtraBlocker[] = [];
 
 export function setExtraEngineBlocker(blocker: EngineExtraBlocker | null): void {
   extraEngineBlocker = blocker;
+}
+
+/** Ещё один блок запуска, не затирая АЗС. */
+export function addExtraEngineBlocker(blocker: EngineExtraBlocker): void {
+  extraEngineBlockers.push(blocker);
+}
+
+function extraEngineDeny(player: Player, vehicle: Vehicle): string | null {
+  const primary = extraEngineBlocker?.(player, vehicle);
+  if (primary) {
+    return primary;
+  }
+
+  for (const blocker of extraEngineBlockers) {
+    const message = blocker(player, vehicle);
+    if (message) {
+      return message;
+    }
+  }
+
+  return null;
 }
 
 /**
@@ -102,7 +124,7 @@ export function clearVehicleFuel(runtimeId: number): void {
 
 export function startFuelSystem(): void {
   setEngineStartBlocker((player, vehicle) => {
-    const extra = extraEngineBlocker?.(player, vehicle);
+    const extra = extraEngineDeny(player, vehicle);
     if (extra) {
       return extra;
     }
