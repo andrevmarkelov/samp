@@ -27,6 +27,7 @@ import { zonesModule } from "./modules/zones";
 import { hudModule } from "./modules/hud";
 import { adminModule } from "./modules/admin";
 import { orgModule } from "./modules/org";
+import { patrolModule } from "./modules/patrol";
 import { maskModule } from "./modules/mask";
 import { fireworkModule } from "./modules/firework";
 import { flowersModule } from "./modules/flowers";
@@ -77,6 +78,7 @@ const modules: GameModule[] = [
   commandsModule,
   adminModule,
   orgModule,
+  patrolModule,
   autoschoolModule,
   vehiclesModule,
   jobsModule,

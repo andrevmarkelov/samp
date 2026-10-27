@@ -15,6 +15,7 @@ import { clearCuff } from "../cuff";
 import { clearMask } from "../mask";
 import { endPhoneCall } from "../commands/call";
 import { endFirefighterShift } from "../jobs/firefighter";
+import { endPatrol } from "../patrol/end";
 import { endLimoRental } from "../vehicles/limo";
 import { applyOrgVisuals } from "../org/appearance";
 import { clearArmyDisguise } from "../org/army-disguise";
@@ -143,6 +144,7 @@ export async function applyJail(player: Player, minutes: number): Promise<boolea
     // Слот ещё не готов.
   }
 
+  endPatrol(player);
   placeInJail(player);
   clearArmyDisguise(player);
   clearCuff(player);
