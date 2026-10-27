@@ -44,6 +44,7 @@ export const PRISON_YARD_WORLD = 4;
 /** Радиоцентр (кастомный интерьер): VW 8 — `org/radio.ts`. */
 /** Мэрия (кастомный интерьер): VW 3 (= org id) — `org/meriya.ts`. Совпадает с PRISON_WORLD; координаты далеко. */
 /** FBI HQ (кастомный интерьер): VW 6 (= org id) — `org/fbi.ts`. Совпадает с VW аммунации FBI (другой interior). */
+/** Областная полиция (кастомный интерьер, interior 6): VW 21 — `org/police.ts`. */
 
 /** Обычный спавн, пока игрок не в организации. */
 export const DEFAULT_SPAWN: SpawnPoint = {

@@ -8,7 +8,7 @@ import { AMMUNATION_INTERIOR } from "./ammunation-doors";
 import { ORG_FBI_ID } from "./fbi";
 import { getMembership } from "./membership";
 import { LAW_ORG_IDS } from "./lspd";
-import { ORG_POLICE_ID, POLICE_INTERIOR } from "./police";
+import { ORG_POLICE_ID, POLICE_INTERIOR, POLICE_WORLD } from "./police";
 
 export const POLICE_SERVICE_DIALOG_ID = 55;
 
@@ -48,21 +48,21 @@ const PARKING_STREET: SpawnPoint = {
 };
 
 const OFFICE_FROM_PARKING: SpawnPoint = {
-  x: 245.1678,
-  y: 66.2916,
-  z: 1003.6406,
-  angle: 267.5659,
+  x: 617.5976,
+  y: -558.5342,
+  z: 1929.615,
+  angle: 90.3601,
   interior: POLICE_INTERIOR,
-  world: STREET_WORLD,
+  world: POLICE_WORLD,
 };
 
 const OFFICE_FROM_ROOF: SpawnPoint = {
-  x: 246.3152,
-  y: 86.1715,
-  z: 1003.6406,
-  angle: 178.2883,
+  x: 617.3502,
+  y: -552.4045,
+  z: 1929.615,
+  angle: 90.6501,
   interior: POLICE_INTERIOR,
-  world: STREET_WORLD,
+  world: POLICE_WORLD,
 };
 
 const ROOF: SpawnPoint = {
@@ -95,12 +95,12 @@ const DOORS: readonly PoliceDoor[] = [
     kind: "mainIn",
     pickup: { x: 626.973, y: -571.7709, z: 17.9207, interior: 0, world: STREET_WORLD },
     dest: {
-      x: 246.66,
-      y: 65.8,
-      z: 1003.64,
-      angle: 0,
+      x: 620.5906,
+      y: -568.1241,
+      z: 1929.615,
+      angle: 90.0932,
       interior: POLICE_INTERIOR,
-      world: STREET_WORLD,
+      world: POLICE_WORLD,
     },
     label: "Областная полиция\nВход",
     staffOnly: false,
@@ -108,11 +108,11 @@ const DOORS: readonly PoliceDoor[] = [
   {
     kind: "mainOut",
     pickup: {
-      x: 246.757,
-      y: 62.4475,
-      z: 1003.6406,
+      x: 622.8657,
+      y: -568.1423,
+      z: 1929.615,
       interior: POLICE_INTERIOR,
-      world: STREET_WORLD,
+      world: POLICE_WORLD,
     },
     dest: {
       x: 631.6352,
@@ -135,11 +135,11 @@ const DOORS: readonly PoliceDoor[] = [
   {
     kind: "parkingOut",
     pickup: {
-      x: 242.477,
-      y: 66.3774,
-      z: 1003.6406,
+      x: 619.54,
+      y: -558.5139,
+      z: 1929.615,
       interior: POLICE_INTERIOR,
-      world: STREET_WORLD,
+      world: POLICE_WORLD,
     },
     dest: PARKING_STREET,
     label: "Парковка\nСлужебный выход",
@@ -158,11 +158,11 @@ const DOORS: readonly PoliceDoor[] = [
   {
     kind: "interiorMenu",
     pickup: {
-      x: 246.3991,
-      y: 88.0064,
-      z: 1003.6406,
+      x: 619.6847,
+      y: -552.3907,
+      z: 1929.615,
       interior: POLICE_INTERIOR,
-      world: STREET_WORLD,
+      world: POLICE_WORLD,
     },
     label: "Крыша\nАммунация",
     staffOnly: true,
