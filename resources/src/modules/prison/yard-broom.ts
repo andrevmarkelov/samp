@@ -10,11 +10,11 @@ import { isJailed, reduceJailSeconds } from "./sentence";
 
 const BROOM_MODEL = 19622;
 const BROOM_SLOT = 4;
-const BROOM_BONE = 6;
+/** Кость 5 — левая кисть. */
+const BROOM_BONE = 5;
 const PICKUP_TYPE = 1;
 const PICKUP_RADIUS = 1.5;
 const TICK_MS = 200;
-const SWEEP_MS = 5_000;
 const SPOT_COOLDOWN_MS = 20_000;
 const SPOT_GAP = 2;
 const SENTENCE_CUT_SECONDS = 15;
@@ -24,7 +24,18 @@ const MAX_CASH = 2_147_483_647;
 const KEY_CTRL_BACK = 262144;
 const PLAYER_STATE_ONFOOT = 1;
 const ANIM_SYNC_ALL = 1;
+const ANIM_DELTA = 4.1;
 const CLEAN_SPOT_COLOR = 0xcc9966ff;
+
+/** Подход, подметание, завершение и обычная стойка. Взмах — большая часть из 10 секунд. */
+const SWEEP_STEPS = [
+  { lib: "INT_SHOP", name: "SHOP_CASHIER", ms: 2_000, loop: false, hold: true },
+  { lib: "FLAME", name: "FLAME_FIRE", ms: 5_500, loop: true, hold: false },
+  { lib: "INT_SHOP", name: "SHOP_OUT", ms: 1_700, loop: false, hold: true },
+  { lib: "PED", name: "IDLE_STANCE", ms: 800, loop: true, hold: false },
+] as const;
+/** Заморозка в том же кадре сбрасывает анимацию, поэтому первый шаг чуть позже. */
+const SWEEP_ARM_MS = 300;
 
 const BROOM = {
   x: 1751.3143,
@@ -39,12 +50,14 @@ type Spot = {
   until: number;
 };
 
+type SweepStep = (typeof SWEEP_STEPS)[number];
+
 type Sweep = {
   token: number;
   x: number;
   y: number;
   z: number;
-  timer: ReturnType<typeof setTimeout>;
+  timers: ReturnType<typeof setTimeout>[];
 };
 
 const brooms = new Set<number>();
@@ -192,6 +205,7 @@ function giveBroom(player: Player): void {
   }
 
   brooms.add(id);
+  preloadSweepAnims(player);
   tell(
     player,
     Color.white,
@@ -252,17 +266,92 @@ function tryStartSweep(player: Player): void {
     return;
   }
 
-  try {
-    player.applyAnimation("BAR", "cleaning", 4.0, true, false, false, false, 0, ANIM_SYNC_ALL);
-  } catch {
-    tell(player, Color.error, "Не удалось начать подметание.");
+  const first = SWEEP_STEPS[0];
+  if (!first) {
     return;
   }
 
   const token = ++sweepToken;
-  const timer = setTimeout(() => finishSweep(player, id, token), SWEEP_MS);
-  sweeps.set(id, { token, x: pos.x, y: pos.y, z: pos.z, timer });
+  const timers: ReturnType<typeof setTimeout>[] = [];
+  timers.push(
+    setTimeout(() => {
+      if (!isSweepToken(id, token) || !isPlayerActive(player)) {
+        return;
+      }
+      if (!playSweepStep(player, first)) {
+        cancelSweep(id);
+        setSweepFrozen(player, false);
+        tell(player, Color.error, "Не удалось начать подметание.");
+      }
+    }, SWEEP_ARM_MS)
+  );
+
+  let at = SWEEP_ARM_MS + first.ms;
+  for (let index = 1; index < SWEEP_STEPS.length; index += 1) {
+    const step = SWEEP_STEPS[index];
+    if (!step) {
+      continue;
+    }
+    const when = at;
+    timers.push(
+      setTimeout(() => {
+        if (!isSweepToken(id, token) || !isPlayerActive(player)) {
+          return;
+        }
+        playSweepStep(player, step);
+      }, when)
+    );
+    at += step.ms;
+  }
+  timers.push(setTimeout(() => finishSweep(player, id, token), at));
+  sweeps.set(id, { token, x: pos.x, y: pos.y, z: pos.z, timers });
   setSweepFrozen(player, true);
+}
+
+function playSweepStep(player: Player, step: SweepStep): boolean {
+  try {
+    player.applyAnimation(
+      step.lib,
+      step.name,
+      ANIM_DELTA,
+      step.loop,
+      true,
+      true,
+      step.hold,
+      step.loop ? 0 : step.ms,
+      ANIM_SYNC_ALL
+    );
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function preloadSweepAnims(player: Player): void {
+  const id = playerId(player);
+  try {
+    player.applyAnimation("INT_SHOP", "SHOP_CASHIER", ANIM_DELTA, false, true, true, false, 1, ANIM_SYNC_ALL);
+    player.applyAnimation("FLAME", "FLAME_FIRE", ANIM_DELTA, false, true, true, false, 1, ANIM_SYNC_ALL);
+    player.applyAnimation("INT_SHOP", "SHOP_OUT", ANIM_DELTA, false, true, true, false, 1, ANIM_SYNC_ALL);
+  } catch {
+    return;
+  }
+
+  // Сразу clearAnimations гасит предзагрузку в том же кадре, и первая анимация не видна.
+  setTimeout(() => {
+    if (id === null || sweeps.has(id) || !isPlayerActive(player)) {
+      return;
+    }
+    try {
+      player.clearAnimations(ANIM_SYNC_ALL);
+    } catch {
+      // Игрок уже вышел.
+    }
+  }, 400);
+}
+
+function isSweepToken(id: number, token: number): boolean {
+  return sweeps.get(id)?.token === token;
 }
 
 function finishSweep(player: Player, id: number, token: number): void {
@@ -357,7 +446,9 @@ function cancelSweep(id: number): void {
   if (!sweep) {
     return;
   }
-  clearTimeout(sweep.timer);
+  for (const timer of sweep.timers) {
+    clearTimeout(timer);
+  }
   sweeps.delete(id);
 }
 
