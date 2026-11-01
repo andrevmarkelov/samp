@@ -30,6 +30,7 @@ import {
   type SpawnPoint,
 } from "./point";
 import { startSpawnHealthPickup } from "./health";
+import { isEventParticipant } from "../events/state";
 
 const pendingHospital = new Map<number, SpawnPoint>();
 const seenWorldSpawn = new Set<number>();
@@ -63,7 +64,7 @@ export const spawnModule: GameModule = {
     });
 
     omp.on("playerDeath", (player) => {
-      if (!isAuthenticated(player)) {
+      if (!isAuthenticated(player) || isEventParticipant(player)) {
         return;
       }
 
@@ -109,6 +110,10 @@ export const spawnModule: GameModule = {
     });
 
     omp.on("playerSpawn", (player) => {
+      if (isEventParticipant(player)) {
+        return;
+      }
+
       if (!isAuthenticated(player)) {
         holdAtAuth(player);
         return;

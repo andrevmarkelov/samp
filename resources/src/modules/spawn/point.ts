@@ -2,6 +2,7 @@ import type { Player } from "@omp-node/core";
 import { isPlayerActive, playerId } from "../../shared/player";
 import { trustPosition } from "../anticheat/trust";
 import { isCuffed } from "../cuff";
+import { isEventParticipant } from "../events/state";
 
 export type SpawnPoint = {
   x: number;
@@ -179,6 +180,10 @@ export function scheduleSettleFreeze(player: Player, settleMs: number): void {
       settleTokens.delete(id);
 
       try {
+        // На мероприятии заморозку снимает сам матч, иначе лобби откроется через 2.5 с.
+        if (isEventParticipant(player)) {
+          return;
+        }
         if (isPlayerActive(player) && !isCuffed(player)) {
           player.toggleControllable(true);
         }

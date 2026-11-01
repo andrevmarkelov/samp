@@ -10,6 +10,7 @@ import { isBusDriverOnShift } from "../jobs/bus/active";
 import { isAutoschoolExamOnRoute } from "../autoschool/session";
 import { isHospitalMedDeliveryActive } from "../vehicles/hospital";
 import { isArmyAmmoCarrying } from "../vehicles/army-ammo-delivery";
+import { isEventParticipant } from "../events/state";
 import type { GameModule } from "../types";
 
 export const GPS_DIALOG_ID = 7;
@@ -249,6 +250,19 @@ const CATEGORIES: readonly GpsCategory[] = [
       TARGETS.firefighter,
     ],
   },
+  {
+    key: "fun",
+    label: "Развлечения",
+    targets: [
+      {
+        key: "cs",
+        label: "Counter-Strike",
+        x: 416.4834,
+        y: -1430.7191,
+        z: 32.4797,
+      },
+    ],
+  },
 ];
 
 /** Только типы бизнесов, которые реально есть в системе. */
@@ -320,6 +334,11 @@ export const gpsModule: GameModule = {
     });
   },
 };
+
+export function gpsCategoryNumber(key: string): number {
+  const index = CATEGORIES.findIndex((category) => category.key === key);
+  return index < 0 ? 0 : index + 1;
+}
 
 export function showGpsMenu(player: Player): void {
   const id = playerId(player);
@@ -587,7 +606,7 @@ function tickGps(): void {
     }
 
     const target = activeByPlayer.get(id);
-    if (!target || !isPlayerActive(player) || !isAuthenticated(player)) {
+    if (!target || !isPlayerActive(player) || !isAuthenticated(player) || isEventParticipant(player)) {
       return;
     }
 

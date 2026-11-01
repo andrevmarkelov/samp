@@ -127,6 +127,11 @@ const CATEGORIES: readonly HelpCategory[] = [
       "frang",
     ],
   },
+  {
+    key: "events",
+    label: "Мероприятия",
+    commands: ["team", "leave", "spec"],
+  },
 ];
 
 const menuState = new Map<number, string>();

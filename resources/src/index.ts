@@ -40,6 +40,7 @@ import { warehouseModule } from "./modules/warehouse";
 import { familyModule } from "./modules/family";
 import { ghettoModule } from "./modules/ghetto";
 import { anticheatModule } from "./modules/anticheat";
+import { eventsModule } from "./modules/events";
 import type { GameModule } from "./modules/types";
 
 const modules: GameModule[] = [
@@ -75,6 +76,7 @@ const modules: GameModule[] = [
   cuffModule,
   animModule,
   chatModule,
+  eventsModule,
   commandsModule,
   adminModule,
   orgModule,

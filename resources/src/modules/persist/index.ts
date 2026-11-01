@@ -23,6 +23,7 @@ import { isSafeZoneDamage } from "../zones/safe";
 import { isDonateWalletHeld } from "../auth/donate-guard";
 import { isBusinessCashHeld } from "../businesses/cash-hold";
 import { isBankBusy } from "../bank/tellers";
+import { clearEventParticipant, isEventParticipant, runEventDisconnectHook } from "../events/state";
 import type { GameModule } from "../types";
 
 const PLAYER_STATE_ONFOOT = 1;
@@ -54,6 +55,10 @@ function isInWorld(player: Player): boolean {
 }
 
 function readLiveHealth(player: Player, fallback: number): number {
+  if (isEventParticipant(player)) {
+    return fallback;
+  }
+
   try {
     const state = player.getState();
     if (state === PLAYER_STATE_WASTED || state === PLAYER_STATE_SPECTATING) {
@@ -189,7 +194,7 @@ function decayVitals(player: Player): void {
   }
 
   try {
-    if (account.hospitalized) {
+    if (account.hospitalized || isEventParticipant(player)) {
       return;
     }
 
@@ -231,7 +236,7 @@ export const persistModule: GameModule = {
   name: "persist",
   start() {
     omp.on("playerTakeDamage", (player, from, amount) => {
-      if (isSafeZoneDamage(player, from)) {
+      if (isEventParticipant(player) || isSafeZoneDamage(player, from)) {
         return;
       }
       const account = getAccount(player);
@@ -261,7 +266,9 @@ export const persistModule: GameModule = {
       }
       // До queueSave: иначе в БД уйдёт jail_seconds=0 и штраф за выход сгорит.
       applyCuffDisconnectJail(player);
+      runEventDisconnectHook(player);
       queueSave(player);
+      clearEventParticipant(player);
     });
 
     setInterval(() => {
