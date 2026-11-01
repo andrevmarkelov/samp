@@ -9,6 +9,8 @@ import { getMembership } from "../org/membership";
 import { bindPrisonControl, isPrisonYardOpen } from "./control";
 import { bindJailSentence, isJailed, JAIL_INMATE_DENY } from "./sentence";
 import { bindPrisonLocker } from "./prison-locker";
+import { bindKitchen } from "./kitchen";
+import { bindYardBroom } from "./yard-broom";
 import { PRISON_WORLD, PRISON_YARD_WORLD, STREET_WORLD, placeAt, type SpawnPoint } from "../spawn/point";
 import type { GameModule } from "../types";
 
@@ -224,6 +226,8 @@ export const prisonModule: GameModule = {
     bindPrisonLocker();
     bindPrisonControl();
     bindJailSentence();
+    bindYardBroom();
+    bindKitchen();
 
     for (const door of DOORS) {
       new Pickup(

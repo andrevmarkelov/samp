@@ -78,6 +78,25 @@ export function isJailedAccount(account: Account | null | undefined): boolean {
   return (account?.jailSeconds ?? 0) > 0;
 }
 
+/** Снимает секунды срока. При нуле выпускает тем же путём, что и конец срока. */
+export function reduceJailSeconds(player: Player, seconds: number): "reduced" | "released" | "none" {
+  const account = getAccount(player);
+  const cut = Math.floor(seconds);
+  if (!isPlayerActive(player) || !account || account.jailSeconds <= 0 || cut <= 0) {
+    return "none";
+  }
+
+  const next = account.jailSeconds - cut;
+  if (next <= 0) {
+    void releaseFromJail(player);
+    return "released";
+  }
+
+  patchAccount(player, { jailSeconds: next });
+  persistJail(player, true);
+  return "reduced";
+}
+
 export function pickJailCell(): SpawnPoint {
   const first = CELLS[0];
   if (!first) {
