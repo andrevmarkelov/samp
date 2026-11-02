@@ -47,7 +47,6 @@ const RACE_CP_FINISH = 1;
 const TELEPORT_SPEED = 90;
 const TELEPORT_SLACK = 50;
 const MOVE_GRACE_MS = 2_000;
-/** Дальше этого от своей клетки в лобби машину возвращают на старт. */
 const GRID_HOLD_M = 15;
 const PARAM_ON = 1;
 const PARAM_OFF = 0;
