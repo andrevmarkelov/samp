@@ -3,7 +3,7 @@ import { playerId } from "../../shared/player";
 
 const participants = new Set<number>();
 
-let disconnectHook: ((player: Player) => void) | null = null;
+const disconnectHooks: Array<(player: Player) => void> = [];
 
 export function setEventParticipant(player: Player, active: boolean): void {
   const id = playerId(player);
@@ -28,9 +28,17 @@ export function clearEventParticipant(player: Player): void {
 
 /** Вызывается из сохранения персонажа до записи денег, чтобы вернуть взнос. */
 export function setEventDisconnectHook(hook: ((player: Player) => void) | null): void {
-  disconnectHook = hook;
+  if (!hook) {
+    disconnectHooks.length = 0;
+    return;
+  }
+  if (!disconnectHooks.includes(hook)) {
+    disconnectHooks.push(hook);
+  }
 }
 
 export function runEventDisconnectHook(player: Player): void {
-  disconnectHook?.(player);
+  for (const hook of disconnectHooks) {
+    hook(player);
+  }
 }

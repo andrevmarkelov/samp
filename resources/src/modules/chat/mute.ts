@@ -18,7 +18,6 @@ export const MUTED_CHAT_COMMANDS = new Set([
   "gov",
   "f",
   "team",
-  "cs",
   "ad",
   "sms",
   "call",

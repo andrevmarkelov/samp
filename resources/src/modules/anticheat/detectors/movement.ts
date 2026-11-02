@@ -1,5 +1,6 @@
 import type { Player } from "@omp-node/core";
 import { playerId } from "../../../shared/player";
+import { isEventParticipant } from "../../events/state";
 import { AcCode, PLAYER_STATE, SPECIAL_ACTION } from "../codes";
 import { getConfig, isCodeEnabled } from "../config";
 import { dist3, nowMs, speedFromVelocity } from "../math";
@@ -74,6 +75,16 @@ export function checkMovement(player: Player): void {
   const dist = dist3(state.x, state.y, state.z, pos.x, pos.y, pos.z);
   const inVeh =
     pState === PLAYER_STATE.driver || pState === PLAYER_STATE.passenger;
+
+  // Гонка выдаёт нитро x10. Скорость и рывок машины здесь легитимны, телепорт ловит сама гонка.
+  if (inVeh && isEventParticipant(player)) {
+    state.x = pos.x;
+    state.y = pos.y;
+    state.z = pos.z;
+    state.speed = speed;
+    state.lastUpdateAt = now;
+    return;
+  }
 
   // Ожидаемый путь с запасом на лаг (velocity SA → м/с ≈ speed/179).
   const expected = (speed / 179.28625) * dtSec * 2.2 + 2.5;

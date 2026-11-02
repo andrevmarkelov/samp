@@ -27,6 +27,8 @@ import {
   registerScheduledEvent,
 } from "./schedule";
 import { isEventParticipant, setEventDisconnectHook, setEventParticipant } from "./state";
+import { onEventLeave } from "./commands";
+import { runStartCountdown } from "./countdown";
 
 export const CS_REGISTER_DIALOG_ID = 173;
 export const CS_LEAVE_DIALOG_ID = 174;
@@ -47,8 +49,8 @@ const MIN_PLAYERS = 2;
 const MAX_PLAYERS = 20;
 const FEE = 20_000;
 const ROUNDS_TO_WIN = 10;
-const ROUND_FREEZE_MS = 3_000;
 const ROUND_PAUSE_MS = 5_000;
+const EVENT_NOTICE = 0x00ffa4ff;
 /** Ждём соседние смерти, чтобы размен в одном моменте не отдал раунд одной стороне. */
 const ROUND_RESOLVE_MS = 800;
 const MAX_CASH = 2_147_483_647;
@@ -124,6 +126,9 @@ let scoreCt = 0;
 let scoreT = 0;
 let pot = 0;
 let timerToken = 0;
+let stopCountdown: (() => void) | null = null;
+/** До первого сигнала старта взнос ещё возвращается. Между раундами уже нет. */
+let matchStarted = false;
 let bound = false;
 
 const RETURN_POINT: SpawnPoint = {
@@ -145,6 +150,7 @@ export function bindCounterStrike(): void {
   registerScheduledEvent({
     id: "cs",
     name: "Counter-Strike",
+    parity: "even",
     openRegistration,
     closeRegistration,
   });
@@ -205,12 +211,7 @@ export function bindCounterStrike(): void {
   registerCommand("team", "Чат своей команды на мероприятии", (player, args) => {
     sayTeam(player, args);
   });
-  registerCommand("cs", "Чат своей команды на Counter-Strike", (player, args) => {
-    sayTeam(player, args);
-  }, true);
-  registerCommand("leave", "Покинуть мероприятие", (player) => {
-    askLeave(player);
-  });
+  onEventLeave(askLeave);
   registerCommand("spec", "Сменить цель слежки на мероприятии", (player) => {
     cycleSpectate(player);
   });
@@ -221,6 +222,7 @@ function openRegistration(startAt: number): void {
     return;
   }
   phase = "registration";
+  matchStarted = false;
   roundNumber = 0;
   scoreCt = 0;
   scoreT = 0;
@@ -228,8 +230,8 @@ function openRegistration(startAt: number): void {
   const item = entertainmentGpsNumber();
   const gps = item > 0 ? String(item) : "Развлечения";
   announce(
-    Color.white,
-    `Через 10 минут начинаются Counter-Strike. Регистрация на месте {669999}(/gps ${gps})`
+    EVENT_NOTICE,
+    `Через 10 минут начинаются Counter-Strike. Регистрация на месте {73ACAC}(/gps ${gps})`
   );
   void startAt;
 }
@@ -249,7 +251,7 @@ function closeRegistration(startAt: number): void {
 
 function cancelRegistration(): void {
   announce(
-    Color.info,
+    EVENT_NOTICE,
     "Мероприятие Counter-Strike отменено: не набралось игроков. Взнос за регистрацию возвращён."
   );
   for (const id of [...fighters.keys()]) {
@@ -263,6 +265,7 @@ function cancelRegistration(): void {
   }
   pot = 0;
   phase = "idle";
+  matchStarted = false;
   cancelTimers();
 }
 
@@ -327,7 +330,7 @@ function tickCs(): void {
       continue;
     }
     tellOthers(id, `${leftLine(fighter)} покинул игру.`);
-    releaseFighter(player, isJailed(player) ? "jail" : "eject", phase === "registration");
+    releaseFighter(player, isJailed(player) ? "jail" : "eject", feeReturns());
     watchTeams();
     refreshSpectators();
   }
@@ -530,29 +533,44 @@ function beginRound(): void {
     placeFighter(player, fighter, true);
   }
   tellEvent(
-    `Раунд ${roundNumber}. Счёт: спецназ ${scoreCt} — террористы ${scoreT}. Через 3 секунды можно двигаться.`
+    `Раунд ${roundNumber}. Счёт: спецназ ${scoreCt} — террористы ${scoreT}. Старт через 5 секунд.`
   );
-  later(ROUND_FREEZE_MS, () => {
-    if (phase !== "freeze") {
-      return;
+  stopCountdown = runStartCountdown(
+    () => phase === "freeze",
+    () => {
+      const list: Player[] = [];
+      for (const id of fighters.keys()) {
+        const player = omp.players.at(id);
+        if (player && isPlayerActive(player)) {
+          list.push(player);
+        }
+      }
+      return list;
+    },
+    () => {
+      stopCountdown = null;
+      if (phase !== "freeze") {
+        return;
+      }
+      matchStarted = true;
+      phase = "round";
+      for (const [id, fighter] of fighters) {
+        if (fighter.dead) {
+          continue;
+        }
+        const player = omp.players.at(id);
+        if (!player || !isPlayerActive(player) || isCuffed(player)) {
+          continue;
+        }
+        try {
+          player.toggleControllable(true);
+        } catch {
+          // Уже вышел.
+        }
+      }
+      tellEvent("Раунд начался.");
     }
-    phase = "round";
-    for (const [id, fighter] of fighters) {
-      if (fighter.dead) {
-        continue;
-      }
-      const player = omp.players.at(id);
-      if (!player || !isPlayerActive(player) || isCuffed(player)) {
-        continue;
-      }
-      try {
-        player.toggleControllable(true);
-      } catch {
-        // Уже вышел.
-      }
-    }
-    tellEvent("Раунд начался.");
-  });
+  );
 }
 
 function onFightDeath(player: Player): void {
@@ -626,6 +644,7 @@ function finishMatch(winner: TeamId): void {
     return;
   }
   cancelTimers();
+  matchStarted = false;
   const roster = [...fighters.entries()];
   phase = "idle";
   const winnerCount = roster.filter(([id, fighter]) => {
@@ -689,6 +708,7 @@ function finishBecauseEmpty(): void {
   if (fighters.size === 0) {
     pot = 0;
     phase = "idle";
+    matchStarted = false;
     cancelTimers();
     return;
   }
@@ -704,6 +724,7 @@ function finishBecauseEmpty(): void {
   }
   pot = 0;
   phase = "idle";
+  matchStarted = false;
   cancelTimers();
 }
 
@@ -726,13 +747,12 @@ function watchTeams(): void {
   }
 }
 
-function askLeave(player: Player): void {
+function askLeave(player: Player): boolean {
   const fighter = fighterOf(player);
   if (!fighter) {
-    tell(player, Color.error, "Вы не на мероприятии.");
-    return;
+    return false;
   }
-  const refund = phase === "registration" ? "Взнос вернут." : "Взнос не вернут.";
+  const refund = feeReturns() ? "Взнос вернут." : "Взнос не вернут.";
   try {
     Dialog.show(
       player,
@@ -746,6 +766,7 @@ function askLeave(player: Player): void {
   } catch {
     tell(player, Color.error, "Не удалось открыть окно.");
   }
+  return true;
 }
 
 function leaveMatch(player: Player, asked: boolean): void {
@@ -753,7 +774,7 @@ function leaveMatch(player: Player, asked: boolean): void {
   if (!fighter) {
     return;
   }
-  const refund = phase === "registration";
+  const refund = feeReturns();
   tellOthers(idOf(player), `${leftLine(fighter)} покинул игру.`);
   releaseFighter(player, "return", refund);
   if (asked) {
@@ -981,7 +1002,7 @@ function onDisconnect(player: Player): void {
     return;
   }
   fighter.name = playerChatName(player);
-  const refund = phase === "registration" && fighter.feePaid;
+  const refund = feeReturns() && fighter.feePaid;
   if (refund) {
     const account = getAccount(player);
     if (account) {
@@ -999,6 +1020,7 @@ function onDisconnect(player: Player): void {
     if (fighters.size === 0 && phase !== "registration" && phase !== "idle") {
       pot = 0;
       phase = "idle";
+      matchStarted = false;
       cancelTimers();
     }
     return;
@@ -1330,6 +1352,10 @@ function freezeLiving(): void {
   }
 }
 
+function feeReturns(): boolean {
+  return phase === "registration" || (phase !== "idle" && !matchStarted);
+}
+
 function later(ms: number, action: () => void): void {
   const token = ++timerToken;
   setTimeout(() => {
@@ -1342,6 +1368,8 @@ function later(ms: number, action: () => void): void {
 
 function cancelTimers(): void {
   timerToken += 1;
+  stopCountdown?.();
+  stopCountdown = null;
 }
 
 function idOf(player: Player): number | null {

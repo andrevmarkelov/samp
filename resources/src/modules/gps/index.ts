@@ -261,6 +261,13 @@ const CATEGORIES: readonly GpsCategory[] = [
         y: -1430.7191,
         z: 32.4797,
       },
+      {
+        key: "race",
+        label: "Гонки",
+        x: 1444.027,
+        y: -2286.9031,
+        z: 13.5469,
+      },
     ],
   },
 ];
